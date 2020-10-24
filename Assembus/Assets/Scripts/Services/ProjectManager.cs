@@ -1,26 +1,35 @@
 ﻿using System;
 using System.IO;
 using Models;
-using UnityEditor;
 
 namespace Services
 {
     public class ProjectManager
     {
         /// <summary>
-        ///     The current project
+        ///     The singleton
         /// </summary>
-        public ProjectSpace currentProject;
+        private static readonly ProjectManager Instance = new ProjectManager();
 
         /// <summary>
-        ///     Open the file explorer and select a path
+        ///     The current project
         /// </summary>
-        /// <param name="title">The title of the file explorer</param>
-        /// <param name="startingDir">The starting directory</param>
-        /// <returns>The selected path</returns>
-        public static string GetPath(string title, string startingDir)
+        public ProjectSpace CurrentProject;
+
+        /// <summary>
+        ///     Make constructor private
+        /// </summary>
+        private ProjectManager()
         {
-            return EditorUtility.OpenFilePanel(title, startingDir, "");
+        }
+
+        /// <summary>
+        ///     Return the instance of this singleton
+        /// </summary>
+        /// <returns>The instance of the singleton</returns>
+        public static ProjectManager GetInstance()
+        {
+            return Instance;
         }
 
         /// <summary>
@@ -38,28 +47,19 @@ namespace Services
         public (bool, string) CreateProject(string name, string dirPath, string importPath, bool overwrite)
         {
             // Check if the name is empty
-            if (name.Equals(""))
-            {
-                return (false, "Name is empty!");
-            }
-            
+            if (name.Equals("")) return (false, "Name is empty!");
+
             // Check if the import path is valid
-            if (!File.Exists(importPath))
-            {
-                return (false, "The given import path is incorrect!");
-            }
+            if (!File.Exists(importPath)) return (false, "The given import path is incorrect!");
 
             // Create the project path
             var projectPath = Path.Combine(dirPath, name);
-            
+
             // Check if the project directory exists
             if (Directory.Exists(projectPath))
             {
-                if (!overwrite)
-                {
-                    return (false, "Directory already exists!");
-                }
-                currentProject = new ProjectSpace(name);
+                if (!overwrite) return (false, "Directory already exists!");
+                CurrentProject = new ProjectSpace(name);
             }
             else
             {
@@ -67,16 +67,15 @@ namespace Services
                 try
                 {
                     Directory.CreateDirectory(projectPath);
-                    currentProject = new ProjectSpace(name);
+                    CurrentProject = new ProjectSpace(name);
                 }
                 catch (Exception)
                 {
                     return (false, "The target directory could not be created!");
                 }
             }
+
             return (true, "");
         }
-        
-        
     }
 }

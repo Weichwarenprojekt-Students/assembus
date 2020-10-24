@@ -49,8 +49,13 @@ namespace Services
             // Check if the name is empty
             if (name.Equals("")) return (false, "Name is empty!");
 
+            // Check if the directory path is valid
+            if (dirPath.Equals("") || !Path.IsPathRooted(dirPath))
+                return (false, "The given directory path is invalid!");
+
             // Check if the import path is valid
-            if (!File.Exists(importPath)) return (false, "The given import path is incorrect!");
+            if (!File.Exists(importPath) || !Path.IsPathRooted(importPath))
+                return (false, "The given import path is incorrect!");
 
             // Create the project path
             var projectPath = Path.Combine(dirPath, name);

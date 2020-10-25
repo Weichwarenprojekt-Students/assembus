@@ -40,6 +40,32 @@ public class StartScreenController : MonoBehaviour
     }
 
     /// <summary>
+    ///     Check if tab was clicked
+    /// </summary>
+    private void Update()
+    {
+        if (!Input.GetKeyDown(KeyCode.Tab)) return;
+        
+        // Check which input is currently focussed
+        if (nameInput.isFocused)
+        {
+            directoryInput.Select();
+        }
+        else if (directoryInput.isFocused)
+        {
+            importInput.Select();
+        }
+        else if (importInput.isFocused)
+        {
+            nameInput.Select();
+        }
+        else
+        {
+            nameInput.Select();
+        }
+    }
+
+    /// <summary>
     ///     Open the file explorer to get the path selected by the user
     /// </summary>
     public void GetDirectory()

@@ -1,5 +1,5 @@
 ﻿using Services;
-using UnityEditor;
+using SFB;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +20,9 @@ public class StartScreenController : MonoBehaviour
     /// </summary>
     public GameObject errorView;
 
+    /// <summary>
+    ///     The error text
+    /// </summary>
     public Text errorText;
 
     /// <summary>
@@ -41,8 +44,8 @@ public class StartScreenController : MonoBehaviour
     /// </summary>
     public void GetDirectory()
     {
-        var path = EditorUtility.OpenFolderPanel("Directory", "", "");
-        if (!path.Equals("")) directoryInput.SetTextWithoutNotify(path);
+        var paths = StandaloneFileBrowser.OpenFolderPanel("", "", false);
+        if (paths.Length != 0 && !paths[0].Equals("")) directoryInput.SetTextWithoutNotify(paths[0]);
     }
 
     /// <summary>
@@ -50,8 +53,8 @@ public class StartScreenController : MonoBehaviour
     /// </summary>
     public void GetImportPath()
     {
-        var path = EditorUtility.OpenFilePanel("Import Path", "", "");
-        if (!path.Equals("")) importInput.SetTextWithoutNotify(path);
+        var paths = StandaloneFileBrowser.OpenFilePanel("", "", "obj", false);
+        if (paths.Length != 0 && !paths[0].Equals("")) importInput.SetTextWithoutNotify(paths[0]);
     }
 
     /// <summary>

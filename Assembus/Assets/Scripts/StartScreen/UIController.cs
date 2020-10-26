@@ -170,6 +170,21 @@ namespace StartScreen
                 //Get text components of listview item GameObjects
                 var projectText = newListViewItem.transform.Find("Text").GetComponent<Text>();
                 var descriptionText = newListViewItem.transform.Find("Description").GetComponent<Text>();
+                var deleteButton = newListViewItem.transform.Find("Delete").GetComponent<Button>();
+
+                //Add new OnClick listener to remove items from listview and update the XML file
+                deleteButton.onClick.AddListener(() =>
+                {
+                    //Remove existing entry
+                    _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
+                        .Where(conf => conf.projectDirectory != descriptionText.text).ToList();
+
+                    //Remove current listview item
+                    Destroy(newListViewItem);
+
+                    //Write the XML file
+                    _configManager.SaveConfig();
+                });
 
                 projectText.text = _configManager.Config.oldProjectsConfig[i].projectName;
                 descriptionText.text = _configManager.Config.oldProjectsConfig[i].projectDirectory;
@@ -202,11 +217,9 @@ namespace StartScreen
             };
 
             if (overwriteToggle.isOn) //Remove entry of existing project in oldProjects
-            {
                 //Remove existing entry
                 _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
                     .Where(conf => conf.projectDirectory != _manager.CurrentProjectDir).ToList();
-            }
 
             _configManager.Config.oldProjectsConfig.Add(oldConfig);
 

@@ -3,6 +3,7 @@ using Models;
 using Services;
 using SFB;
 using Shared;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,7 @@ namespace StartScreen
         /// <summary>
         ///     The input fields for the project creation
         /// </summary>
-        public InputField nameInput, directoryInput, importInput;
+        public TMP_InputField nameInput, directoryInput, importInput;
 
         /// <summary>
         ///     The toggle for the overwrite function
@@ -28,12 +29,12 @@ namespace StartScreen
         /// <summary>
         ///     The error text
         /// </summary>
-        public Text errorText;
+        public TextMeshProUGUI errorText;
 
         /// <summary>
-        ///     The listview for old projects
+        ///     The listview item for old projects
         /// </summary>
-        public GameObject listViewItemPrefab;
+        public GameObject defaultListViewItem;
 
         /// <summary>
         ///     A prefab instance which is used to create new listview items
@@ -50,7 +51,6 @@ namespace StartScreen
         /// </summary>
         public DialogController dialog;
 
-
         /// <summary>
         ///     ConfigurationManager singleton to save/load config and handle XML serialization
         /// </summary>
@@ -60,7 +60,6 @@ namespace StartScreen
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _manager = ProjectManager.GetInstance();
-
 
         /// <summary>
         ///     Setup the UI
@@ -99,6 +98,7 @@ namespace StartScreen
         {
             var paths = StandaloneFileBrowser.OpenFolderPanel("", "", false);
             if (paths.Length != 0 && !paths[0].Equals("")) directoryInput.SetTextWithoutNotify(paths[0]);
+            directoryInput.caretPosition = directoryInput.text.Length;
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace StartScreen
         /// </summary>
         public void CreateProject()
         {
-            dialog.Show("Create", "Create the project?", () =>
+            dialog.Show("Create Project", "Create the project " + nameInput.text + "?", () =>
             {
                 // Get the input data
                 var projectName = nameInput.text;
@@ -154,44 +154,54 @@ namespace StartScreen
         /// </summary>
         private void LoadWindowConfig()
         {
-            //Apply data to the GUI elements. No need to load XML file first, 
-            //as this has been already done in configManager constructor
+            // Apply data to the GUI elements. No need to load XML file first, 
+            // as this has been already done in configManager constructor
             nameInput.text = _configManager.Config.newProjectConfig.projectName;
             directoryInput.text = _configManager.Config.newProjectConfig.projectDirectory;
             importInput.text = _configManager.Config.newProjectConfig.projectImportPath;
 
 
-            //Apply data to listview. Iterate oldProjects list backwards
+            // Apply data to listview. Iterate oldProjects list backwards
             for (var i = _configManager.Config.oldProjectsConfig.Count - 1; i >= 0; i--)
             {
-                //Create new listview item by instantiating a new prefab
-                var newListViewItem = Instantiate(listViewItemPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+                // Create new listview item by instantiating a new prefab
+                var newListViewItem = Instantiate(
+                    defaultListViewItem,
+                    listView.transform,
+                    true
+                );
 
-                //Get text components of listview item GameObjects
-                var projectText = newListViewItem.transform.Find("Text").GetComponent<Text>();
-                var descriptionText = newListViewItem.transform.Find("Description").GetComponent<Text>();
+                // Get text components of listview item GameObjects
+                var projectText = newListViewItem.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+                var descriptionText = newListViewItem.transform.Find("Description").GetComponent<TextMeshProUGUI>();
                 var deleteButton = newListViewItem.transform.Find("Delete").GetComponent<Button>();
 
-                //Add new OnClick listener to remove items from listview and update the XML file
+                // Add new OnClick listener to remove items from listview and update the XML file
                 deleteButton.onClick.AddListener(() =>
                 {
-                    //Remove existing entry
-                    _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
-                        .Where(conf => conf.projectDirectory != descriptionText.text).ToList();
+                    dialog.Show(
+                        "Delete Project",
+                        "Delete the project " + projectText.text + "?",
+                        () =>
+                        {
+                            // Remove existing entry
+                            _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
+                                .Where(conf => conf.projectDirectory != descriptionText.text).ToList();
 
-                    //Remove current listview item
-                    Destroy(newListViewItem);
+                            // Remove current listview item
+                            Destroy(newListViewItem);
 
-                    //Write the XML file
-                    _configManager.SaveConfig();
+                            // Write the XML file
+                            _configManager.SaveConfig();
+                        });
                 });
 
                 projectText.text = _configManager.Config.oldProjectsConfig[i].projectName;
                 descriptionText.text = _configManager.Config.oldProjectsConfig[i].projectDirectory;
-
-                //Add the new item to the list view
-                newListViewItem.transform.parent = listView.transform;
             }
+
+            // Hide the default item
+            defaultListViewItem.SetActive(false);
         }
 
         /// <summary>
@@ -199,7 +209,7 @@ namespace StartScreen
         /// </summary>
         private void SaveWindowConfig()
         {
-            //Create new config for new project
+            // Create new config for new project
             var newConfig = new ProjectConfig
             {
                 projectName = _manager.CurrentProject.name,
@@ -209,21 +219,21 @@ namespace StartScreen
 
             _configManager.Config.newProjectConfig = newConfig;
 
-            //Add new config to project history/old projects
+            // Add new config to project history/old projects
             var oldConfig = new ProjectConfig
             {
                 projectName = _manager.CurrentProject.name,
                 projectDirectory = _manager.CurrentProjectDir
             };
 
-            if (overwriteToggle.isOn) //Remove entry of existing project in oldProjects
-                //Remove existing entry
+            if (overwriteToggle.isOn)
+                // Remove entry of existing project in oldProjects
                 _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
                     .Where(conf => conf.projectDirectory != _manager.CurrentProjectDir).ToList();
 
             _configManager.Config.oldProjectsConfig.Add(oldConfig);
 
-            //Write the XML file
+            // Write the XML file
             _configManager.SaveConfig();
         }
     }

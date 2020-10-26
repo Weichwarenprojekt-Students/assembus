@@ -1,6 +1,6 @@
 ﻿using System;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Shared
 {
@@ -14,7 +14,7 @@ namespace Shared
         /// <summary>
         ///     The dialog text
         /// </summary>
-        public Text title, description;
+        public TextMeshProUGUI title, description;
 
         /// <summary>
         ///     The current action for the dialog

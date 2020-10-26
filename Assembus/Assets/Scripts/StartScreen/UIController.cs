@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Windows.Forms;
 using Services;
 using SFB;
+using Shared;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,24 +30,19 @@ namespace StartScreen
         public Text errorText;
 
         /// <summary>
-        ///     The dialog panel
+        ///     The two screens
         /// </summary>
-        public GameObject dialog;
+        public GameObject startScreen, mainScreen;
 
         /// <summary>
-        ///     The dialog text
+        ///     The dialog
         /// </summary>
-        public Text title, description;
-
+        public DialogController dialog;
+        
         /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _manager = ProjectManager.GetInstance();
-
-        /// <summary>
-        ///     The current action for the dialog
-        /// </summary>
-        private Action _dialogAction;
 
         /// <summary>
         ///     Check if tab was clicked
@@ -55,24 +50,16 @@ namespace StartScreen
         private void Update()
         {
             if (!Input.GetKeyDown(KeyCode.Tab)) return;
-        
+
             // Check which input is currently focussed
             if (nameInput.isFocused)
-            {
                 directoryInput.Select();
-            }
             else if (directoryInput.isFocused)
-            {
                 importInput.Select();
-            }
             else if (importInput.isFocused)
-            {
                 nameInput.Select();
-            }
             else
-            {
                 nameInput.Select();
-            }
         }
 
         /// <summary>
@@ -98,7 +85,7 @@ namespace StartScreen
         /// </summary>
         public void CreateProject()
         {
-            ShowDialog("Create", "Create the project?", () =>
+            dialog.Show("Create", "Create the project?", () =>
             {
                 // Get the input data
                 var projectName = nameInput.text;
@@ -114,6 +101,10 @@ namespace StartScreen
                 {
                     // Hide the error
                     errorView.SetActive(false);
+                    
+                    // Show the main screen
+                    startScreen.SetActive(false);
+                    mainScreen.SetActive(true);
                 }
                 else
                 {
@@ -122,41 +113,6 @@ namespace StartScreen
                     errorText.text = message;
                 }
             });
-        }
-
-        /// <summary>
-        ///     Show the dialog
-        /// </summary>
-        /// <param name="title">The title of the dialog</param>
-        /// <param name="description">The description of the dialog</param>
-        /// <param name="action">The action that shall be executed on confirm</param>
-        private void ShowDialog(string title, string description, Action action)
-        {
-            // Set the title
-            this.title.text = title;
-            // Set the description
-            this.description.text = description;
-            // Set the action
-            _dialogAction = action;
-            // Show the dialog
-            dialog.SetActive(true);
-        }
-
-        /// <summary>
-        ///     Execute the dialog action
-        /// </summary>
-        public void ConfirmDialog()
-        {
-            _dialogAction();
-            dialog.SetActive(false);
-        }
-
-        /// <summary>
-        ///     Close the dialog
-        /// </summary>
-        public void CancelDialog()
-        {
-            dialog.SetActive(false);
         }
     }
 }

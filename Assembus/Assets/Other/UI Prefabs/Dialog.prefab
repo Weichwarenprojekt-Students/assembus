@@ -323,6 +323,7 @@ GameObject:
   - component: {fileID: 7596204180819697938}
   - component: {fileID: 7596204180819697936}
   - component: {fileID: 7596204180819697937}
+  - component: {fileID: 8267864944282248901}
   m_Layer: 5
   m_Name: Dialog
   m_TagString: Untagged
@@ -387,6 +388,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8267864944282248901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7596204180819697939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1167d0ae1480bdf44b14ae1455d069e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialog: {fileID: 7596204180819697939}
+  title: {fileID: 7596204181116782624}
+  description: {fileID: 7596204180810130199}
 --- !u!1 &7596204180930978191
 GameObject:
   m_ObjectHideFlags: 0
@@ -506,7 +522,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 8267864944282248901}
         m_MethodName: ConfirmDialog
         m_Mode: 1
         m_Arguments:
@@ -789,7 +805,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 8267864944282248901}
         m_MethodName: CancelDialog
         m_Mode: 1
         m_Arguments:

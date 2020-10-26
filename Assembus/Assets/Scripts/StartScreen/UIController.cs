@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Linq;
+using Models;
 using Services;
 using SFB;
 using Shared;
@@ -30,6 +31,16 @@ namespace StartScreen
         public Text errorText;
 
         /// <summary>
+        ///     The listview for old projects
+        /// </summary>
+        public GameObject listViewItemPrefab;
+
+        /// <summary>
+        ///     A prefab instance which is used to create new listview items
+        /// </summary>
+        public GameObject listView;
+
+        /// <summary>
         ///     The two screens
         /// </summary>
         public GameObject startScreen, mainScreen;
@@ -38,11 +49,30 @@ namespace StartScreen
         ///     The dialog
         /// </summary>
         public DialogController dialog;
-        
+
+
+        /// <summary>
+        ///     ConfigurationManager singleton to save/load config and handle XML serialization
+        /// </summary>
+        private readonly ConfigurationManager _configManager = ConfigurationManager.GetInstance();
+
         /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _manager = ProjectManager.GetInstance();
+
+
+        /// <summary>
+        ///     Setup the UI
+        /// </summary>
+        private void Start()
+        {
+            // Hide the error view
+            errorView.SetActive(false);
+
+            //Apply old configuration to GUI window
+            LoadWindowConfig();
+        }
 
         /// <summary>
         ///     Check if tab was clicked
@@ -101,10 +131,13 @@ namespace StartScreen
                 {
                     // Hide the error
                     errorView.SetActive(false);
-                    
+
                     // Show the main screen
                     startScreen.SetActive(false);
                     mainScreen.SetActive(true);
+
+                    //Write window config to XML file before leaving this window
+                    SaveWindowConfig();
                 }
                 else
                 {
@@ -113,6 +146,72 @@ namespace StartScreen
                     errorText.text = message;
                 }
             });
+        }
+
+        /// <summary>
+        ///     Loads the configuration file from disk and applies config to GUI window.
+        ///     This includes changing the listview and the fields for new projects.
+        /// </summary>
+        private void LoadWindowConfig()
+        {
+            //Apply data to the GUI elements. No need to load XML file first, 
+            //as this has been already done in configManager constructor
+            nameInput.text = _configManager.Config.newProjectConfig.projectName;
+            directoryInput.text = _configManager.Config.newProjectConfig.projectDirectory;
+            importInput.text = _configManager.Config.newProjectConfig.projectImportPath;
+
+
+            //Apply data to listview. Iterate oldProjects list backwards
+            for (var i = _configManager.Config.oldProjectsConfig.Count - 1; i >= 0; i--)
+            {
+                //Create new listview item by instantiating a new prefab
+                var newListViewItem = Instantiate(listViewItemPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+
+                //Get text components of listview item GameObjects
+                var projectText = newListViewItem.transform.Find("Text").GetComponent<Text>();
+                var descriptionText = newListViewItem.transform.Find("Description").GetComponent<Text>();
+
+                projectText.text = _configManager.Config.oldProjectsConfig[i].projectName;
+                descriptionText.text = _configManager.Config.oldProjectsConfig[i].projectDirectory;
+
+                //Add the new item to the list view
+                newListViewItem.transform.parent = listView.transform;
+            }
+        }
+
+        /// <summary>
+        ///     Stores the configuration from the GUI window to disk
+        /// </summary>
+        private void SaveWindowConfig()
+        {
+            //Create new config for new project
+            var newConfig = new ProjectConfig
+            {
+                projectName = _manager.CurrentProject.name,
+                projectDirectory = directoryInput.text,
+                projectImportPath = importInput.text
+            };
+
+            _configManager.Config.newProjectConfig = newConfig;
+
+            //Add new config to project history/old projects
+            var oldConfig = new ProjectConfig
+            {
+                projectName = _manager.CurrentProject.name,
+                projectDirectory = _manager.CurrentProjectDir
+            };
+
+            if (overwriteToggle.isOn) //Remove entry of existing project in oldProjects
+            {
+                //Remove existing entry
+                _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
+                    .Where(conf => conf.projectDirectory != _manager.CurrentProjectDir).ToList();
+            }
+
+            _configManager.Config.oldProjectsConfig.Add(oldConfig);
+
+            //Write the XML file
+            _configManager.SaveConfig();
         }
     }
 }

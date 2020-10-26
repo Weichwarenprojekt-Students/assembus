@@ -2,6 +2,7 @@
 # Custom ignores                         #
 ##########################################
 .idea
+assembus.xml
 
 ##########################################
 # GitHub gitignore Unity Template	     #

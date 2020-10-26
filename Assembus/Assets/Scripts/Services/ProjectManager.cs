@@ -17,6 +17,11 @@ namespace Services
         public ProjectSpace CurrentProject;
 
         /// <summary>
+        ///     Current project dir
+        /// </summary>
+        public string CurrentProjectDir;
+
+        /// <summary>
         ///     Make constructor private
         /// </summary>
         private ProjectManager()
@@ -65,6 +70,7 @@ namespace Services
             {
                 if (!overwrite) return (false, "Directory already exists!");
                 CurrentProject = new ProjectSpace(name);
+                CurrentProjectDir = projectPath;
             }
             else
             {
@@ -73,6 +79,7 @@ namespace Services
                 {
                     Directory.CreateDirectory(projectPath);
                     CurrentProject = new ProjectSpace(name);
+                    CurrentProjectDir = projectPath;
                 }
                 catch (Exception)
                 {

@@ -11,19 +11,14 @@ namespace MainScreen
         public Camera mainCamera;
 
         /// <summary>
-        ///     The layout components
+        ///     The sidebar
         /// </summary>
-        public RectTransform toolbar, sidebar;
+        public RectTransform sidebar;
 
         /// <summary>
         ///     The canvas for the main screen
         /// </summary>
         public Canvas mainCanvas;
-
-        /// <summary>
-        ///     The panels
-        /// </summary>
-        public GameObject editPanel, settingsPanel;
         
         /// <summary>
         ///     The two screens
@@ -50,34 +45,14 @@ namespace MainScreen
             
             // Get the actual layout sizes
             var localScale = mainCanvas.transform.localScale;
-            var toolbarHeight = localScale.y * toolbar.rect.height;
             var sidebarWidth = localScale.x * sidebar.rect.width;
             
             // Calculate the bounds
             var x = sidebarWidth / width;
-            var y = toolbarHeight / Screen.height;
             
             // Set the new bounds
-            mainCamera.rect = new Rect(x, 0, 1 - x, 1 - y);
+            mainCamera.rect = new Rect(x, 0, 1 - x, 1);
             _width = width;
-        }
-
-        /// <summary>
-        ///     Show the edit panel
-        /// </summary>
-        public void ShowEditor()
-        {
-            editPanel.SetActive(true);
-            settingsPanel.SetActive(false);
-        }
-        
-        /// <summary>
-        ///     Show the settings panel
-        /// </summary>
-        public void ShowSettings()
-        {
-            editPanel.SetActive(false);
-            settingsPanel.SetActive(true);
         }
 
         /// <summary>

@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6639148136021447822}
   - component: {fileID: 6639148136021447809}
   - component: {fileID: 4164959752614096364}
-  - component: {fileID: 3879087061542212300}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -138,7 +137,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 3879087061542212300}
+        - m_Target: {fileID: 0}
           m_MethodName: SetHand
           m_Mode: 1
           m_Arguments:
@@ -153,7 +152,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 3879087061542212300}
+        - m_Target: {fileID: 0}
           m_MethodName: SetDefault
           m_Mode: 1
           m_Arguments:
@@ -164,19 +163,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &3879087061542212300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6639148136021447811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0dbd2e345ab4bc587d16c9fc47c6c63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cursor: {fileID: 2800000, guid: cd3794f9556066c479fe5f0d934a37b9, type: 3}
 --- !u!1001 &6639148136391611942
 PrefabInstance:
   m_ObjectHideFlags: 0

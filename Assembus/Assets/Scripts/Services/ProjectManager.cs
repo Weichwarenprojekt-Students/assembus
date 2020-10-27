@@ -78,6 +78,13 @@ namespace Services
                 }
             }
 
+            // Load object model into the MainScene
+            var (parent, children) = ObjectLoader.LoadObject(importPath);
+            if (parent == null)
+            {
+                return (false, "Object model could not be initialized.");
+            }
+
             return (true, "");
         }
     }

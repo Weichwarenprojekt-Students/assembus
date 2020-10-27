@@ -30,13 +30,13 @@ namespace Services
         /// <returns>Parent element of the loaded object model hierarchy</returns>
         private static GameObject LoadObjectModel(string objPath)
         {
-            if (!File.Exists(objPath))
+            if (File.Exists(objPath))
             {
-                Debug.LogError("Path to object model invalid.");
-                return null;
+                return new OBJLoader().Load(objPath);
             }
-
-            return new OBJLoader().Load(objPath);
+            
+            Debug.LogError("Path to object model invalid.");
+            return null;
         }
 
         /// <summary>

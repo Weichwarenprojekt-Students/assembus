@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Shared
@@ -15,12 +14,12 @@ namespace Shared
         ///     The offset of the tooltip
         /// </summary>
         public int offsetX, offsetY;
-        
+
         /// <summary>
         ///     The controller for the tooltip
         /// </summary>
         public TooltipController tooltip;
-        
+
         /// <summary>
         ///     Show the tooltip
         /// </summary>
@@ -31,7 +30,7 @@ namespace Shared
             var scale = tooltip.mainCanvas.transform.localScale;
             var x = position.x + offsetX * scale.x;
             var y = position.y + offsetY * scale.y;
-            
+
             Debug.Log(position);
             // Show the tooltip
             tooltip.ShowTooltip(x, y, text);

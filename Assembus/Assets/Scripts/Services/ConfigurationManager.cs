@@ -13,11 +13,6 @@ namespace Services
         private const string FileName = "assembus.xml";
 
         /// <summary>
-        ///     ConfigurationManager singleton
-        /// </summary>
-        private static readonly ConfigurationManager Instance = new ConfigurationManager();
-
-        /// <summary>
         ///     The XML writer/reader instance
         /// </summary>
         private readonly XmlDeSerializer<Configuration> _xmlDeSerializer = new XmlDeSerializer<Configuration>();
@@ -37,13 +32,9 @@ namespace Services
         }
 
         /// <summary>
-        ///     Get singleton
+        ///     ConfigurationManager singleton
         /// </summary>
-        /// <returns></returns>
-        public static ConfigurationManager GetInstance()
-        {
-            return Instance;
-        }
+        public static ConfigurationManager Instance { get; } = new ConfigurationManager();
 
 
         /// <summary>

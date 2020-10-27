@@ -1,13 +1,11 @@
-﻿using System;
-
-namespace Models
+﻿namespace Models
 {
     public class ProjectSpace
     {
         /// <summary>
-        /// The project's name
+        ///     The project's name
         /// </summary>
-        public string name;
+        public string Name;
 
         /// <summary>
         ///     Constructor
@@ -15,7 +13,7 @@ namespace Models
         /// <param name="name">The project's name</param>
         public ProjectSpace(string name)
         {
-            this.name = name;
+            this.Name = name;
         }
     }
 }

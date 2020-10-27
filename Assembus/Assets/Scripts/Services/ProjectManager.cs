@@ -7,11 +7,6 @@ namespace Services
     public class ProjectManager
     {
         /// <summary>
-        ///     The singleton
-        /// </summary>
-        private static readonly ProjectManager Instance = new ProjectManager();
-
-        /// <summary>
         ///     The current project
         /// </summary>
         public ProjectSpace CurrentProject;
@@ -29,13 +24,9 @@ namespace Services
         }
 
         /// <summary>
-        ///     Return the instance of this singleton
+        ///     The singleton
         /// </summary>
-        /// <returns>The instance of the singleton</returns>
-        public static ProjectManager GetInstance()
-        {
-            return Instance;
-        }
+        public static ProjectManager Instance { get; } = new ProjectManager();
 
         /// <summary>
         ///     Try to create a new project

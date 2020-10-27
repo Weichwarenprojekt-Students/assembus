@@ -19,7 +19,7 @@ namespace MainScreen
         ///     The canvas for the main screen
         /// </summary>
         public Canvas mainCanvas;
-        
+
         /// <summary>
         ///     The two screens
         /// </summary>
@@ -29,27 +29,27 @@ namespace MainScreen
         ///     The dialog
         /// </summary>
         public DialogController dialog;
-        
+
         /// <summary>
         ///     The current width of the screen
         /// </summary>
         private int _width;
 
         /// <summary>
-        ///      Check if the screen was resized
+        ///     Check if the screen was resized
         /// </summary>
         private void Update()
         {
             var width = Screen.width;
             if (width == _width) return;
-            
+
             // Get the actual layout sizes
             var localScale = mainCanvas.transform.localScale;
             var sidebarWidth = localScale.x * sidebar.rect.width;
-            
+
             // Calculate the bounds
             var x = sidebarWidth / width;
-            
+
             // Set the new bounds
             mainCamera.rect = new Rect(x, 0, 1 - x, 1);
             _width = width;
@@ -65,7 +65,7 @@ namespace MainScreen
                 // Show the start screen
                 mainScreen.SetActive(false);
                 startScreen.SetActive(true);
-                
+
                 // Reset camera
                 _width = 0;
                 mainCamera.rect = new Rect(0, 0, 1, 1);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Models;
 using Services;
 using SFB;
@@ -54,12 +55,12 @@ namespace StartScreen
         /// <summary>
         ///     ConfigurationManager singleton to save/load config and handle XML serialization
         /// </summary>
-        private readonly ConfigurationManager _configManager = ConfigurationManager.GetInstance();
+        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
 
         /// <summary>
         ///     The project manager
         /// </summary>
-        private readonly ProjectManager _manager = ProjectManager.GetInstance();
+        private readonly ProjectManager _manager = ProjectManager.Instance;
 
         /// <summary>
         ///     Setup the UI
@@ -212,7 +213,7 @@ namespace StartScreen
             // Create new config for new project
             var newConfig = new ProjectConfig
             {
-                projectName = _manager.CurrentProject.name,
+                projectName = _manager.CurrentProject.Name,
                 projectDirectory = directoryInput.text,
                 projectImportPath = importInput.text
             };
@@ -222,7 +223,7 @@ namespace StartScreen
             // Add new config to project history/old projects
             var oldConfig = new ProjectConfig
             {
-                projectName = _manager.CurrentProject.name,
+                projectName = _manager.CurrentProject.Name,
                 projectDirectory = _manager.CurrentProjectDir
             };
 

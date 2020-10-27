@@ -1,11 +1,15 @@
-﻿using System.Windows.Forms;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 namespace Shared
 {
     public class TooltipController : MonoBehaviour
     {
+        /// <summary>
+        ///     The padding of the tooltip
+        /// </summary>
+        private const float Padding = 12;
+
         /// <summary>
         ///     The text of the tooltip
         /// </summary>
@@ -17,11 +21,6 @@ namespace Shared
         public Canvas mainCanvas;
 
         /// <summary>
-        ///     The padding of the tooltip
-        /// </summary>
-        private const float Padding = 12;
-        
-        /// <summary>
         ///     Show the tooltip
         /// </summary>
         /// <param name="x">Position of the tooltip</param>
@@ -31,15 +30,15 @@ namespace Shared
         {
             // Set the text
             textLabel.SetText(text);
-            
+
             // Calculate the size of the tooltip
             var width = textLabel.preferredWidth + 2 * Padding;
-            
+
             // Set the bounds of the rect transform
-            var rectTransform = gameObject.GetComponent<RectTransform>();  
+            var rectTransform = gameObject.GetComponent<RectTransform>();
             rectTransform.position = new Vector2(x, y);
             rectTransform.sizeDelta = new Vector2(width, rectTransform.sizeDelta.y);
-            
+
             // Show the tooltip
             gameObject.SetActive(true);
         }

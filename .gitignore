@@ -2,6 +2,7 @@
 # Custom ignores                         #
 ##########################################
 workspace.xml
+contentModel.xml
 assembus.xml
 
 ##########################################

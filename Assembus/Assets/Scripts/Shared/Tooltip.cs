@@ -31,7 +31,6 @@ namespace Shared
             var x = position.x + offsetX * scale.x;
             var y = position.y + offsetY * scale.y;
 
-            Debug.Log(position);
             // Show the tooltip
             tooltip.ShowTooltip(x, y, text);
         }

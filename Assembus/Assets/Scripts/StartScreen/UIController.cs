@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Models;
 using Services;
 using SFB;
@@ -70,7 +69,7 @@ namespace StartScreen
             // Hide the error view
             errorView.SetActive(false);
 
-            //Apply old configuration to GUI window
+            // Apply old configuration to GUI window
             LoadWindowConfig();
         }
 
@@ -116,37 +115,44 @@ namespace StartScreen
         /// </summary>
         public void CreateProject()
         {
-            dialog.Show("Create Project", "Create the project " + nameInput.text + "?", () =>
-            {
-                // Get the input data
-                var projectName = nameInput.text;
-                var dir = directoryInput.text;
-                var importPath = importInput.text;
-                var overwrite = overwriteToggle.isOn;
-
-                // Try to create the project
-                var (success, message) = _manager.CreateProject(projectName, dir, importPath, overwrite);
-
-                // Check if creation was successful
-                if (success)
+            dialog.Show(
+                "Create Project",
+                "Create the project " + nameInput.text + "?",
+                () =>
                 {
-                    // Hide the error
-                    errorView.SetActive(false);
+                    // Get the input data
+                    var projectName = nameInput.text;
+                    var dir = directoryInput.text;
+                    var importPath = importInput.text;
+                    var overwrite = overwriteToggle.isOn;
 
-                    // Show the main screen
-                    startScreen.SetActive(false);
-                    mainScreen.SetActive(true);
+                    // Try to create the project
+                    var (success, message) = _manager.CreateProject(projectName, dir, importPath, overwrite);
 
-                    //Write window config to XML file before leaving this window
-                    SaveWindowConfig();
+                    // Check if creation was successful
+                    if (success)
+                    {
+                        // Hide the error
+                        errorView.SetActive(false);
+
+                        // Show the main screen
+                        startScreen.SetActive(false);
+                        mainScreen.SetActive(true);
+
+                        // Write window config to XML file before leaving this window
+                        SaveWindowConfig();
+
+                        // Save the new project on disk
+                        _manager.SaveProject(projectName, dir);
+                    }
+                    else
+                    {
+                        // Show the error
+                        errorView.SetActive(true);
+                        errorText.text = message;
+                    }
                 }
-                else
-                {
-                    // Show the error
-                    errorView.SetActive(true);
-                    errorText.text = message;
-                }
-            });
+            );
         }
 
         /// <summary>
@@ -178,24 +184,27 @@ namespace StartScreen
                 var deleteButton = newListViewItem.transform.Find("Delete").GetComponent<Button>();
 
                 // Add new OnClick listener to remove items from listview and update the XML file
-                deleteButton.onClick.AddListener(() =>
-                {
-                    dialog.Show(
-                        "Delete Project",
-                        "Delete the project " + projectText.text + "?",
-                        () =>
-                        {
-                            // Remove existing entry
-                            _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
-                                .Where(conf => conf.projectDirectory != descriptionText.text).ToList();
+                deleteButton.onClick.AddListener(
+                    () =>
+                    {
+                        dialog.Show(
+                            "Delete Project",
+                            "Delete the project " + projectText.text + "?",
+                            () =>
+                            {
+                                // Remove existing entry
+                                _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
+                                    .Where(conf => conf.projectDirectory != descriptionText.text).ToList();
 
-                            // Remove current listview item
-                            Destroy(newListViewItem);
+                                // Remove current listview item
+                                Destroy(newListViewItem);
 
-                            // Write the XML file
-                            _configManager.SaveConfig();
-                        });
-                });
+                                // Write the XML file
+                                _configManager.SaveConfig();
+                            }
+                        );
+                    }
+                );
 
                 projectText.text = _configManager.Config.oldProjectsConfig[i].projectName;
                 descriptionText.text = _configManager.Config.oldProjectsConfig[i].projectDirectory;

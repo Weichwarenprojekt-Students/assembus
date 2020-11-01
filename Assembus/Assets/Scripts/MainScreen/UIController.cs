@@ -54,9 +54,35 @@ namespace MainScreen
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
 
         /// <summary>
+        ///     True if application shall be closed
+        /// </summary>
+        private bool _close;
+
+        /// <summary>
         ///     The current width of the screen
         /// </summary>
         private int _width;
+
+        /// <summary>
+        ///     Add event for window closing
+        /// </summary>
+        private void Start()
+        {
+            Application.wantsToQuit += () =>
+            {
+                if (_projectManager.Saved || _close) return true;
+                dialog.Show(
+                    "Close Assembus",
+                    "Unsaved changes! Are you sure?",
+                    () =>
+                    {
+                        _close = true;
+                        Application.Quit();
+                    }
+                );
+                return false;
+            };
+        }
 
         /// <summary>
         ///     Check if the screen was resized
@@ -118,6 +144,7 @@ namespace MainScreen
                     // Remove the last opened project 
                     _configManager.Config.lastProject = "";
                     _configManager.SaveConfig();
+                    _projectManager.Saved = true;
 
                     // Reset camera
                     _width = 0;

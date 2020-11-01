@@ -1,5 +1,6 @@
 ﻿using Services;
 using Shared;
+using Shared.Toast;
 using UnityEngine;
 
 namespace MainScreen
@@ -27,14 +28,24 @@ namespace MainScreen
         public GameObject startScreen, mainScreen;
 
         /// <summary>
-        ///     The dialog
+        ///     The dialog controller
         /// </summary>
         public DialogController dialog;
+
+        /// <summary>
+        ///     The toast controller
+        /// </summary>
+        public ToastController toast;
 
         /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
+
+        /// <summary>
+        ///     The project manager
+        /// </summary>
+        private readonly ProjectManager _projectManager = ProjectManager.Instance;
 
         /// <summary>
         ///     The current width of the screen
@@ -59,6 +70,21 @@ namespace MainScreen
             // Set the new bounds
             mainCamera.rect = new Rect(x, 0, 1 - x, 1);
             _width = width;
+        }
+
+        /// <summary>
+        ///     Save the current project
+        /// </summary>
+        public void SaveProject()
+        {
+            var (success, message) = _projectManager.SaveProject();
+            if (!success)
+            {
+                toast.Error(Toast.Short, message);
+                return;
+            }
+
+            toast.Success(Toast.Short, "Project was saved successfully!");
         }
 
         /// <summary>

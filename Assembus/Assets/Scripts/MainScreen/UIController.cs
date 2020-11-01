@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using Services;
+using Shared;
 using UnityEngine;
 
 namespace MainScreen
@@ -31,6 +32,11 @@ namespace MainScreen
         public DialogController dialog;
 
         /// <summary>
+        ///     The configuration manager
+        /// </summary>
+        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
+
+        /// <summary>
         ///     The current width of the screen
         /// </summary>
         private int _width;
@@ -60,16 +66,24 @@ namespace MainScreen
         /// </summary>
         public void CloseProject()
         {
-            dialog.Show("Close Project", "Are you sure?", () =>
-            {
-                // Show the start screen
-                mainScreen.SetActive(false);
-                startScreen.SetActive(true);
+            dialog.Show(
+                "Close Project",
+                "Are you sure?",
+                () =>
+                {
+                    // Remove the last opened project 
+                    _configManager.Config.lastProject = "";
+                    _configManager.SaveConfig();
 
-                // Reset camera
-                _width = 0;
-                mainCamera.rect = new Rect(0, 0, 1, 1);
-            });
+                    // Reset camera
+                    _width = 0;
+                    mainCamera.rect = new Rect(0, 0, 1, 1);
+
+                    // Show the start screen
+                    mainScreen.SetActive(false);
+                    startScreen.SetActive(true);
+                }
+            );
         }
     }
 }

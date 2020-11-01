@@ -28,6 +28,11 @@ namespace Services
         private readonly XmlDeSerializer<ProjectSpace> _xmlDeSerializer = new XmlDeSerializer<ProjectSpace>();
 
         /// <summary>
+        ///     The configuration manager
+        /// </summary>
+        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
+
+        /// <summary>
         ///     The current project
         /// </summary>
         public ProjectSpace CurrentProject;
@@ -68,11 +73,12 @@ namespace Services
 
             // Check if the directory path is valid
             if (dirPath.Equals("") || !Path.IsPathRooted(dirPath))
-                return (false, "The given directory path is invalid!");
+                return (false, "The given directory \n path is invalid!");
 
             // Check if the import path is valid
             if (!File.Exists(importPath) || !Path.IsPathRooted(importPath))
-                return (false, "The given import path is incorrect!");
+                return (false, "The given import \n path is incorrect!");
+            var objectFile = Path.GetFileName(importPath);
 
             // Create the project path
             var projectPath = Path.Combine(dirPath, name);
@@ -82,14 +88,18 @@ namespace Services
             {
                 if (!overwrite) return (false, "Directory already exists!");
 
-                // Import the OBJ model and convert it to GameObject with default hierarchy
-                var importModel = LoadGameObjectsFromObj(importPath);
+                // Import the OBJ model
+                var (success, message, importModel) = LoadGameObjectsFromObj(importPath);
+                if (!success) return (false, message);
 
                 // Create a new ProjectSpace
-                CurrentProject = new ProjectSpace(name, importModel);
+                CurrentProject = new ProjectSpace(name, objectFile, importModel);
                 CurrentProjectDir = projectPath;
 
-                return (true, "Project successfully created");
+                // Save the new open project in the config
+                _configManager.Config.lastProject = projectPath;
+
+                return CreateProjectFiles(projectPath, importPath);
             }
 
             // Otherwise try to create the directories
@@ -97,25 +107,53 @@ namespace Services
             {
                 Directory.CreateDirectory(projectPath);
 
-                // Import the OBJ model and convert it to GameObject with default hierarchy
-                var importModel = LoadGameObjectsFromObj(importPath);
+                // Import the OBJ model
+                var (success, message, importModel) = LoadGameObjectsFromObj(importPath);
+                if (!success) return (false, message);
 
                 // Create a new ProjectSpace
-                CurrentProject = new ProjectSpace(name, importModel);
+                CurrentProject = new ProjectSpace(name, objectFile, importModel);
                 CurrentProjectDir = projectPath;
 
-                return (true, "Project successfully created");
+                // Save the new open project in the config
+                _configManager.Config.lastProject = projectPath;
+
+                return CreateProjectFiles(projectPath, importPath);
             }
             catch (Exception)
             {
-                return (false, "The target directory or project could not be created!");
+                return (false, "The target project \n could not be created!");
             }
+        }
+
+        /// <summary>
+        ///     Create the necessary files for the project and copy
+        ///     the import object.
+        /// </summary>
+        /// <param name="projectPath">The path to the project</param>
+        /// <param name="importPath">The path to the import object</param>
+        /// <returns></returns>
+        private (bool, string) CreateProjectFiles(string projectPath, string importPath)
+        {
+            // Copy the file
+            try
+            {
+                var file = Path.GetFileName(importPath);
+                File.Copy(importPath, Path.Combine(projectPath, file), true);
+            }
+            catch (Exception)
+            {
+                return (false, "The model couldn't \n be imported!");
+            }
+
+            // Try to save the project
+            return SaveProject();
         }
 
         /// <summary>
         ///     Save all project data from the local ProjectSpace instance to disk
         /// </summary>
-        public bool SaveProject(string name, string dirPath)
+        public (bool, string) SaveProject()
         {
             try
             {
@@ -128,66 +166,80 @@ namespace Services
                     CurrentProject.ObjectModel
                 );
 
-                return true;
+                return (true, "");
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Debug.Log("Couldn't write the project files: " + e.Message);
-                return false;
+                return (false, "The project couldn't \n be saved!");
             }
         }
 
         /// <summary>
         ///     Load all project data into the local ProjectSpace instance
         /// </summary>
-        public (bool, string) LoadProject(string name, string dirPath, string importPath)
+        public (bool, string) LoadProject(string projectPath)
         {
-            // Check if the name is empty
-            if (name.Equals("")) return (false, "Name is empty!");
-
             // Check if the directory path is valid
-            if (dirPath.Equals("") || !Path.IsPathRooted(dirPath))
+            if (projectPath.Equals("") || !Path.IsPathRooted(projectPath))
                 return (false, "The given directory path is invalid!");
 
-            // Check if the import path is valid
-            if (!File.Exists(importPath) || !Path.IsPathRooted(importPath))
-                return (false, "The given import path is incorrect!");
+            // Check if the project config file exists
+            var projectConfigFile = Path.Combine(projectPath, ProjectConfigFile);
+            if (!File.Exists(projectConfigFile)) return (false, "Project doesn't contain \n a config file!");
 
-            //    Initialize the project dir when loading the project
-            CurrentProjectDir = Path.Combine(dirPath, name);
+            // Check if the project model file exists
+            var projectModelFile = Path.Combine(projectPath, ProjectModelFile);
+            if (!File.Exists(projectConfigFile)) return (false, "Project doesn't contain \n a model file!");
 
             try
             {
                 // Load the project configuration from XML (excluding 3D model)
-                CurrentProject = _xmlDeSerializer.DeserializeData(Path.Combine(CurrentProjectDir, ProjectConfigFile));
+                CurrentProject = _xmlDeSerializer.DeserializeData(projectConfigFile);
+
+                // Check if the project model file exists
+                var importPath = Path.Combine(projectPath, CurrentProject.ObjectFile);
+                if (!File.Exists(projectConfigFile)) return (false, "Project doesn't contain \n an object file!");
 
                 // Load the OBJ model
-                CurrentProject.ObjectModel = LoadGameObjectsFromObj(importPath);
+                var (success, message, objModel) = LoadGameObjectsFromObj(importPath);
+                if (!success) return (false, message);
+                CurrentProject.ObjectModel = objModel;
 
                 // Load the 3D model hierarchy
                 CurrentProject.ObjectModel = _gameObjectDeSerializer.DeserializeGameObject(
-                    Path.Combine(CurrentProjectDir, ProjectModelFile),
+                    projectModelFile,
                     CurrentProject.ObjectModel
                 );
 
+                // Save the new open project in the config
+                CurrentProjectDir = projectPath;
+                _configManager.Config.lastProject = projectPath;
+
                 return (true, "");
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Debug.Log("Couldn't load the project configuration files: " + e.Message);
-                return (false, "Couldn't load the project configuration files: ");
+                return (false, "The project couldn't \n be loaded!");
             }
         }
 
         /// <summary>
         ///     Imports the GameObject instances from the provided OBJ file
         /// </summary>
-        /// <returns></returns>
-        public GameObject LoadGameObjectsFromObj(string importPath)
+        /// <param name="importPath">The import path</param>
+        /// <returns>The game object, a success flag and a message in case of an error</returns>
+        private (bool, string, GameObject) LoadGameObjectsFromObj(string importPath)
         {
-            GameObject importObject;
-            (importObject, _) = ObjectLoader.LoadObject(importPath);
-            return importObject;
+            try
+            {
+                GameObject importObject;
+                (importObject, _) = ObjectLoader.LoadObject(importPath);
+                return (true, "", importObject);
+            }
+            catch (Exception)
+            {
+                return (false, "Object could not \n be imported!", null);
+            }
         }
     }
 }

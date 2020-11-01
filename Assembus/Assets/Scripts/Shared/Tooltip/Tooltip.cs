@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Shared
+namespace Shared.Tooltip
 {
     public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

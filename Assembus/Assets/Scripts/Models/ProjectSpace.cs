@@ -14,6 +14,11 @@ namespace Models
         public string Name;
 
         /// <summary>
+        ///     The name of the object file
+        /// </summary>
+        public string ObjectFile;
+
+        /// <summary>
         ///     The actual GameObject which stores the imported OBJ file with the
         ///     correct hierarchy which is loaded from the XMl config file.
         ///     This model will be serialized to a separate file
@@ -24,10 +29,12 @@ namespace Models
         ///     Constructor
         /// </summary>
         /// <param name="name">The project's name</param>
+        /// <param name="objectFile">The name of the project's object file</param>
         /// <param name="importModel">The imported GameObject with default hierarchy</param>
-        public ProjectSpace(string name, GameObject importModel)
+        public ProjectSpace(string name, string objectFile, GameObject importModel)
         {
             Name = name;
+            ObjectFile = objectFile;
             ObjectModel = importModel;
         }
 

@@ -38,6 +38,11 @@ namespace Services
         public ProjectSpace CurrentProject;
 
         /// <summary>
+        ///     True if the current project is saved
+        /// </summary>
+        public bool Saved = false;
+
+        /// <summary>
         ///     Current project dir
         /// </summary>
         public string CurrentProjectDir;

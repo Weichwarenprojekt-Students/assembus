@@ -1,6 +1,7 @@
 ﻿using Services;
 using Shared;
 using Shared.Toast;
+using TMPro;
 using UnityEngine;
 
 namespace MainScreen
@@ -38,6 +39,11 @@ namespace MainScreen
         public ToastController toast;
 
         /// <summary>
+        ///     The title view
+        /// </summary>
+        public TextMeshProUGUI title;
+
+        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
@@ -73,6 +79,14 @@ namespace MainScreen
         }
 
         /// <summary>
+        ///     Set the name of the current project
+        /// </summary>
+        private void OnEnable()
+        {
+            title.text = _projectManager.CurrentProject.Name + "*";
+        }
+
+        /// <summary>
         ///     Save the current project
         /// </summary>
         public void SaveProject()
@@ -84,6 +98,9 @@ namespace MainScreen
                 return;
             }
 
+            // Show that the saving was successful
+            _projectManager.Saved = true;
+            title.text = _projectManager.CurrentProject.Name;
             toast.Success(Toast.Short, "Project was saved successfully!");
         }
 
@@ -92,9 +109,10 @@ namespace MainScreen
         /// </summary>
         public void CloseProject()
         {
+            var description = _projectManager.Saved ? "Are you sure?" : "Unsaved changes! Are you sure?";
             dialog.Show(
                 "Close Project",
-                "Are you sure?",
+                description,
                 () =>
                 {
                     // Remove the last opened project 

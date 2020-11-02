@@ -51,7 +51,7 @@ namespace Services
 
         /// <summary>
         ///     Loads GameObject configuration/hierarchy from XMl file and applies changes to passed instance.
-        ///     Please make a deep-copy of the passed GameObject if you need a untouched instance.
+        ///     Please make a deep-copy of the passed GameObject if you need an untouched instance.
         /// </summary>
         /// <param name="filePath">The path where the GameObject config is stored as a XML file</param>
         /// <param name="inputData">The actual GameObject instance which should be returned modified</param>

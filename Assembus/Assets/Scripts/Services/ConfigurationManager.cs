@@ -40,7 +40,6 @@ namespace Services
         ///     Loads ConfigFileStruct FileStruct from XML file.
         ///     If reading fails, return false and write to debug log
         /// </summary>
-        /// <returns>Returns true if loading was successful</returns>
         private void LoadConfig()
         {
             if (!File.Exists(FileName)) Debug.Log("No XML config file existing!");
@@ -60,7 +59,6 @@ namespace Services
         ///     Writes ConfigFileStruct FileStruct to XML file.
         ///     If writing fails, return false and write to debug log
         /// </summary>
-        /// <returns>Returns true if saving was successful</returns>
         public void SaveConfig()
         {
             try

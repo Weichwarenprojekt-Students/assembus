@@ -137,7 +137,9 @@ namespace Services
         /// </summary>
         /// <param name="projectPath">The path to the project</param>
         /// <param name="importPath">The path to the import object</param>
-        /// <returns></returns>
+        /// <returns>
+        ///     A success flag and a message in case of an error.
+        /// </returns>
         private (bool, string) CreateProjectFiles(string projectPath, string importPath)
         {
             // Copy the file
@@ -158,6 +160,9 @@ namespace Services
         /// <summary>
         ///     Save all project data from the local ProjectSpace instance to disk
         /// </summary>
+        /// <returns>
+        ///     A success flag and a message in case of an error.
+        /// </returns>
         public (bool, string) SaveProject()
         {
             try
@@ -182,6 +187,9 @@ namespace Services
         /// <summary>
         ///     Load all project data into the local ProjectSpace instance
         /// </summary>
+        /// <returns>
+        ///     A success flag and a message in case of an error.
+        /// </returns>
         public (bool, string) LoadProject(string projectPath)
         {
             // Check if the directory path is valid

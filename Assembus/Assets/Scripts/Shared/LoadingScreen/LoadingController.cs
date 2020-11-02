@@ -35,10 +35,16 @@ namespace Shared.LoadingScreen
         /// <param name="delay">Delay to be inserted on positive result</param>
         public void ShowLoadingScreen(Func<(bool, string)> action, Action<(bool, string)> reaction, int delay = 0)
         {
+            // Show the object and reset the rotation
             logoObject.SetActive(true);
+            logo.transform.rotation = Quaternion.Euler(0, 0, 0);
+
+            // Start the animations
             leftPanel.SetBool(Open, true);
             rightPanel.SetBool(Open, true);
             logo.SetBool(Open, true);
+
+            // Start the coroutine
             StartCoroutine(ShowLoadingScreen(delay, action, reaction));
         }
 

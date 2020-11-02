@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Models;
 using UnityEngine;
 
@@ -34,8 +35,7 @@ namespace Services
             foreach (var originalChild in allOriginalChildren)
             {
                 // Generate a new description
-                var newComponent = new ModelComponent();
-                newComponent.gameObjectName = originalChild.name;
+                var newComponent = new ModelComponent {gameObjectName = originalChild.name};
 
                 // Write the string 'null' if there is no parent GameObject
                 var parent = originalChild.transform.parent;
@@ -81,11 +81,7 @@ namespace Services
                 var originalObject = GetChildByName(allOriginalChildren, hierarchyItem.gameObjectName);
 
                 // Object not existing in original GameObject list --> New/own grouping
-                if (originalObject == null)
-                {
-                    originalObject = new GameObject();
-                    originalObject.name = hierarchyItem.gameObjectName;
-                }
+                if (originalObject == null) originalObject = new GameObject {name = hierarchyItem.gameObjectName};
 
                 // Check if we loaded the root object or a child object
                 if (hierarchyItem.parentGameObjectName != "null")
@@ -115,14 +111,13 @@ namespace Services
         /// </summary>
         /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
         /// <param name="outputData">Contains all child GameObjects of provided input GameObject</param>
-        private static void GetAllGameObjects(GameObject inputObject, List<GameObject> outputData)
+        private static void GetAllGameObjects(GameObject inputObject, ICollection<GameObject> outputData)
         {
             // Add new child to the GameObject list
             outputData.Add(inputObject);
 
             // Recursively traverse to children
-            foreach (Transform child in inputObject.transform)
-                GetAllGameObjects(child.gameObject, outputData);
+            foreach (Transform child in inputObject.transform) GetAllGameObjects(child.gameObject, outputData);
         }
 
         /// <summary>
@@ -131,18 +126,9 @@ namespace Services
         /// <param name="gameObjects">The GameObject instance list where the search should take place</param>
         /// <param name="name">The name of the requested GameObject instance</param>
         /// <returns></returns>
-        private static GameObject GetChildByName(List<GameObject> gameObjects, string name)
+        private static GameObject GetChildByName(IEnumerable<GameObject> gameObjects, string name)
         {
-            GameObject returnObj = null;
-
-            foreach (var go in gameObjects)
-                if (go.name == name)
-                {
-                    returnObj = go;
-                    break;
-                }
-
-            return returnObj;
+            return gameObjects.FirstOrDefault(gameObject => gameObject.name == name);
         }
     }
 }

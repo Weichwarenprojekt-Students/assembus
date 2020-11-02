@@ -44,6 +44,16 @@ namespace MainScreen
         public TextMeshProUGUI title;
 
         /// <summary>
+        ///     The hierarchy view
+        /// </summary>
+        public GameObject hierarchyView;
+
+        /// <summary>
+        ///     A default hierarchy view item
+        /// </summary>
+        public GameObject defaultHierarchyViewItem;
+
+        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
@@ -57,6 +67,11 @@ namespace MainScreen
         ///     True if application shall be closed
         /// </summary>
         private bool _close;
+
+        /// <summary>
+        ///     True if hierarchy view needs to be updated
+        /// </summary>
+        private bool _updateHierarchyView;
 
         /// <summary>
         ///     The current width of the screen
@@ -111,6 +126,49 @@ namespace MainScreen
         {
             _projectManager.Saved = false;
             title.text = _projectManager.CurrentProject.Name + "*";
+
+            LoadModelIntoHierarchyView();
+        }
+
+        /// <summary>
+        ///     Load the object model into the hierarchy view
+        /// </summary>
+        private void LoadModelIntoHierarchyView()
+        {
+            defaultHierarchyViewItem.SetActive(true);
+
+            // Get the root element of the object model
+            var parent = _projectManager.CurrentProject.ObjectModel;
+
+            // Execute the recursive loading of game objects
+            LoadElementWithChildren(hierarchyView, parent);
+
+            defaultHierarchyViewItem.SetActive(false);
+        }
+
+        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 16)
+        {
+            for (var i = 0; i < parent.transform.childCount; i++)
+            {
+                // for every child element
+                var child = parent.transform.GetChild(i).gameObject;
+
+                // generate a new hierarchy item in the hierarchy view
+                var newHierarchyItem = Instantiate(
+                    defaultHierarchyViewItem,
+                    containingListView.transform,
+                    true
+                );
+
+                // get the script of the new item
+                var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
+
+                // initialize the item
+                itemController.Initialize(child.name, depth, hierarchyView);
+
+                // fill the new item recursively with children
+                LoadElementWithChildren(itemController.ChildrenContainer, child, depth + 16);
+            }
         }
 
         /// <summary>
@@ -150,7 +208,7 @@ namespace MainScreen
                     // Reset camera
                     _width = 0;
                     mainCamera.rect = new Rect(0, 0, 1, 1);
-                    
+
                     // Remove GameObject of current project
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 

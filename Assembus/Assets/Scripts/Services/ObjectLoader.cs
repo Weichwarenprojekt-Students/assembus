@@ -30,11 +30,8 @@ namespace Services
         /// <returns>Parent element of the loaded object model hierarchy</returns>
         private static GameObject LoadObjectModel(string objPath)
         {
-            if (File.Exists(objPath))
-            {
-                return new OBJLoader().Load(objPath);
-            }
-            
+            if (File.Exists(objPath)) return new OBJLoader().Load(objPath);
+
             Debug.LogError("Path to object model invalid.");
             return null;
         }
@@ -52,12 +49,6 @@ namespace Services
                 var child = parent.transform.GetChild(i).gameObject;
 
                 child.AddComponent<MeshCollider>();
-
-                // Apply shader to material
-                var childMaterial = child.GetComponent<Renderer>().material;
-                childMaterial.shader = Shader.Find("Universal Render Pipeline/Lit");
-                childMaterial.color = Color.grey;
-
                 children.Add(child);
             }
 

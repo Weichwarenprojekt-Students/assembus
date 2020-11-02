@@ -3,6 +3,7 @@ using Models.Configuration;
 using Services;
 using SFB;
 using Shared;
+using Shared.LoadingScreen;
 using Shared.Toast;
 using TMPro;
 using UnityEngine;
@@ -46,6 +47,11 @@ namespace StartScreen
         ///     The toast controller
         /// </summary>
         public ToastController toast;
+
+        /// <summary>
+        ///     The loading screen controller
+        /// </summary>
+        public LoadingController loadingScreen;
 
         /// <summary>
         ///     ConfigurationManager singleton to save/load config and handle XML serialization
@@ -113,19 +119,41 @@ namespace StartScreen
             // Check the path
             var paths = StandaloneFileBrowser.OpenFolderPanel("", "", false);
             if (paths.Length == 0 || paths[0].Equals("")) return;
+            dialog.Show(
+                "Open Project",
+                "Open the project?",
+                () =>
+                {
+                    // Show the loading screen
+                    loadingScreen.ShowLoadingScreen(
+                        () => _projectManager.LoadProject(paths[0]),
+                        result =>
+                        {
+                            // Check if the object was loaded
+                            var (success, message) = result;
+                            if (!success)
+                            {
+                                toast.Error(Toast.Short, message);
+                                return;
+                            }
 
-            // Try to load the new project
-            var (success, message) = _projectManager.LoadProject(paths[0]);
-            if (!success)
-            {
-                toast.Error(Toast.Short, message);
-                return;
-            }
+                            // Load the OBJ model
+                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+                            if (!loadSuccess)
+                            {
+                                toast.Error(Toast.Short, loadMessage);
+                                return;
+                            }
 
-            // Show the new project
-            startScreen.SetActive(false);
-            mainScreen.SetActive(true);
-            SaveWindowConfig();
+                            // Show the new project
+                            startScreen.SetActive(false);
+                            mainScreen.SetActive(true);
+                            SaveWindowConfig();
+                        },
+                        2000
+                    );
+                }
+            );
         }
 
         /// <summary>
@@ -145,23 +173,36 @@ namespace StartScreen
                     var overwrite = overwriteToggle.isOn;
 
                     // Try to create the project
-                    var (success, message) = _projectManager.CreateProject(projectName, dir, importPath, overwrite);
+                    loadingScreen.ShowLoadingScreen(
+                        () => _projectManager.CreateProject(projectName, dir, importPath, overwrite),
+                        result =>
+                        {
+                            // Check if creation was successful
+                            var (success, message) = result;
+                            if (!success)
+                            {
+                                // Show the error
+                                toast.Error(Toast.Short, message);
+                                return;
+                            }
 
-                    // Check if creation was successful
-                    if (success)
-                    {
-                        // Show the main screen
-                        startScreen.SetActive(false);
-                        mainScreen.SetActive(true);
+                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(true);
+                            if (!loadSuccess)
+                            {
+                                // Show the error
+                                toast.Error(Toast.Short, loadMessage);
+                                return;
+                            }
 
-                        // Write window config to XML file before leaving this window
-                        SaveWindowConfig();
-                    }
-                    else
-                    {
-                        // Show the error
-                        toast.Error(Toast.Short, message);
-                    }
+                            // Show the main screen
+                            startScreen.SetActive(false);
+                            mainScreen.SetActive(true);
+
+                            // Write window config to XML file before leaving this window
+                            SaveWindowConfig();
+                        },
+                        3000
+                    );
                 }
             );
         }
@@ -232,18 +273,34 @@ namespace StartScreen
                 "Open the project " + project + "?",
                 () =>
                 {
-                    // Try to load the project
-                    var (success, message) = _projectManager.LoadProject(projectPath);
-                    if (!success)
-                    {
-                        toast.Error(Toast.Short, message);
-                        return;
-                    }
+                    // Show the loading screen
+                    loadingScreen.ShowLoadingScreen(
+                        () => _projectManager.LoadProject(projectPath),
+                        result =>
+                        {
+                            // Check if the object was loaded
+                            var (success, message) = result;
+                            if (!success)
+                            {
+                                toast.Error(Toast.Short, message);
+                                return;
+                            }
 
-                    // Show the new project
-                    startScreen.SetActive(false);
-                    mainScreen.SetActive(true);
-                    SaveWindowConfig();
+                            // Load the OBJ model
+                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+                            if (!loadSuccess)
+                            {
+                                toast.Error(Toast.Short, loadMessage);
+                                return;
+                            }
+
+                            // Show the new project
+                            startScreen.SetActive(false);
+                            mainScreen.SetActive(true);
+                            SaveWindowConfig();
+                        },
+                        2000
+                    );
                 }
             );
         }
@@ -318,6 +375,14 @@ namespace StartScreen
             // Try to load the project
             var (success, _) = _projectManager.LoadProject(lastProject);
             if (!success) return;
+
+            // Load the OBJ model
+            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+            if (!loadSuccess)
+            {
+                toast.Error(Toast.Short, loadMessage);
+                return;
+            }
 
             // Show the main screen
             startScreen.SetActive(false);

@@ -1,9 +1,10 @@
-﻿using System;
-using System.Linq;
-using Models;
+﻿using System.Linq;
+using Models.Configuration;
 using Services;
 using SFB;
 using Shared;
+using Shared.LoadingScreen;
+using Shared.Toast;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,16 +24,6 @@ namespace StartScreen
         public Toggle overwriteToggle;
 
         /// <summary>
-        ///     The error view
-        /// </summary>
-        public GameObject errorView;
-
-        /// <summary>
-        ///     The error text
-        /// </summary>
-        public TextMeshProUGUI errorText;
-
-        /// <summary>
         ///     The listview item for old projects
         /// </summary>
         public GameObject defaultListViewItem;
@@ -48,9 +39,19 @@ namespace StartScreen
         public GameObject startScreen, mainScreen;
 
         /// <summary>
-        ///     The dialog
+        ///     The dialog controller
         /// </summary>
         public DialogController dialog;
+
+        /// <summary>
+        ///     The toast controller
+        /// </summary>
+        public ToastController toast;
+
+        /// <summary>
+        ///     The loading screen controller
+        /// </summary>
+        public LoadingController loadingScreen;
 
         /// <summary>
         ///     ConfigurationManager singleton to save/load config and handle XML serialization
@@ -60,19 +61,7 @@ namespace StartScreen
         /// <summary>
         ///     The project manager
         /// </summary>
-        private readonly ProjectManager _manager = ProjectManager.Instance;
-
-        /// <summary>
-        ///     Setup the UI
-        /// </summary>
-        private void Start()
-        {
-            // Hide the error view
-            errorView.SetActive(false);
-
-            //Apply old configuration to GUI window
-            LoadWindowConfig();
-        }
+        private readonly ProjectManager _projectManager = ProjectManager.Instance;
 
         /// <summary>
         ///     Check if tab was clicked
@@ -90,6 +79,17 @@ namespace StartScreen
                 nameInput.Select();
             else
                 nameInput.Select();
+        }
+
+        /// <summary>
+        ///     Setup the UI
+        /// </summary>
+        private void OnEnable()
+        {
+            // Apply old configuration to GUI window
+            LoadWindowConfig();
+            // Check if there was a project open
+            ReopenLastProject();
         }
 
         /// <summary>
@@ -112,41 +112,99 @@ namespace StartScreen
         }
 
         /// <summary>
+        ///     Import a project
+        /// </summary>
+        public void ImportProject()
+        {
+            // Check the path
+            var paths = StandaloneFileBrowser.OpenFolderPanel("", "", false);
+            if (paths.Length == 0 || paths[0].Equals("")) return;
+            dialog.Show(
+                "Open Project",
+                "Open the project?",
+                () =>
+                {
+                    // Show the loading screen
+                    loadingScreen.ShowLoadingScreen(
+                        () => _projectManager.LoadProject(paths[0]),
+                        result =>
+                        {
+                            // Check if the object was loaded
+                            var (success, message) = result;
+                            if (!success)
+                            {
+                                toast.Error(Toast.Short, message);
+                                return;
+                            }
+
+                            // Load the OBJ model
+                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+                            if (!loadSuccess)
+                            {
+                                toast.Error(Toast.Short, loadMessage);
+                                return;
+                            }
+
+                            // Show the new project
+                            startScreen.SetActive(false);
+                            mainScreen.SetActive(true);
+                            SaveWindowConfig();
+                        },
+                        2000
+                    );
+                }
+            );
+        }
+
+        /// <summary>
         ///     Create a project
         /// </summary>
         public void CreateProject()
         {
-            dialog.Show("Create Project", "Create the project " + nameInput.text + "?", () =>
-            {
-                // Get the input data
-                var projectName = nameInput.text;
-                var dir = directoryInput.text;
-                var importPath = importInput.text;
-                var overwrite = overwriteToggle.isOn;
-
-                // Try to create the project
-                var (success, message) = _manager.CreateProject(projectName, dir, importPath, overwrite);
-
-                // Check if creation was successful
-                if (success)
+            dialog.Show(
+                "Create Project",
+                "Create the project " + nameInput.text + "?",
+                () =>
                 {
-                    // Hide the error
-                    errorView.SetActive(false);
+                    // Get the input data
+                    var projectName = nameInput.text;
+                    var dir = directoryInput.text;
+                    var importPath = importInput.text;
+                    var overwrite = overwriteToggle.isOn;
 
-                    // Show the main screen
-                    startScreen.SetActive(false);
-                    mainScreen.SetActive(true);
+                    // Try to create the project
+                    loadingScreen.ShowLoadingScreen(
+                        () => _projectManager.CreateProject(projectName, dir, importPath, overwrite),
+                        result =>
+                        {
+                            // Check if creation was successful
+                            var (success, message) = result;
+                            if (!success)
+                            {
+                                // Show the error
+                                toast.Error(Toast.Short, message);
+                                return;
+                            }
 
-                    //Write window config to XML file before leaving this window
-                    SaveWindowConfig();
+                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(true);
+                            if (!loadSuccess)
+                            {
+                                // Show the error
+                                toast.Error(Toast.Short, loadMessage);
+                                return;
+                            }
+
+                            // Show the main screen
+                            startScreen.SetActive(false);
+                            mainScreen.SetActive(true);
+
+                            // Write window config to XML file before leaving this window
+                            SaveWindowConfig();
+                        },
+                        3000
+                    );
                 }
-                else
-                {
-                    // Show the error
-                    errorView.SetActive(true);
-                    errorText.text = message;
-                }
-            });
+            );
         }
 
         /// <summary>
@@ -161,6 +219,11 @@ namespace StartScreen
             directoryInput.text = _configManager.Config.newProjectConfig.projectDirectory;
             importInput.text = _configManager.Config.newProjectConfig.projectImportPath;
 
+            // Remove old items
+            for (var i = 1; i < listView.transform.childCount; i++) Destroy(listView.transform.GetChild(i).gameObject);
+
+            // Show the default item
+            defaultListViewItem.SetActive(true);
 
             // Apply data to listview. Iterate oldProjects list backwards
             for (var i = _configManager.Config.oldProjectsConfig.Count - 1; i >= 0; i--)
@@ -177,32 +240,95 @@ namespace StartScreen
                 var descriptionText = newListViewItem.transform.Find("Description").GetComponent<TextMeshProUGUI>();
                 var deleteButton = newListViewItem.transform.Find("Delete").GetComponent<Button>();
 
+                // Set the values
+                var projectName = _configManager.Config.oldProjectsConfig[i].projectName;
+                var projectPath = _configManager.Config.oldProjectsConfig[i].projectDirectory;
+                projectText.text = projectName;
+                descriptionText.text = projectPath;
+
+                // Set the on click for the list item
+                newListViewItem.GetComponent<Button>().onClick.AddListener(
+                    () => { OpenProject(projectName, projectPath); }
+                );
+
                 // Add new OnClick listener to remove items from listview and update the XML file
-                deleteButton.onClick.AddListener(() =>
-                {
-                    dialog.Show(
-                        "Delete Project",
-                        "Delete the project " + projectText.text + "?",
-                        () =>
-                        {
-                            // Remove existing entry
-                            _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
-                                .Where(conf => conf.projectDirectory != descriptionText.text).ToList();
-
-                            // Remove current listview item
-                            Destroy(newListViewItem);
-
-                            // Write the XML file
-                            _configManager.SaveConfig();
-                        });
-                });
-
-                projectText.text = _configManager.Config.oldProjectsConfig[i].projectName;
-                descriptionText.text = _configManager.Config.oldProjectsConfig[i].projectDirectory;
+                deleteButton.onClick.AddListener(
+                    () => { DeleteItem(projectName, projectPath, newListViewItem); }
+                );
             }
 
             // Hide the default item
             defaultListViewItem.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Open a project
+        /// </summary>
+        /// <param name="project">The name of the project</param>
+        /// <param name="projectPath">The path to the project's directory</param>
+        private void OpenProject(string project, string projectPath)
+        {
+            dialog.Show(
+                "Open Project",
+                "Open the project " + project + "?",
+                () =>
+                {
+                    // Show the loading screen
+                    loadingScreen.ShowLoadingScreen(
+                        () => _projectManager.LoadProject(projectPath),
+                        result =>
+                        {
+                            // Check if the object was loaded
+                            var (success, message) = result;
+                            if (!success)
+                            {
+                                toast.Error(Toast.Short, message);
+                                return;
+                            }
+
+                            // Load the OBJ model
+                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+                            if (!loadSuccess)
+                            {
+                                toast.Error(Toast.Short, loadMessage);
+                                return;
+                            }
+
+                            // Show the new project
+                            startScreen.SetActive(false);
+                            mainScreen.SetActive(true);
+                            SaveWindowConfig();
+                        },
+                        2000
+                    );
+                }
+            );
+        }
+
+        /// <summary>
+        ///     Delete an item on click
+        /// </summary>
+        /// <param name="project">The project name</param>
+        /// <param name="description">The project's description (the directory path)</param>
+        /// <param name="item">The game object to be deleted</param>
+        private void DeleteItem(string project, string description, Object item)
+        {
+            dialog.Show(
+                "Delete Project",
+                "Delete the project " + project + "?",
+                () =>
+                {
+                    // Remove existing entry
+                    _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
+                        .Where(conf => conf.projectDirectory != description).ToList();
+
+                    // Remove current listview item
+                    Destroy(item);
+
+                    // Write the XML file
+                    _configManager.SaveConfig();
+                }
+            );
         }
 
         /// <summary>
@@ -213,7 +339,7 @@ namespace StartScreen
             // Create new config for new project
             var newConfig = new ProjectConfig
             {
-                projectName = _manager.CurrentProject.Name,
+                projectName = _projectManager.CurrentProject.Name,
                 projectDirectory = directoryInput.text,
                 projectImportPath = importInput.text
             };
@@ -223,19 +349,44 @@ namespace StartScreen
             // Add new config to project history/old projects
             var oldConfig = new ProjectConfig
             {
-                projectName = _manager.CurrentProject.Name,
-                projectDirectory = _manager.CurrentProjectDir
+                projectName = _projectManager.CurrentProject.Name,
+                projectDirectory = _projectManager.CurrentProjectDir
             };
 
-            if (overwriteToggle.isOn)
-                // Remove entry of existing project in oldProjects
-                _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
-                    .Where(conf => conf.projectDirectory != _manager.CurrentProjectDir).ToList();
+            // Remove entry of existing project in oldProjects
+            _configManager.Config.oldProjectsConfig = _configManager.Config.oldProjectsConfig
+                .Where(conf => conf.projectDirectory != _projectManager.CurrentProjectDir).ToList();
 
             _configManager.Config.oldProjectsConfig.Add(oldConfig);
 
             // Write the XML file
             _configManager.SaveConfig();
+        }
+
+        /// <summary>
+        ///     Check if there was a last project
+        /// </summary>
+        private void ReopenLastProject()
+        {
+            // If there's no path given 
+            var lastProject = _configManager.Config.lastProject;
+            if (lastProject.Equals("")) return;
+
+            // Try to load the project
+            var (success, _) = _projectManager.LoadProject(lastProject);
+            if (!success) return;
+
+            // Load the OBJ model
+            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+            if (!loadSuccess)
+            {
+                toast.Error(Toast.Short, loadMessage);
+                return;
+            }
+
+            // Show the main screen
+            startScreen.SetActive(false);
+            mainScreen.SetActive(true);
         }
     }
 }

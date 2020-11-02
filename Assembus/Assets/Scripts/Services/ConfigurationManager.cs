@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Models;
+using Models.Configuration;
 using UnityEngine;
 
 namespace Services
@@ -36,19 +36,17 @@ namespace Services
         /// </summary>
         public static ConfigurationManager Instance { get; } = new ConfigurationManager();
 
-
         /// <summary>
         ///     Loads ConfigFileStruct FileStruct from XML file.
         ///     If reading fails, return false and write to debug log
         /// </summary>
-        /// <returns>Returns true if loading was successful</returns>
         private void LoadConfig()
         {
             if (!File.Exists(FileName)) Debug.Log("No XML config file existing!");
 
             try
             {
-                //Read object from XML
+                // Read object from XML
                 Config = _xmlDeSerializer.DeserializeData(FileName);
             }
             catch (Exception e)
@@ -61,19 +59,16 @@ namespace Services
         ///     Writes ConfigFileStruct FileStruct to XML file.
         ///     If writing fails, return false and write to debug log
         /// </summary>
-        /// <returns>Returns true if saving was successful</returns>
-        public bool SaveConfig()
+        public void SaveConfig()
         {
             try
             {
-                //Write object to XML
+                // Write object to XML
                 _xmlDeSerializer.SerializeData(FileName, Config);
-                return true;
             }
             catch (Exception e)
             {
                 Debug.Log("Couldn't write XML file!: " + e.Message);
-                return false;
             }
         }
     }

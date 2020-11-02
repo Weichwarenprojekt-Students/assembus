@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace Shared
+namespace Shared.Tooltip
 {
     public class TooltipController : MonoBehaviour
     {

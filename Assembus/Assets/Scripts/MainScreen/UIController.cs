@@ -149,6 +149,9 @@ namespace MainScreen
                     // Reset camera
                     _width = 0;
                     mainCamera.rect = new Rect(0, 0, 1, 1);
+                    
+                    // Remove GameObject of current project
+                    Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen
                     mainScreen.SetActive(false);

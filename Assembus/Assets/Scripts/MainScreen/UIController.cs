@@ -109,6 +109,7 @@ namespace MainScreen
         /// </summary>
         private void OnEnable()
         {
+            _projectManager.Saved = false;
             title.text = _projectManager.CurrentProject.Name + "*";
         }
 

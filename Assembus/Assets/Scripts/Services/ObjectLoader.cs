@@ -52,12 +52,6 @@ namespace Services
                 var child = parent.transform.GetChild(i).gameObject;
 
                 child.AddComponent<MeshCollider>();
-
-                // Apply shader to material
-                var childMaterial = child.GetComponent<Renderer>().material;
-                childMaterial.shader = Shader.Find("Universal Render Pipeline/Lit");
-                childMaterial.color = Color.grey;
-
                 children.Add(child);
             }
 

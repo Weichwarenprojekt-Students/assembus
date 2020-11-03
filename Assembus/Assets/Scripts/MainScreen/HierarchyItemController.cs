@@ -10,6 +10,26 @@ namespace MainScreen
     public class HierarchyItemController : MonoBehaviour
     {
         /// <summary>
+        ///     The text view in which the name is shown
+        /// </summary>
+        public TextMeshProUGUI nameText;
+
+        /// <summary>
+        ///     The rect transform of the name
+        /// </summary>
+        public RectTransform nameRect;
+
+        /// <summary>
+        ///     The expand button
+        /// </summary>
+        public GameObject expandButton, expandDown, expandRight;
+
+        /// <summary>
+        ///     The container of the item which contains all children
+        /// </summary>
+        public GameObject childrenContainer;
+
+        /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
         /// </summary>
         private bool _isExpanded = true;
@@ -20,51 +40,25 @@ namespace MainScreen
         private string _name;
 
         /// <summary>
+        ///     The root element of the hierarchy view
+        /// </summary>
+        private RectTransform _rectTransform;
+
+        /// <summary>
         ///     True if the hierarchy view needs to be updated
         /// </summary>
         private bool _updateHierarchy;
 
         /// <summary>
-        ///     The Element part of the hierarchy item
-        /// </summary>
-        private Transform Element => gameObject.transform.Find("Background").Find("Element");
-
-        /// <summary>
-        ///     The container of the item which contains all children
-        /// </summary>
-        public GameObject ChildrenContainer => gameObject.transform.Find("Content").gameObject;
-
-        /// <summary>
-        ///     The root element of the hierarchy view
-        /// </summary>
-        private GameObject MainHierarchyView { get; set; }
-
-        /// <summary>
         ///     True if the item has children
         /// </summary>
-        private bool HasChildren => ChildrenContainer.transform.childCount > 0;
+        private bool HasChildren => childrenContainer.transform.childCount > 0;
 
         /// <summary>
-        ///     Setup the item the first time the script gets executed
+        ///     Update the expand button to display the correct icon
         /// </summary>
         private void Start()
         {
-            // Add a click listener to the expand button
-            Element.Find("Expand").GetComponent<Button>().onClick.AddListener(
-                () =>
-                {
-                    if (!HasChildren) return;
-
-                    ChildrenContainer.SetActive(!_isExpanded);
-
-                    _isExpanded = !_isExpanded;
-                    _updateHierarchy = true;
-
-                    UpdateButton();
-                }
-            );
-
-            // Update the expand button to display the correct icon
             UpdateButton();
         }
 
@@ -75,7 +69,19 @@ namespace MainScreen
         {
             // force update of the hierarchy view if the item expansion changed
             if (_updateHierarchy)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(MainHierarchyView.GetComponent<RectTransform>());
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
+        }
+
+        /// <summary>
+        ///     Expand the item's content
+        /// </summary>
+        public void ExpandItem()
+        {
+            if (!HasChildren) return;
+            childrenContainer.SetActive(!_isExpanded);
+            _isExpanded = !_isExpanded;
+            _updateHierarchy = true;
+            UpdateButton();
         }
 
         /// <summary>
@@ -83,28 +89,13 @@ namespace MainScreen
         /// </summary>
         private void UpdateButton()
         {
-            if (HasChildren)
-            {
-                // enable the expand button
-                Element.Find("Expand").gameObject.SetActive(true);
-                if (_isExpanded)
-                {
-                    // show the down arrow
-                    Element.Find("Expand").Find("ExpandDown").gameObject.SetActive(true);
-                    Element.Find("Expand").Find("ExpandRight").gameObject.SetActive(false);
-                }
-                else
-                {
-                    // show the right arrow
-                    Element.Find("Expand").Find("ExpandDown").gameObject.SetActive(false);
-                    Element.Find("Expand").Find("ExpandRight").gameObject.SetActive(true);
-                }
-            }
-            else
-            {
-                // disable the expand button
-                Element.Find("Expand").gameObject.SetActive(false);
-            }
+            // Enable/Disable the button
+            expandButton.SetActive(HasChildren);
+            if (!HasChildren) return;
+
+            // Update the logos if necessary
+            expandDown.SetActive(_isExpanded);
+            expandRight.SetActive(!_isExpanded);
         }
 
         /// <summary>
@@ -116,13 +107,14 @@ namespace MainScreen
         public void Initialize(string itemName, int indentionDepth, GameObject mainHierarchyView)
         {
             // set the name of the item
-            Element.Find("Name").GetComponent<TextMeshProUGUI>().text = itemName;
+            nameText.text = itemName;
 
             // indent the item
-            Element.GetComponent<RectTransform>().position += new Vector3(indentionDepth, 0);
+            nameRect.offsetMin += new Vector2(indentionDepth, 0);
+            expandButton.GetComponent<RectTransform>().anchoredPosition += new Vector2(indentionDepth, 0);
 
             // set the root hierarchy view
-            MainHierarchyView = mainHierarchyView;
+            _rectTransform = mainHierarchyView.GetComponent<RectTransform>();
         }
     }
 }

@@ -146,7 +146,7 @@ namespace MainScreen
             defaultHierarchyViewItem.SetActive(false);
         }
 
-        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 16)
+        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 0)
         {
             for (var i = 0; i < parent.transform.childCount; i++)
             {
@@ -167,7 +167,7 @@ namespace MainScreen
                 itemController.Initialize(child.name, depth, hierarchyView);
 
                 // fill the new item recursively with children
-                LoadElementWithChildren(itemController.ChildrenContainer, child, depth + 16);
+                LoadElementWithChildren(itemController.childrenContainer, child, depth + 16);
             }
         }
 

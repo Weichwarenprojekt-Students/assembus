@@ -14,12 +14,12 @@ namespace MainScreen
         /// <summary>
         ///     Rotation speed of the camera
         /// </summary>
-        private readonly float rotationSpeed = 200f;
+        private const float RotationSpeed = 200f;
 
         /// <summary>
-        ///     Scroll/Zoom speed of the camera
+        ///     The factor between scroll speed and distance of the camera
         /// </summary>
-        private readonly float scrollSpeed = 20f;
+        private const float ScrollFactor = 0.05f;
 
         /// <summary>
         ///     Reference to the main camera
@@ -30,6 +30,11 @@ namespace MainScreen
         ///     Distance from the camera to the object
         /// </summary>
         private float _cameraDistance = 200f;
+
+        /// <summary>
+        ///     The transform object of the camera
+        /// </summary>
+        private Transform _camTransform;
 
         /// <summary>
         ///     Point the camera rotates around
@@ -57,21 +62,9 @@ namespace MainScreen
         private Vector3 _prevPosition;
 
         /// <summary>
-        ///     Private reference to singleton
+        ///     Scroll/Zoom speed of the camera
         /// </summary>
-        public static CameraController Instance { get; private set; }
-
-        /// <summary>
-        ///     Called when script object is initialized
-        /// </summary>
-        private void Awake()
-        {
-            if (Instance != null && Instance != this)
-                Destroy(gameObject);
-            else
-                Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+        private float _scrollSpeed = 20f;
 
         /// <summary>
         ///     Called on the frame when script is enabled
@@ -79,6 +72,7 @@ namespace MainScreen
         private void Start()
         {
             _cam = Camera.main;
+            if (!(_cam is null)) _camTransform = _cam.transform;
             _centerPoint = new Vector3(0, 0, 0);
 
             // this is needed! without this the camera "snaps" to another location on first right click
@@ -112,9 +106,31 @@ namespace MainScreen
         }
 
         /// <summary>
+        ///     Zoom camera on the given object
+        /// </summary>
+        /// <param name="parent">The object that shall be shown</param>
+        public void ZoomOnObject(GameObject parent)
+        {
+            // Calculate the bounds of the game object
+            var bounds = new Bounds(parent.transform.position, Vector3.zero);
+            foreach (var r in parent.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
+            var objectSizes = bounds.max - bounds.min;
+
+            // Calculate the camera distance
+            var objectSize = Mathf.Max(objectSizes.x, objectSizes.y, objectSizes.z);
+            _cameraDistance = 0.5f * (objectSize / Mathf.Tan(0.5f * Mathf.Deg2Rad * _cam.fieldOfView) + objectSize);
+            _camTransform.position = bounds.center - _cameraDistance * _camTransform.forward;
+
+            // Set the focus to the middle
+            SetFocus(bounds.center);
+
+            // Recalculate the scroll speed
+            _scrollSpeed = ScrollFactor * _cameraDistance;
+        }
+
+        /// <summary>
         ///     Coroutine, detect double clicking
         /// </summary>
-        /// <returns>IEnumerator to pause action</returns>
         private IEnumerator DoubleClickDetection()
         {
             _coroutineAllowed = false;
@@ -161,8 +177,8 @@ namespace MainScreen
 
             _cam.transform.position = _centerPoint;
 
-            _cam.transform.Rotate(Vector3.right, direction.y * rotationSpeed);
-            _cam.transform.Rotate(Vector3.up, -direction.x * rotationSpeed, Space.World);
+            _cam.transform.Rotate(Vector3.right, direction.y * RotationSpeed);
+            _cam.transform.Rotate(Vector3.up, -direction.x * RotationSpeed, Space.World);
             _cam.transform.Translate(new Vector3(0, 0, -_cameraDistance));
 
             _prevPosition = _cam.ScreenToViewportPoint(Input.mousePosition);
@@ -182,7 +198,8 @@ namespace MainScreen
         private void Zoom(float delta)
         {
             // calculate camera distance
-            _cameraDistance -= delta * scrollSpeed;
+            _cameraDistance -= delta * _scrollSpeed;
+            if (_cameraDistance < 0) _cameraDistance = 0;
 
             // apply camera distance
             StoreLastMousePosition();
@@ -190,30 +207,12 @@ namespace MainScreen
         }
 
         /// <summary>
-        ///     Sets focus on given transform
-        /// </summary>
-        /// <param name="t">Transform to center on</param>
-        public void SetFocus(Transform t)
-        {
-            _centerPoint = t.position;
-        }
-
-        /// <summary>
         ///     Sets focus on given Vector3
         /// </summary>
         /// <param name="position">Vector3 to center on</param>
-        public void SetFocus(Vector3 position)
+        private void SetFocus(Vector3 position)
         {
             _centerPoint = position;
-        }
-
-        /// <summary>
-        ///     Sets focus on given gameobject
-        /// </summary>
-        /// <param name="g">Gameobject to center on</param>
-        public void SetFocus(GameObject g)
-        {
-            _centerPoint = g.transform.position;
         }
     }
 }

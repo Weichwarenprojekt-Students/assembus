@@ -49,6 +49,7 @@ namespace Services
                 var child = parent.transform.GetChild(i).gameObject;
 
                 child.AddComponent<MeshCollider>();
+
                 children.Add(child);
             }
 

@@ -15,6 +15,11 @@ namespace MainScreen
         public Camera mainCamera;
 
         /// <summary>
+        ///     The camera controller
+        /// </summary>
+        public CameraController cameraController;
+
+        /// <summary>
         ///     The sidebar
         /// </summary>
         public RectTransform sidebar;
@@ -107,6 +112,9 @@ namespace MainScreen
         {
             var width = Screen.width;
             if (width == _width) return;
+
+            // Reposition the camera
+            cameraController.ZoomOnObject(_projectManager.CurrentProject.ObjectModel);
 
             // Get the actual layout sizes
             var localScale = mainCanvas.transform.localScale;

@@ -9,7 +9,7 @@ namespace MainScreen
     public class CameraController : MonoBehaviour
     {
 
-        public static CameraController instance;
+        public static CameraController Instance;
 
         /// <summary>
         ///     Reference to the main camera
@@ -43,10 +43,10 @@ namespace MainScreen
 
         private void Awake()
         {
-            if (instance == null)
+            if (Instance == null)
             {
-                instance = this;
-            } else if (instance != this)
+                Instance = this;
+            } else if (Instance != this)
             {
                 Destroy(gameObject);
             }
@@ -83,9 +83,9 @@ namespace MainScreen
             {
                 Zoom(Input.mouseScrollDelta.y);
             }
-
+            
         }
-
+        
         /// <summary>
         ///     Calculates the new camera position based on the mouse position
         /// </summary>

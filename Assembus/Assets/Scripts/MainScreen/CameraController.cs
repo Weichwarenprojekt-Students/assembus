@@ -14,10 +14,15 @@ namespace MainScreen
         /// </summary>
         private static CameraController _instance;
         
+        /// <summary>
+        ///     Public reference to singleton
+        /// </summary>
         public static CameraController Instance
         {
             get { return _instance; }
         }
+        
+        private const float MINZoom = 10f;
 
         /// <summary>
         ///     Reference to the main camera
@@ -125,6 +130,10 @@ namespace MainScreen
         {
             // calculate camera distance
             _cameraDistance -= delta * scrollSpeed;
+            if (_cameraDistance < MINZoom)
+            {
+                _cameraDistance = MINZoom;
+            }
             
             // apply camera distance
             StoreLastMousePosition(); 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace MainScreen
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
     {
+
+        public static CameraController instance;
 
         /// <summary>
         ///     Reference to the main camera
@@ -36,13 +39,24 @@ namespace MainScreen
         /// <summary>
         ///     Distance from the camera to the object
         /// </summary>
-        private float _cameraDistance;
-        
+        private float _cameraDistance = 200f;
+
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+            } else if (instance != this)
+            {
+                Destroy(gameObject);
+            }
+            DontDestroyOnLoad(gameObject);
+        }
+
         void Start()
         {
             _cam = Camera.main;
             _centerPoint = new Vector3(0,0,0);
-            _cameraDistance = transform.position.x;
             
             // this is needed! without this the camera "snaps" to another location on first right click
             StoreLastMousePosition();
@@ -69,7 +83,7 @@ namespace MainScreen
             {
                 Zoom(Input.mouseScrollDelta.y);
             }
-            
+
         }
 
         /// <summary>
@@ -96,6 +110,9 @@ namespace MainScreen
             _prevPosition = _cam.ScreenToViewportPoint((Input.mousePosition));
         }
 
+        /// <summary>
+        ///     Calculates camera distance
+        /// </summary>
         private void Zoom(float delta)
         {
             // calculate camera distance
@@ -105,7 +122,30 @@ namespace MainScreen
             StoreLastMousePosition(); 
             CalculateNewCameraTransform();
         }
+
+        /// <summary>
+        ///     Sets focus on given transform
+        /// </summary>
+        public void SetFocus(Transform t)
+        {
+            _centerPoint = t.position;
+        }
+
+        /// <summary>
+        ///     Sets focus on given Vector3
+        /// </summary>
+        public void SetFocus(Vector3 position)
+        {
+            _centerPoint = position;
+        }
         
+        /// <summary>
+        ///     Sets focus on given gameobject
+        /// </summary>
+        public void SetFocus(GameObject g)
+        {
+            _centerPoint = g.transform.position;
+        }
         
     }
 }

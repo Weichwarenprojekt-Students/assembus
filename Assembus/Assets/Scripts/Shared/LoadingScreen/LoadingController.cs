@@ -15,7 +15,7 @@ namespace Shared.LoadingScreen
         /// <summary>
         ///     The logo object
         /// </summary>
-        public GameObject logoObject;
+        public GameObject logoObject, leftPanelObject, rightPanelObject;
 
         /// <summary>
         ///     The animators
@@ -36,6 +36,8 @@ namespace Shared.LoadingScreen
         public void ShowLoadingScreen(Func<(bool, string)> action, Action<(bool, string)> reaction, int delay = 0)
         {
             // Show the object and reset the rotation
+            leftPanelObject.SetActive(true);
+            rightPanelObject.SetActive(true);
             logoObject.SetActive(true);
             logo.transform.rotation = Quaternion.Euler(0, 0, 0);
 
@@ -71,18 +73,21 @@ namespace Shared.LoadingScreen
 
             // Hide the screen and process the result
             reaction(_result);
-            HideLoadingScreen();
+            yield return HideLoadingScreen();
         }
 
         /// <summary>
         ///     Hide the loading screen
         /// </summary>
-        private void HideLoadingScreen()
+        private IEnumerator HideLoadingScreen()
         {
             leftPanel.SetBool(Open, false);
             rightPanel.SetBool(Open, false);
             logo.SetBool(Open, false);
             logoObject.SetActive(false);
+            yield return new WaitForSeconds(1);
+            leftPanelObject.SetActive(false);
+            rightPanelObject.SetActive(false);
         }
     }
 }

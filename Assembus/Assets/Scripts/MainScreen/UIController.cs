@@ -3,6 +3,7 @@ using Shared;
 using Shared.Toast;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MainScreen
 {
@@ -120,6 +121,15 @@ namespace MainScreen
         }
 
         /// <summary>
+        ///     Late update of the UI
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (_updateHierarchyView)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView.GetComponent<RectTransform>());
+        }
+
+        /// <summary>
         ///     Set the name of the current project
         /// </summary>
         private void OnEnable()
@@ -145,6 +155,9 @@ namespace MainScreen
 
             // Execute the recursive loading of game objects
             LoadElementWithChildren(hierarchyView, parent);
+
+            // Force hierarchy view update
+            _updateHierarchyView = true;
 
             defaultHierarchyViewItem.SetActive(false);
         }

@@ -140,12 +140,35 @@ namespace MainScreen
             // Get the root element of the object model
             var parent = _projectManager.CurrentProject.ObjectModel;
 
+            // Remove the old children
+            RemoveElementWithChildren(hierarchyView.transform, true);
+
             // Execute the recursive loading of game objects
             LoadElementWithChildren(hierarchyView, parent);
 
             defaultHierarchyViewItem.SetActive(false);
         }
 
+        /// <summary>
+        ///     Remove all previous list view items
+        /// </summary>
+        /// <param name="parent">The parent of the children that shall be removed</param>
+        /// <param name="first">True if it is the first (to make sure that the default item isn't deleted)</param>
+        private static void RemoveElementWithChildren(Transform parent, bool first)
+        {
+            for (var i = first ? 1 : 0; i < parent.childCount; i++)
+            {
+                RemoveElementWithChildren(parent.GetChild(i).transform, false);
+                Destroy(parent.GetChild(i).gameObject);
+            }
+        }
+
+        /// <summary>
+        ///     Load all elements of the game object and add them to the list
+        /// </summary>
+        /// <param name="containingListView">The container of the list view</param>
+        /// <param name="parent">The parent item on the actual model</param>
+        /// <param name="depth">The margin to the left side</param>
         private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 0)
         {
             for (var i = 0; i < parent.transform.childCount; i++)

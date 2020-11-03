@@ -3281,6 +3281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
+  cameraController: {fileID: 963194229}
   sidebar: {fileID: 431994765}
   mainCanvas: {fileID: 1135199803}
   startScreen: {fileID: 1754779550}
@@ -3867,8 +3868,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0.0000038146973
-  m_Size: 0.9747634
+  m_Value: -0.0000019073414
+  m_Size: 0.97476333
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

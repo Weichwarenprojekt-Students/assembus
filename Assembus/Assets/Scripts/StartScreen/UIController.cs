@@ -378,11 +378,7 @@ namespace StartScreen
 
             // Load the OBJ model
             var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
-            if (!loadSuccess)
-            {
-                toast.Error(Toast.Short, loadMessage);
-                return;
-            }
+            if (!loadSuccess) return;
 
             // Show the main screen
             startScreen.SetActive(false);

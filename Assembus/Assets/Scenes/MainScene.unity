@@ -3846,7 +3846,8 @@ Transform:
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 181.48, y: 80.45, z: 41.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: [{fileID: 414793189}]
+  m_Children:
+  - {fileID: 414793189}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
@@ -4797,8 +4798,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0.0000019073414
-  m_Size: 0.97476333
+  m_Value: 0.0000019073632
+  m_Size: 0.9747636
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

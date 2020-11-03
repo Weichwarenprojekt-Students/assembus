@@ -67,6 +67,18 @@ namespace MainScreen
         private float _scrollSpeed = 20f;
 
         /// <summary>
+        ///     True if mouse position is over viewport of 3D editor
+        /// </summary>
+        private bool MouseOverViewport
+        {
+            get
+            {
+                var view = _cam.ScreenToViewportPoint(Input.mousePosition);
+                return !(view.x < 0 || view.x > 1 || view.y < 0 || view.y > 1);
+            }
+        }
+
+        /// <summary>
         ///     Called on the frame when script is enabled
         /// </summary>
         private void Start()
@@ -197,6 +209,9 @@ namespace MainScreen
         /// </summary>
         private void Zoom(float delta)
         {
+            // Don't zoom if mouse is not over viewport
+            if (!MouseOverViewport) return;
+
             // calculate camera distance
             _cameraDistance -= delta * _scrollSpeed;
             if (_cameraDistance < 0) _cameraDistance = 0;

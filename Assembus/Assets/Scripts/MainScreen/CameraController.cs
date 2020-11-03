@@ -9,7 +9,15 @@ namespace MainScreen
     public class CameraController : MonoBehaviour
     {
 
-        public static CameraController Instance;
+        /// <summary>
+        ///     Private reference to singleton
+        /// </summary>
+        private static CameraController _instance;
+        
+        public static CameraController Instance
+        {
+            get { return _instance; }
+        }
 
         /// <summary>
         ///     Reference to the main camera
@@ -43,17 +51,17 @@ namespace MainScreen
 
         private void Awake()
         {
-            if (Instance == null)
+            if (_instance != null && _instance != this)
             {
-                Instance = this;
-            } else if (Instance != this)
+                Destroy(this.gameObject);
+            } else 
             {
-                Destroy(gameObject);
+                _instance = this;
             }
             DontDestroyOnLoad(gameObject);
         }
 
-        void Start()
+        private void Start()
         {
             _cam = Camera.main;
             _centerPoint = new Vector3(0,0,0);
@@ -64,7 +72,7 @@ namespace MainScreen
         }
 
         
-        void LateUpdate()
+        private void LateUpdate()
         {
             // store position when right mouse button is clicked
             if (Input.GetMouseButtonDown(1))
@@ -83,7 +91,7 @@ namespace MainScreen
             {
                 Zoom(Input.mouseScrollDelta.y);
             }
-            
+
         }
         
         /// <summary>
@@ -126,6 +134,7 @@ namespace MainScreen
         /// <summary>
         ///     Sets focus on given transform
         /// </summary>
+        /// <param name="t">Transform to center on</param>
         public void SetFocus(Transform t)
         {
             _centerPoint = t.position;
@@ -134,6 +143,7 @@ namespace MainScreen
         /// <summary>
         ///     Sets focus on given Vector3
         /// </summary>
+        /// <param name="position">Vector3 to center on</param>
         public void SetFocus(Vector3 position)
         {
             _centerPoint = position;
@@ -142,6 +152,7 @@ namespace MainScreen
         /// <summary>
         ///     Sets focus on given gameobject
         /// </summary>
+        /// <param name="g">Gameobject to center on</param>
         public void SetFocus(GameObject g)
         {
             _centerPoint = g.transform.position;

@@ -24,5 +24,11 @@ namespace Models.Configuration
         ///     Project configuration for all previously generated projects
         /// </summary>
         public List<ProjectConfig> oldProjectsConfig = new List<ProjectConfig>();
+
+        /// <summary>
+        ///     Limits the length of the undo/redo LinkedList with default 30
+        /// </summary>
+        /// <returns></returns>
+        public int undoHistoryLimit = 30;
     }
 }

@@ -6,10 +6,17 @@ namespace Services.UndoRedo
     public class UndoService
     {
         /// <summary>
+        ///     Get the list length limit from the configuration manager instance 
+        /// </summary>
+        private int _listLengthLimit = ConfigurationManager.Instance.Config.undoHistoryLimit;
+
+        /// <summary>
         ///      Singleton private constructor 
         /// </summary>
-        private UndoService() {}
-        
+        private UndoService()
+        {
+        }
+
         /// <summary>
         ///     Singleton instance
         /// </summary>
@@ -19,7 +26,7 @@ namespace Services.UndoRedo
         ///     LinkedList contains the undo redo history
         /// </summary>
         private readonly LinkedList<ICommand> _linkedList = new LinkedList<ICommand>();
-        
+
         /// <summary>
         ///     Current element of the linked list
         /// </summary>
@@ -37,11 +44,16 @@ namespace Services.UndoRedo
                 // Insert element as the first one and set current to it
                 _linkedList.AddFirst(command);
                 _current = _linkedList.First;
+                return;
             }
-            else
+
+            // Add element after current
+            _linkedList.AddAfter(_current, command);
+
+            // Remove first entry if greater than configured length
+            if (_linkedList.Count > _listLengthLimit)
             {
-                // Add element after current
-                _linkedList.AddAfter(_current, command);       
+                _linkedList.RemoveFirst();
             }
         }
 
@@ -64,7 +76,7 @@ namespace Services.UndoRedo
 
             // Call redo function of the command
             _current.Value.CallRedo();
-            
+
             // Set current to next element of the linked list
             _current = _current.Next;
         }
@@ -85,13 +97,12 @@ namespace Services.UndoRedo
         {
             // Exit if no undo command available
             if (!HasUndo()) return;
-            
+
             // Call Undo function of command
             _current.Value.CallUndo();
-            
+
             // Move back in linked list
             _current = _current.Previous;
         }
-        
     }
 }

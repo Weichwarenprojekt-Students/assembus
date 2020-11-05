@@ -6,12 +6,12 @@ namespace Services.UndoRedo
     public class UndoService
     {
         /// <summary>
-        ///  Singleton private constructor 
+        ///      Singleton private constructor 
         /// </summary>
         private UndoService() {}
         
         /// <summary>
-        /// Singleton instance
+        ///     Singleton instance
         /// </summary>
         public static UndoService Instance { get; } = new UndoService();
 
@@ -48,14 +48,14 @@ namespace Services.UndoRedo
         /// <summary>
         ///     Checks whether a redo action is possible/avaiable
         /// </summary>
-        /// <returns>Boolean</returns>
+        /// <returns>True if redo possible</returns>
         public bool HasRedo()
         {
             return _current.Next != null;
         }
 
         /// <summary>
-        ///
+        ///     Call redo action from list
         /// </summary>
         public void Redo()
         {
@@ -70,7 +70,7 @@ namespace Services.UndoRedo
         }
 
         /// <summary>
-        ///  Checks whether a undo action is possible/available
+        ///      Checks whether a undo action is possible/available
         /// </summary>
         /// <returns></returns>
         public bool HasUndo()
@@ -79,7 +79,7 @@ namespace Services.UndoRedo
         }
 
         /// <summary>
-        /// 
+        ///     Call undo action from list
         /// </summary>
         public void Undo()
         {

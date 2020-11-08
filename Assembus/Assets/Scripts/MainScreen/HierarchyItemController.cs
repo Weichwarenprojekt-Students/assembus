@@ -275,9 +275,29 @@ namespace MainScreen
                 (_rootView.transform.FindDeepChild(child).gameObject
                 , _rootModel.FindDeepChild(child).gameObject);
             
+            ClearSelectedItems();
             _selectedItems.Add(child, tempEntry);
         }
         
+        /// <summary>
+        ///     Deletes the currently stored list and creates a new one based on the strings in the given selection
+        /// </summary>
+        /// <param name="itemList">The list of key for the Objects</param>
+        public void UpdateSelectedItems(Collection<string> itemList)
+        {
+            ClearSelectedItems();
+            foreach (var item in itemList)
+            {
+                var tempEntry = new Tuple<GameObject, GameObject>
+                (_rootView.transform.FindDeepChild(item).gameObject
+                    , _rootModel.FindDeepChild(item).gameObject);
+
+                _selectedItems.Add(item, tempEntry);
+            }
+            foreach (var item in _selectedItems.Values)
+                SetSelectableColor(item.Item1.GetComponentInChildren<Button>(), selectColor);
+        }
+
         /// <summary>
         ///     Will set the normalColor of a Selectable to the defined given color
         /// </summary>

@@ -1,4 +1,6 @@
-﻿using Services;
+﻿using System;
+using System.Collections.Generic;
+using Services;
 using Shared;
 using Shared.Toast;
 using TMPro;
@@ -86,9 +88,11 @@ namespace MainScreen
 
         /// <summary>
         ///     Add event for window closing
+        ///     Initialize Dictionary for Selected Items
         /// </summary>
         private void Start()
         {
+            _projectManager.SelectedItems = new Dictionary<string, Tuple<GameObject, GameObject>>();
             Application.wantsToQuit += () =>
             {
                 if (_projectManager.Saved || _close) return true;
@@ -203,7 +207,9 @@ namespace MainScreen
                     containingListView.transform,
                     true
                 );
-
+                
+                newHierarchyItem.name = child.name;
+                
                 // get the script of the new item
                 var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
 

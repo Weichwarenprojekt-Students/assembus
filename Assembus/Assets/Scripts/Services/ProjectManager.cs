@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Models;
 using UnityEngine;
@@ -46,6 +47,19 @@ namespace Services
         ///     True if the current project is saved
         /// </summary>
         public bool Saved = false;
+        
+        /// <summary>
+        ///     Maps the ID of an Object to a tuple consisting of the hierarchyView Object and the model Object.
+        ///     This dictionary stores the items currently selected by a user
+        ///     Item1 = hierarchyView Object
+        ///     Item2 = model Object
+        /// </summary>
+        public Dictionary<string, Tuple<GameObject, GameObject>> SelectedItems;
+
+        /// <summary>
+        ///     last item selected by user
+        /// </summary>
+        public string LastSelectedItem;
 
         /// <summary>
         ///     Make constructor private

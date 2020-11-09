@@ -31,11 +31,6 @@ namespace MainScreen
         ///     List of selected game objects and their initial color value
         /// </summary>
         private readonly Dictionary<GameObject, Color> _selectedGameObjects = new Dictionary<GameObject, Color>();
-        
-        /// <summary>
-        ///     Currently selected items in list view for comparison between frames
-        /// </summary>
-        private HashSet<GameObject> _listViewSelection = new HashSet<GameObject>();
 
         /// <summary>
         ///     Main camera
@@ -53,6 +48,11 @@ namespace MainScreen
         private Color _hoveredOriginalColor;
 
         /// <summary>
+        ///     Currently selected items in list view for comparison between frames
+        /// </summary>
+        private HashSet<GameObject> _listViewSelection = new HashSet<GameObject>();
+
+        /// <summary>
         ///     Called on the frame the script is enabled on
         /// </summary>
         private void Start()
@@ -62,9 +62,9 @@ namespace MainScreen
         }
 
         /// <summary>
-        ///     Called once per frame, update object highlighting
+        ///     Called once per frame, update object highlighting after update-processing
         /// </summary>
-        private void Update()
+        private void LateUpdate()
         {
             // Highlight selections from listview, if any new ones have appeared
             var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
@@ -73,7 +73,7 @@ namespace MainScreen
                 HighlightGameObjects(list);
                 _listViewSelection = new HashSet<GameObject>(list);
             }
-            
+
             // View highlighting
             if (_cam is null) return;
 
@@ -92,29 +92,23 @@ namespace MainScreen
                 var multipleSelectionsAllowed = Input.GetKey(KeyCode.LeftControl);
 
                 // Selection of a game object
-                if (Input.GetMouseButtonDown(0))
-                {
-                    HighlightSelection(hoveredObject, multipleSelectionsAllowed);
-                }
+                if (Input.GetMouseButtonDown(0)) HighlightSelection(hoveredObject, multipleSelectionsAllowed);
 
                 // Hovered object was not highlighted yet
                 if (hoveredObject != _hoveredObject)
-                {
                     // Highlight hovered object
                     HighlightHover(hoveredObject);
-                }
             }
             // No hit was registered
             else
             {
                 // Reset hover-highlighting on non-selected objects
-                if (!(_hoveredObject is null) && !_selectedGameObjects.ContainsKey(_hoveredObject))
-                {
-                    _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
+                if (_hoveredObject is null || _selectedGameObjects.ContainsKey(_hoveredObject)) return;
 
-                    // Reset previously hovered object
-                    _hoveredObject = null;
-                }
+                _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
+
+                // Reset previously hovered object
+                _hoveredObject = null;
             }
         }
 
@@ -126,24 +120,20 @@ namespace MainScreen
         {
             if (_selectedGameObjects.ContainsKey(hoveredObject)) return;
 
-            Debug.Log("Hovering");
-
             // Different object was hovered over before
             if (!(_hoveredObject is null))
-            {
                 // Reset highlighting color of previously hovered object if it is not a selected object
                 if (!_selectedGameObjects.ContainsKey(_hoveredObject))
-                {
                     _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
-                }
-            }
 
             // Save previous color and game object
+            var material = hoveredObject.GetComponent<Renderer>().material;
+
             _hoveredObject = hoveredObject;
-            _hoveredOriginalColor = hoveredObject.GetComponent<Renderer>().material.color;
+            _hoveredOriginalColor = material.color;
 
             // Set highlighting color
-            hoveredObject.GetComponent<Renderer>().material.color = _colorHover;
+            material.color = _colorHover;
         }
 
         /// <summary>
@@ -156,13 +146,8 @@ namespace MainScreen
             // Clicked object is not selected yet
             if (!_selectedGameObjects.ContainsKey(clickedObject))
             {
-                Debug.Log("Select");
-
                 // Reset previously selected objects if multiple selection is not enabled
-                if (_selectedGameObjects.Count > 0 && !multipleSelectionsAllowed)
-                {
-                    ResetPreviousSelections();
-                }
+                if (_selectedGameObjects.Count > 0 && !multipleSelectionsAllowed) ResetPreviousSelections();
 
                 // Save clicked object and its previous color (before highlighting)
                 var originalColor = clickedObject == _hoveredObject
@@ -172,19 +157,13 @@ namespace MainScreen
 
                 // Highlight
                 if (_selectedGameObjects.Count > 1)
-                {
                     HighlightGameObjects(_selectedGameObjects.Keys.ToList());
-                }
                 else
-                {
                     clickedObject.GetComponent<Renderer>().material.color = _colorSelectedSingle;
-                }
             }
             // Clicked object was selected before already
             else
             {
-                Debug.Log("Deselection");
-
                 // Set color before selection
                 clickedObject.GetComponent<Renderer>().material.color = _selectedGameObjects[clickedObject];
 
@@ -198,14 +177,10 @@ namespace MainScreen
         /// </summary>
         private void ResetPreviousSelections()
         {
-            Debug.Log("Reset");
-
             // Go through selected game objects
             foreach (var keyValuePair in _selectedGameObjects)
-            {
                 // Reset to original color before selection
                 keyValuePair.Key.GetComponent<Renderer>().material.color = keyValuePair.Value;
-            }
 
             // Clear selection
             _selectedGameObjects.Clear();
@@ -214,23 +189,25 @@ namespace MainScreen
         /// <summary>
         ///     Highlight every game object in list
         /// </summary>
-        /// <param name="gameObjects">List of gameObjects to be highlighted</param>
+        /// <param name="gameObjects">List of game objects to be highlighted</param>
         private void HighlightGameObjects(List<GameObject> gameObjects)
         {
             // Clear current selection, to preserve original color invariance
             ResetPreviousSelections();
 
             // Single selection or group selection
-            Color color = (gameObjects.Count > 1) ? _colorSelectedGroup : _colorSelectedSingle;
+            var color = gameObjects.Count > 1 ? _colorSelectedGroup : _colorSelectedSingle;
 
             gameObjects.ForEach(
                 g =>
                 {
+                    var material = g.GetComponent<Renderer>();
+
                     // Add to selection list and save original color
-                    _selectedGameObjects.Add(g, g.GetComponent<Renderer>().material.color);
+                    _selectedGameObjects.Add(g, material.material.color);
 
                     // Highlight selection
-                    g.GetComponent<Renderer>().material.color = color;
+                    material.material.color = color;
                 }
             );
         }

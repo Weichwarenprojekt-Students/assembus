@@ -49,13 +49,6 @@ namespace MainScreen.HierarchyView
         private Transform _rootView;
 
         /// <summary>
-        ///     Update the expand button to display the correct icon
-        /// </summary>
-        private void Start()
-        {
-        }
-
-        /// <summary>
         ///     Add one item to the hierarchy list
         /// </summary>
         /// <param name="item">The item which is going to be added</param>

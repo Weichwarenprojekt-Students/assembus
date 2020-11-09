@@ -1,9 +1,10 @@
-﻿using MainScreen.HierarchyView;
+﻿using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace MainScreen
+namespace MainScreen.HierarchyView
 {
     /// <summary>
     ///     Manage the behaviour of a hierarchy view item
@@ -31,6 +32,11 @@ namespace MainScreen
         ///     The container of the item which contains all children
         /// </summary>
         public GameObject childrenContainer;
+
+        /// <summary>
+        ///     The context menu controller
+        /// </summary>
+        public ContextMenuController contextMenu;
 
         /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
@@ -136,6 +142,23 @@ namespace MainScreen
             // Update the logos if necessary
             expandDown.SetActive(_isExpanded);
             expandRight.SetActive(!_isExpanded);
+        }
+
+        /// <summary>
+        ///     Open the context menu on right click
+        /// </summary>
+        /// <param name="data"></param>
+        public void OpenContextMenu(BaseEventData data)
+        {
+            // Execute the right click action
+            var pointerData = (PointerEventData) data;
+            if (pointerData.button == PointerEventData.InputButton.Right)
+            {
+                contextMenu.Show(new []{"Test"}, new Action[]{(() => Debug.Log("Test"))});
+            }
+            
+            // Select the item 
+            SelectItem();
         }
     }
 }

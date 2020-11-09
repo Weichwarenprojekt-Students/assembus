@@ -265,6 +265,7 @@ namespace MainScreen
 
                     // Remove GameObject of current project
                     Destroy(_projectManager.CurrentProject.ObjectModel);
+                    FindObjectOfType<ComponentHighlighting>().ResetHighlighting();
 
                     // Show the start screen
                     mainScreen.SetActive(false);

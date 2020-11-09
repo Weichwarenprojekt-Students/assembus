@@ -1285,9 +1285,12 @@ MonoBehaviour:
   expandDown: {fileID: 2036959277}
   expandRight: {fileID: 219485499}
   childrenContainer: {fileID: 1569549510}
-  selectColor: {r: 0.30588236, g: 0.38431373, b: 0.50980395, a: 1}
-  normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
-  toast: {fileID: 1305548565}
+<<<<<<< HEAD
+=======
+  selectColor: {r: 0, g: 0, b: 0, a: 0}
+  normalColor: {r: 0, g: 0, b: 0, a: 0}
+  toast: {fileID: 0}
+>>>>>>> origin/feature/altering-component-groups-BUS-14
 --- !u!1 &187689806
 GameObject:
   m_ObjectHideFlags: 0
@@ -4850,7 +4853,11 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
+<<<<<<< HEAD
   m_Value: -0.000001907356
+=======
+  m_Value: -0.000003814712
+>>>>>>> origin/feature/altering-component-groups-BUS-14
   m_Size: 0.9747635
   m_NumberOfSteps: 0
   m_OnValueChanged:

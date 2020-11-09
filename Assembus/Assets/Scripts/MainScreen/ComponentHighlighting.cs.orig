@@ -68,6 +68,16 @@ namespace MainScreen
         private void LateUpdate()
         {
             // Highlight selections from listview, if any new ones have appeared
+<<<<<<< HEAD
+            
+            /* var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
+            if (!_listViewSelection.SetEquals(list))
+            {
+                HighlightGameObjects(list);
+                _listViewSelection = new HashSet<GameObject>(list);
+            }*/
+            
+=======
             if (!(ProjectManager.Instance.SelectedItems is null))
             {
                 var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
@@ -78,6 +88,7 @@ namespace MainScreen
                 }
             }
 
+>>>>>>> origin/feature/altering-component-groups-BUS-14
             // View highlighting
             if (_cam is null) return;
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MainScreen.HierarchyView;
+﻿using MainScreen.HierarchyView;
 using Services;
 using Shared;
 using Shared.Toast;
@@ -61,6 +59,16 @@ namespace MainScreen
         ///     A default hierarchy view item
         /// </summary>
         public GameObject defaultHierarchyViewItem;
+
+        /// <summary>
+        ///     The hierarchy view controller
+        /// </summary>
+        public HierarchyViewController hierarchyViewController;
+
+        /// <summary>
+        ///     The component highlighting script
+        /// </summary>
+        public ComponentHighlighting componentHighlighting;
 
         /// <summary>
         ///     The configuration manager
@@ -148,7 +156,7 @@ namespace MainScreen
         {
             _projectManager.Saved = false;
             title.text = _projectManager.CurrentProject.Name + "*";
-            
+
             LoadModelIntoHierarchyView();
         }
 
@@ -207,13 +215,12 @@ namespace MainScreen
                     containingListView.transform,
                     true
                 );
-                
+
                 newHierarchyItem.name = child.name;
-                
+
                 // Add the item to the HierarchyViewController
-                GameObject go = GameObject.Find("Viewport");
-                go.GetComponent<HierarchyViewController>().AddItem(newHierarchyItem);
-                
+                hierarchyViewController.AddItem(newHierarchyItem);
+
                 // get the script of the new item
                 var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
 
@@ -265,7 +272,7 @@ namespace MainScreen
 
                     // Remove GameObject of current project
                     Destroy(_projectManager.CurrentProject.ObjectModel);
-                    FindObjectOfType<ComponentHighlighting>().ResetHighlighting();
+                    componentHighlighting.ResetHighlighting();
 
                     // Show the start screen
                     mainScreen.SetActive(false);

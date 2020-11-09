@@ -1279,15 +1279,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4903f57d35ecc45b83f992387e38dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hierarchyViewController: {fileID: 441038527}
   nameText: {fileID: 954240688}
   nameRect: {fileID: 1290008324}
   expandButton: {fileID: 1831478596}
   expandDown: {fileID: 2036959277}
   expandRight: {fileID: 219485499}
   childrenContainer: {fileID: 1569549510}
-  selectColor: {r: 0.30588236, g: 0.38431373, b: 0.50980395, a: 1}
-  normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
-  toast: {fileID: 1305548565}
 --- !u!1 &187689806
 GameObject:
   m_ObjectHideFlags: 0
@@ -2002,6 +2000,7 @@ GameObject:
   - component: {fileID: 441038524}
   - component: {fileID: 441038526}
   - component: {fileID: 441038525}
+  - component: {fileID: 441038527}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -2068,6 +2067,19 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
+--- !u!114 &441038527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441038523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d83ca53ff18347a5ac0b81a5744ce6e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  componentHighlighting: {fileID: 963194230}
 --- !u!1001 &458767403
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3915,6 +3927,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 976b916e98c048e68fa1a7d921982de0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hierarchyViewController: {fileID: 441038527}
 --- !u!224 &973023894 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2065074576797381153, guid: 0760d4c278b4b2149b12c08fcda2ce00,
@@ -4123,6 +4136,8 @@ MonoBehaviour:
   title: {fileID: 6856988615751009285}
   hierarchyView: {fileID: 441038523}
   defaultHierarchyViewItem: {fileID: 168202933}
+  hierarchyViewController: {fileID: 441038527}
+  componentHighlighting: {fileID: 963194230}
 --- !u!114 &1135199801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5024,7 +5039,6 @@ GameObject:
   - component: {fileID: 1386904490}
   - component: {fileID: 1386904489}
   - component: {fileID: 1386904488}
-  - component: {fileID: 1386904491}
   m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
@@ -5102,18 +5116,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1386904486}
   m_CullTransparentMesh: 0
---- !u!114 &1386904491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1386904486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d83ca53ff18347a5ac0b81a5744ce6e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1439098820
 GameObject:
   m_ObjectHideFlags: 0

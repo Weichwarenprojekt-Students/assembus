@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using MainScreen.HierarchyView;
-using Services;
-using Shared.Toast;
+﻿using MainScreen.HierarchyView;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +10,8 @@ namespace MainScreen
     /// </summary>
     public class HierarchyItemController : MonoBehaviour
     {
+        public HierarchyViewController hierarchyViewController;
+
         /// <summary>
         ///     The text view in which the name is shown
         /// </summary>
@@ -36,11 +33,6 @@ namespace MainScreen
         public GameObject childrenContainer;
 
         /// <summary>
-        ///     The root element of the hierarchy view
-        /// </summary>
-        private RectTransform _rectTransform;
-        
-        /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
         /// </summary>
         private bool _isExpanded = true;
@@ -49,6 +41,11 @@ namespace MainScreen
         ///     The name of the item
         /// </summary>
         private string _name;
+
+        /// <summary>
+        ///     The root element of the hierarchy view
+        /// </summary>
+        private RectTransform _rectTransform;
 
         /// <summary>
         ///     True if the hierarchy view needs to be updated
@@ -77,7 +74,7 @@ namespace MainScreen
             if (_updateHierarchy)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
         }
-        
+
         /// <summary>
         ///     Initialize the hierarchy item
         /// </summary>
@@ -108,17 +105,16 @@ namespace MainScreen
             _updateHierarchy = true;
             UpdateButton();
         }
-        
+
         /// <summary>
         ///     OnClick Method for the Selection of an item
         /// </summary>
         public void SelectItem()
         {
-            var hierarchyViewController = GameObject.Find("Viewport").GetComponent<HierarchyViewController>();
             // Item Selection if left control is used
             if (Input.GetKey(KeyCode.LeftControl))
                 hierarchyViewController.ClickItem(gameObject, KeyCode.LeftControl);
-            
+
             // Item selection if the left shift key is used
             else if (Input.GetKey(KeyCode.LeftShift))
                 hierarchyViewController.ClickItem(gameObject, KeyCode.LeftShift);

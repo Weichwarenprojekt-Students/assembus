@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MainScreen.HierarchyView;
-using Services;
 using UnityEngine;
 
 namespace MainScreen
@@ -12,6 +11,11 @@ namespace MainScreen
         ///     Maximum distance for a ray intersection
         /// </summary>
         private const int MAXSelectionDistance = 10000;
+
+        /// <summary>
+        ///     The hierarchy view controller
+        /// </summary>
+        public HierarchyViewController hierarchyViewController;
 
         /// <summary>
         ///     Hovering color
@@ -49,11 +53,6 @@ namespace MainScreen
         private Color _hoveredOriginalColor;
 
         /// <summary>
-        ///     Currently selected items in list view for comparison between frames
-        /// </summary>
-        private HashSet<GameObject> _listViewSelection = new HashSet<GameObject>();
-
-        /// <summary>
         ///     Called on the frame the script is enabled on
         /// </summary>
         private void Start()
@@ -67,17 +66,6 @@ namespace MainScreen
         /// </summary>
         private void LateUpdate()
         {
-            // Highlight selections from listview, if any new ones have appeared
-            if (!(ProjectManager.Instance.SelectedItems is null))
-            {
-                var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
-                if (!_listViewSelection.SetEquals(list))
-                {
-                    HighlightGameObjects(list);
-                    _listViewSelection = new HashSet<GameObject>(list);
-                }
-            }
-
             // View highlighting
             if (_cam is null) return;
 
@@ -174,10 +162,10 @@ namespace MainScreen
                 // Remove from selection group
                 _selectedGameObjects.Remove(clickedObject);
             }
-            
+
             // Set the selected items active in the list view
-            var names = _selectedGameObjects.Keys.ToList().Select((o => o.name));
-            GameObject.Find("Viewport").GetComponent<HierarchyViewController>().SetItemStatusFromList(names);
+            var names = _selectedGameObjects.Keys.ToList().Select(o => o.name);
+            hierarchyViewController.SetItemStatusFromList(names);
         }
 
         /// <summary>
@@ -187,10 +175,8 @@ namespace MainScreen
         {
             // Go through selected game objects
             foreach (var keyValuePair in _selectedGameObjects)
-            {
                 // Reset to original color before selection
                 keyValuePair.Key.GetComponent<Renderer>().material.color = keyValuePair.Value;
-            }
 
             // Clear selection
             _selectedGameObjects.Clear();
@@ -200,7 +186,7 @@ namespace MainScreen
         ///     Highlight every game object in list
         /// </summary>
         /// <param name="gameObjects">List of game objects to be highlighted</param>
-        private void HighlightGameObjects(List<GameObject> gameObjects)
+        public void HighlightGameObjects(List<GameObject> gameObjects)
         {
             // Clear current selection, to preserve original color invariance
             ResetPreviousSelections();

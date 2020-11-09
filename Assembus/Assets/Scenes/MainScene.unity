@@ -1204,9 +1204,6 @@ MonoBehaviour:
   expandDown: {fileID: 2036959277}
   expandRight: {fileID: 219485499}
   childrenContainer: {fileID: 1569549510}
-  selectColor: {r: 0.30588236, g: 0.38431373, b: 0.50980395, a: 1}
-  normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
-  toast: {fileID: 1305548565}
 --- !u!1 &187689806
 GameObject:
   m_ObjectHideFlags: 0
@@ -3480,7 +3477,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1142076521}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4358,7 +4355,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1883572204}
   m_HandleRect: {fileID: 1883572203}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4769,7 +4766,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0.000003814712
+  m_Value: -0.000001907356
   m_Size: 0.9747635
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4943,6 +4940,7 @@ GameObject:
   - component: {fileID: 1386904490}
   - component: {fileID: 1386904489}
   - component: {fileID: 1386904488}
+  - component: {fileID: 1386904491}
   m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
@@ -5020,6 +5018,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1386904486}
   m_CullTransparentMesh: 0
+--- !u!114 &1386904491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386904486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d83ca53ff18347a5ac0b81a5744ce6e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1439098820
 GameObject:
   m_ObjectHideFlags: 0

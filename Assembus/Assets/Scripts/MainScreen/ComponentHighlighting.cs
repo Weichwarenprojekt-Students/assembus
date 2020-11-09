@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MainScreen.HierarchyView;
 using Services;
 using UnityEngine;
 
@@ -67,12 +68,13 @@ namespace MainScreen
         private void Update()
         {
             // Highlight selections from listview, if any new ones have appeared
-            var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
+            
+            /* var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
             if (!_listViewSelection.SetEquals(list))
             {
                 HighlightGameObjects(list);
                 _listViewSelection = new HashSet<GameObject>(list);
-            }
+            }*/
             
             // View highlighting
             if (_cam is null) return;
@@ -191,6 +193,10 @@ namespace MainScreen
                 // Remove from selection group
                 _selectedGameObjects.Remove(clickedObject);
             }
+            
+            // Set the selected items active in the list view
+            var names = _selectedGameObjects.Keys.ToList().Select((o => o.name));
+            GameObject.Find("Viewport").GetComponent<HierarchyViewController>().SetItemStatusFromList(names);
         }
 
         /// <summary>

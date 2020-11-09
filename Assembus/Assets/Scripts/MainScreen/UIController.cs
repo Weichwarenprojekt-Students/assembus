@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MainScreen.HierarchyView;
 using Services;
 using Shared;
 using Shared.Toast;
@@ -92,7 +93,6 @@ namespace MainScreen
         /// </summary>
         private void Start()
         {
-            _projectManager.SelectedItems = new Dictionary<string, Tuple<GameObject, GameObject>>();
             Application.wantsToQuit += () =>
             {
                 if (_projectManager.Saved || _close) return true;
@@ -148,7 +148,7 @@ namespace MainScreen
         {
             _projectManager.Saved = false;
             title.text = _projectManager.CurrentProject.Name + "*";
-
+            
             LoadModelIntoHierarchyView();
         }
 
@@ -209,6 +209,10 @@ namespace MainScreen
                 );
                 
                 newHierarchyItem.name = child.name;
+                
+                // Add the item to the HierarchyViewController
+                GameObject go = GameObject.Find("Viewport");
+                go.GetComponent<HierarchyViewController>().AddItem(newHierarchyItem);
                 
                 // get the script of the new item
                 var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();

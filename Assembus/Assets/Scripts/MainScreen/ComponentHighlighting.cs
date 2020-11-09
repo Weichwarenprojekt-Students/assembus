@@ -67,11 +67,14 @@ namespace MainScreen
         private void LateUpdate()
         {
             // Highlight selections from listview, if any new ones have appeared
-            var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
-            if (!_listViewSelection.SetEquals(list))
+            if (!(ProjectManager.Instance.SelectedItems is null))
             {
-                HighlightGameObjects(list);
-                _listViewSelection = new HashSet<GameObject>(list);
+                var list = ProjectManager.Instance.SelectedItems.Values.Select(t => t.Item2).ToList();
+                if (!_listViewSelection.SetEquals(list))
+                {
+                    HighlightGameObjects(list);
+                    _listViewSelection = new HashSet<GameObject>(list);
+                }
             }
 
             // View highlighting
@@ -179,8 +182,10 @@ namespace MainScreen
         {
             // Go through selected game objects
             foreach (var keyValuePair in _selectedGameObjects)
+            {
                 // Reset to original color before selection
                 keyValuePair.Key.GetComponent<Renderer>().material.color = keyValuePair.Value;
+            }
 
             // Clear selection
             _selectedGameObjects.Clear();
@@ -210,6 +215,15 @@ namespace MainScreen
                     material.material.color = color;
                 }
             );
+        }
+
+        /// <summary>
+        ///     Reset highlighting, when application is closed
+        /// </summary>
+        public void ResetHighlighting()
+        {
+            _selectedGameObjects.Clear();
+            _hoveredObject = null;
         }
     }
 }

@@ -156,6 +156,7 @@ namespace MainScreen
         {
             _projectManager.Saved = false;
             title.text = _projectManager.CurrentProject.Name + "*";
+            hierarchyViewController.InitializeLists();
 
             LoadModelIntoHierarchyView();
         }

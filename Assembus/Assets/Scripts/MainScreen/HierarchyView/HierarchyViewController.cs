@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Services;
 using UnityEngine;
@@ -26,12 +27,12 @@ namespace MainScreen.HierarchyView
         /// <summary>
         ///     Names of the items mapped to their GameObject
         /// </summary>
-        private readonly Dictionary<string, GameObject> _hierarchyItemNames = new Dictionary<string, GameObject>();
+        private Dictionary<string, GameObject> _hierarchyItemNames = new Dictionary<string, GameObject>();
 
         /// <summary>
         ///     Dictionary of hierarchy items mapped to a bool that indicates if the item should be highlighted
         /// </summary>
-        private readonly Dictionary<GameObject, bool> _hierarchyItems = new Dictionary<GameObject, bool>();
+        private Dictionary<GameObject, bool> _hierarchyItems = new Dictionary<GameObject, bool>();
 
         /// <summary>
         ///     The project manager
@@ -59,6 +60,12 @@ namespace MainScreen.HierarchyView
 
             if (!_hierarchyItemNames.ContainsKey(item.name))
                 _hierarchyItemNames.Add(item.name, item);
+        }
+
+        public void InitializeLists()
+        {
+            _hierarchyItems = new Dictionary<GameObject, bool>();
+            _hierarchyItemNames = new Dictionary<string, GameObject>();
         }
 
         /// <summary>

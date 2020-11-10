@@ -11,6 +11,9 @@ namespace MainScreen.HierarchyView
     /// </summary>
     public class HierarchyItemController : MonoBehaviour
     {
+        /// <summary>
+        ///     The hierarchy view controller
+        /// </summary>
         public HierarchyViewController hierarchyViewController;
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace MainScreen.HierarchyView
         /// <summary>
         ///     OnClick Method for the Selection of an item
         /// </summary>
-        public void SelectItem()
+        private void SelectItem()
         {
             // Item Selection if left control is used
             if (Input.GetKey(KeyCode.LeftControl))
@@ -147,16 +150,14 @@ namespace MainScreen.HierarchyView
         /// <summary>
         ///     Open the context menu on right click
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">The event data</param>
         public void OpenContextMenu(BaseEventData data)
         {
             // Execute the right click action
             var pointerData = (PointerEventData) data;
             if (pointerData.button == PointerEventData.InputButton.Right)
-            {
-                contextMenu.Show(new []{"Test"}, new Action[]{(() => Debug.Log("Test"))});
-            }
-            
+                contextMenu.Show(new[] {"Test"}, new Action[] {() => Debug.Log("Test")});
+
             // Select the item 
             SelectItem();
         }

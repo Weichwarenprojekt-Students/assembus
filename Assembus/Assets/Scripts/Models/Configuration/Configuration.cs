@@ -28,7 +28,6 @@ namespace Models.Configuration
         /// <summary>
         ///     Limits the length of the undo/redo LinkedList with default 30
         /// </summary>
-        /// <returns></returns>
         public int undoHistoryLimit = 30;
     }
 }

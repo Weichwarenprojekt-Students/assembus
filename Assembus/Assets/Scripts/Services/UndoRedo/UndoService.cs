@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Services.UndoRedo
@@ -6,16 +6,32 @@ namespace Services.UndoRedo
     public class UndoService
     {
         /// <summary>
-        ///     Get the list length limit from the configuration manager instance 
+        ///     The configuration manager
         /// </summary>
-        private int _listLengthLimit = ConfigurationManager.Instance.Config.undoHistoryLimit;
+        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
 
         /// <summary>
-        ///      Singleton private constructor 
+        ///     LinkedList contains the undo redo history
+        /// </summary>
+        private readonly LinkedList<Command> _linkedList = new LinkedList<Command>();
+
+        /// <summary>
+        ///     Current element of the linked list
+        /// </summary>
+        private LinkedListNode<Command> _current = new LinkedListNode<Command>(Command.Empty);
+
+        /// <summary>
+        ///     Singleton private constructor
         /// </summary>
         private UndoService()
         {
+            _linkedList.AddFirst(_current);
         }
+
+        /// <summary>
+        ///     The action to be executed when a new command is inserted
+        /// </summary>
+        public Action OnNewCommand { get; set; }
 
         /// <summary>
         ///     Singleton instance
@@ -23,42 +39,26 @@ namespace Services.UndoRedo
         public static UndoService Instance { get; } = new UndoService();
 
         /// <summary>
-        ///     LinkedList contains the undo redo history
-        /// </summary>
-        private readonly LinkedList<ICommand> _linkedList = new LinkedList<ICommand>();
-
-        /// <summary>
-        ///     Current element of the linked list
-        /// </summary>
-        private LinkedListNode<ICommand> _current = null;
-
-        /// <summary>
         ///     Add a command to the history of commands
         /// </summary>
-        /// <param name="command"></param>
-        public void AddCommand(ICommand command)
+        /// <param name="command">The command to be added</param>
+        public void AddCommand(Command command)
         {
-            // Check if append after is available
-            if (_linkedList.Count == 0)
-            {
-                // Insert element as the first one and set current to it
-                _linkedList.AddFirst(command);
-                _current = _linkedList.First;
-                return;
-            }
-
             // Add element after current
             _linkedList.AddAfter(_current, command);
 
+            // Update the current element
+            _current = _current.Next;
+
             // Remove first entry if greater than configured length
-            if (_linkedList.Count > _listLengthLimit)
-            {
-                _linkedList.RemoveFirst();
-            }
+            if (_linkedList.Count > _configManager.Config.undoHistoryLimit) _linkedList.RemoveFirst();
+
+            // Execute the new command callback
+            OnNewCommand?.Invoke();
         }
 
         /// <summary>
-        ///     Checks whether a redo action is possible/avaiable
+        ///     Checks whether a redo action is possible/available
         /// </summary>
         /// <returns>True if redo possible</returns>
         public bool HasRedo()
@@ -74,20 +74,20 @@ namespace Services.UndoRedo
             // Exit if no redo command exists
             if (!HasRedo()) return;
 
-            // Call redo function of the command
-            _current.Value.CallRedo();
-
             // Set current to next element of the linked list
             _current = _current.Next;
+
+            // Call redo function of the command
+            _current?.Value.CallRedo();
         }
 
         /// <summary>
-        ///      Checks whether a undo action is possible/available
+        ///     Checks whether a undo action is possible/available
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if undo possible</returns>
         public bool HasUndo()
         {
-            return _current != null;
+            return !_current.Value.IsEmpty;
         }
 
         /// <summary>
@@ -102,6 +102,12 @@ namespace Services.UndoRedo
             _current.Value.CallUndo();
 
             // Move back in linked list
+            if (_current.Previous == null)
+            {
+                var previous = new LinkedListNode<Command>(Command.Empty);
+                _linkedList.AddFirst(previous);
+            }
+
             _current = _current.Previous;
         }
     }

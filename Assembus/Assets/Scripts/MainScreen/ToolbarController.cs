@@ -41,6 +41,11 @@ namespace MainScreen
         public SwitchableButton undo, redo;
 
         /// <summary>
+        ///     The settings controller
+        /// </summary>
+        public SettingsController settings;
+
+        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
@@ -55,6 +60,9 @@ namespace MainScreen
         /// </summary>
         private readonly UndoService _undoService = UndoService.Instance;
 
+        /// <summary>
+        ///     Set the callback for new commands and add some example commands
+        /// </summary>
         private void Start()
         {
             _undoService.OnNewCommand = OnEnable;
@@ -62,16 +70,16 @@ namespace MainScreen
                 new Command(
                     new[] {new ItemState("", "", "", 0)},
                     new[] {new ItemState("", "", "", 0)},
-                    item => Debug.Log("redo"),
-                    item => Debug.Log("undo")
+                    item => Debug.Log("redo1"),
+                    item => Debug.Log("undo1")
                 )
             );
             _undoService.AddCommand(
                 new Command(
                     new[] {new ItemState("", "", "", 0)},
                     new[] {new ItemState("", "", "", 0)},
-                    item => Debug.Log("redo"),
-                    item => Debug.Log("undo")
+                    item => Debug.Log("redo2"),
+                    item => Debug.Log("undo2")
                 )
             );
         }
@@ -148,6 +156,14 @@ namespace MainScreen
                     startScreen.SetActive(true);
                 }
             );
+        }
+
+        /// <summary>
+        ///     Show the settings
+        /// </summary>
+        public void Settings()
+        {
+            settings.Show();            
         }
     }
 }

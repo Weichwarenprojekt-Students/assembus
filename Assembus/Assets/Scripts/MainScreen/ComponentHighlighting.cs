@@ -183,6 +183,24 @@ namespace MainScreen
         }
 
         /// <summary>
+        ///     Highlight single game object
+        /// </summary>
+        /// <param name="gameObjects">Game object to be highlighted</param>
+        public void HighlightGameObject(GameObject gameObjects)
+        {
+            // Clear current selection, to preserve original color invariance
+            ResetPreviousSelections();
+
+            var material = gameObjects.GetComponent<Renderer>();
+
+            // Add to selection list and save original color
+            _selectedGameObjects.Add(gameObjects, material.material.color);
+
+            // Highlight selection
+            material.material.color = _colorSelectedSingle;
+        }
+
+        /// <summary>
         ///     Highlight every game object in list
         /// </summary>
         /// <param name="gameObjects">List of game objects to be highlighted</param>

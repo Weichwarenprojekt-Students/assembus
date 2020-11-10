@@ -22,6 +22,11 @@ namespace MainScreen
         private const float ScrollFactor = 0.05f;
 
         /// <summary>
+        ///     Reference to highlighting script
+        /// </summary>
+        public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
         ///     Reference to the main camera
         /// </summary>
         private Camera _cam;
@@ -173,8 +178,10 @@ namespace MainScreen
 
             if (!Physics.Raycast(ray, out var hit, 10000)) return;
 
-            var transformGameObject = hit.transform.gameObject.GetComponent<Renderer>().bounds.center;
+            GameObject o;
+            var transformGameObject = (o = hit.transform.gameObject).GetComponent<Renderer>().bounds.center;
 
+            componentHighlighting.HighlightGameObject(o);
             SetFocus(transformGameObject);
             StoreLastMousePosition();
             CalculateNewCameraTransform();

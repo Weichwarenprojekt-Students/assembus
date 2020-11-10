@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Dummiesman;
+using Models.Project;
 using UnityEngine;
 
 namespace Services
@@ -49,6 +50,20 @@ namespace Services
                 var child = parent.transform.GetChild(i).gameObject;
 
                 child.AddComponent<MeshCollider>();
+
+                // Add empty originator for the GameObject data (holds the GameObject memento instance)
+                child.AddComponent<ItemInfoController>();
+
+                // Set default memento (display name equals fixed internal id) for project creation
+                // Default values will be overwritten when project gets loaded
+                var defaultMemento = new ItemInfo
+                {
+                    isGroup = false,
+                    displayName = child.name
+                };
+
+                // Add the default additional GameObject configuration to the GameObject's originator
+                child.GetComponent<ItemInfoController>().ItemInfo = defaultMemento;
 
                 children.Add(child);
             }

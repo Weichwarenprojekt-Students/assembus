@@ -20,7 +20,8 @@ namespace Models
 
         /// <summary>
         ///     The actual GameObject which stores the imported OBJ file with the
-        ///     correct hierarchy which is loaded from the XMl config file.
+        ///     correct hierarchy and additional GameObject parameters
+        ///     which are loaded from the XMl config file.
         ///     This model will be serialized to a separate file
         /// </summary>
         [XmlIgnoreAttribute] public GameObject ObjectModel;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Models.Configuration
+namespace Models.AppConfiguration
 {
     /// <summary>
     ///     This data model stores all data which is loaded/saved to the XML config file

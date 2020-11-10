@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using MainScreen;
-using MainScreen.HierarchyView;
 using Models;
 using UnityEngine;
 
@@ -28,13 +25,13 @@ namespace Services
         /// <summary>
         ///     The GameObject deserializer which initializes the loaded GameObject
         /// </summary>
-        private readonly GameObjectDeSerializer _gameObjectDeSerializer = new GameObjectDeSerializer();
+        private readonly ModelDeSerializer _modelDeSerializer = new ModelDeSerializer();
 
         /// <summary>
         ///     The XML writer/reader instance to store all non 3D-model settings
         /// </summary>
         private readonly XmlDeSerializer<ProjectSpace> _xmlDeSerializer = new XmlDeSerializer<ProjectSpace>();
-        
+
         /// <summary>
         ///     The current project
         /// </summary>
@@ -165,7 +162,7 @@ namespace Services
                 _xmlDeSerializer.SerializeData(Path.Combine(CurrentProjectDir, ProjectConfigFile), CurrentProject);
 
                 // Save the hierarchy of the GameObject 3D model
-                _gameObjectDeSerializer.SerializeGameObject(
+                _modelDeSerializer.SerializeGameObject(
                     Path.Combine(CurrentProjectDir, ProjectModelFile),
                     CurrentProject.ObjectModel
                 );
@@ -236,7 +233,7 @@ namespace Services
             try
             {
                 // Load the 3D model hierarchy
-                CurrentProject.ObjectModel = _gameObjectDeSerializer.DeserializeGameObject(
+                CurrentProject.ObjectModel = _modelDeSerializer.DeserializeGameObject(
                     Path.Combine(CurrentProjectDir, ProjectModelFile),
                     CurrentProject.ObjectModel
                 );

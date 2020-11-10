@@ -1,57 +1,67 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Models;
+using Models.Project;
 using UnityEngine;
 
 namespace Services
 {
     /// <summary>
-    ///     This class serializes the GameObject configuration but not the GameObject itself.
-    ///     Only the actual hierarchy of the GameObject will be saved/loaded.
+    ///     This class serializes the GameObject configuration + hierarchy but not the GameObject itself.
     /// </summary>
-    public class GameObjectDeSerializer
+    public class ModelDeSerializer
     {
         /// <summary>
         ///     The XML-Serializer instance
         /// </summary>
-        private readonly XmlDeSerializer<List<ModelComponent>> _xmlDeSerializer =
-            new XmlDeSerializer<List<ModelComponent>>();
+        private readonly XmlDeSerializer<List<FileModel>> _xmlDeSerializer =
+            new XmlDeSerializer<List<FileModel>>();
 
         /// <summary>
-        ///     Saves the configuration/hierarchy of the passed GameObject instance to a XML file.
-        ///     This serializer does NOT store anything else than the hierarchy!
+        ///     Saves GameObject configuration + hierarchy of the passed GameObject instance to a XML file.
         /// </summary>
         /// <param name="filePath">The path where the GameObject config should be stored as a XML file</param>
         /// <param name="rootObject">The actual GameObject instance whose configuration should be saved</param>
         public void SerializeGameObject(string filePath, GameObject rootObject)
         {
-            //Extract all child GameObjects/hierarchy from the provided root GameObject recursively
+            // Extract all child GameObjects/hierarchy from the provided root GameObject recursively
             var allOriginalChildren = new List<GameObject>();
             GetAllGameObjects(rootObject, allOriginalChildren);
 
-            //List which stores the GameObject description of all child GameObjects
-            var saveHierarchy = new List<ModelComponent>();
+            // List which stores the GameObject description of all child GameObjects
+            var fileData = new List<FileModel>();
 
             foreach (var originalChild in allOriginalChildren)
             {
                 // Generate a new description
-                var newComponent = new ModelComponent {gameObjectName = originalChild.name};
+                var newComponent = new FileModel
+                {
+                    // Assign the internal/original name of the GameObject
+                    id = originalChild.name
+                };
 
                 // Write the string 'null' if there is no parent GameObject
                 var parent = originalChild.transform.parent;
-                newComponent.parentGameObjectName = parent != null ? parent.name : "null";
+
+                // Assign the internal/original name of the parent GameObject
+                newComponent.parentId = parent != null ? parent.name : "null";
+
+                // Get additional information of the GameObject
+                // Do not retrieve this information if we are at the root element
+                if (originalChild.transform.parent != null)
+                    // Get the memento instance from the GameObject's originator
+                    newComponent.itemInfo = originalChild.GetComponent<ItemInfoController>().ItemInfo;
 
                 // Add the ModelComponent description to the list
-                saveHierarchy.Add(newComponent);
+                fileData.Add(newComponent);
             }
 
             // Write ModelComponent-List to XML file
-            _xmlDeSerializer.SerializeData(filePath, saveHierarchy);
+            _xmlDeSerializer.SerializeData(filePath, fileData);
         }
 
         /// <summary>
-        ///     Loads GameObject configuration/hierarchy from XMl file and applies changes to passed instance.
-        ///     Please make a deep-copy of the passed GameObject if you need an untouched instance.
+        ///     Loads GameObject configuration + hierarchy from XMl file and applies changes to passed instance.
+        ///     Please make a deep-copy of the passed GameObject if you need an untouched inputData instance.
         /// </summary>
         /// <param name="filePath">The path where the GameObject config is stored as a XML file</param>
         /// <param name="inputData">The actual GameObject instance which should be returned modified</param>
@@ -71,30 +81,34 @@ namespace Services
             foreach (var go in allOriginalChildren)
                 go.transform.parent = null;
 
-            // Load the hierarchy description of all GameObject models
-            var loadedHierarchy = _xmlDeSerializer.DeserializeData(filePath);
+            // Load the configuration + hierarchy of all GameObject models
+            var fileData = _xmlDeSerializer.DeserializeData(filePath);
 
             // Go through the content of the config file
-            foreach (var hierarchyItem in loadedHierarchy)
+            foreach (var importedItemData in fileData)
             {
                 // Get the original GameObject by its name.
-                var originalObject = GetChildByName(allOriginalChildren, hierarchyItem.gameObjectName);
+                var originalObject = GetChildByName(allOriginalChildren, importedItemData.id);
 
                 // Object not existing in original GameObject list --> New/own grouping
-                if (originalObject == null) originalObject = new GameObject {name = hierarchyItem.gameObjectName};
+                if (originalObject == null) originalObject = new GameObject {name = importedItemData.id};
 
                 // Check if we loaded the root object or a child object
-                if (hierarchyItem.parentGameObjectName != "null")
+                if (importedItemData.parentId != "null")
                 {
                     // Search the new existing parent in the new outputData list
-                    var newParent = GetChildByName(outputData, hierarchyItem.parentGameObjectName);
+                    var newParent = GetChildByName(outputData, importedItemData.parentId);
 
                     // Override original parent with new parent in new outputData data structure
                     originalObject.transform.parent = newParent.transform;
+
+                    //Overwrite additional GameObject configuration defaults
+                    originalObject.GetComponent<ItemInfoController>().ItemInfo = importedItemData.itemInfo;
+
                 }
                 else
-                    // Found root. Store root reference for later return
                 {
+                    // Found root. Store root reference for later return
                     rootObject = originalObject;
                 }
 

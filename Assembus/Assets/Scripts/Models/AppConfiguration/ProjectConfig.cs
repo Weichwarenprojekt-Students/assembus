@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Models.Configuration
+namespace Models.AppConfiguration
 {
     /// <summary>
     ///     This data model stores the project configuration data which is required to restore GUI window settings

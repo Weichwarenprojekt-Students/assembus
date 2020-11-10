@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using Services;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,16 +23,6 @@ namespace MainScreen.HierarchyView
         public ComponentHighlighting componentHighlighting;
 
         /// <summary>
-        ///     Names of the items mapped to their GameObject
-        /// </summary>
-        private Dictionary<string, GameObject> _hierarchyItemNames = new Dictionary<string, GameObject>();
-
-        /// <summary>
-        ///     Dictionary of hierarchy items mapped to a bool that indicates if the item should be highlighted
-        /// </summary>
-        private Dictionary<GameObject, bool> _hierarchyItems = new Dictionary<GameObject, bool>();
-
-        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -43,6 +31,26 @@ namespace MainScreen.HierarchyView
         ///     The color for an unselected button
         /// </summary>
         private readonly Color32 _unselectedColor = new Color32(53, 73, 103, 255);
+
+        /// <summary>
+        ///     A list of the GameObject in Insertion Order
+        /// </summary>
+        private List<GameObject> _entriesInOrder;
+
+        /// <summary>
+        ///     Names of the items mapped to their GameObject
+        /// </summary>
+        private Dictionary<string, GameObject> _hierarchyItemNames;
+
+        /// <summary>
+        ///     Dictionary of hierarchy items mapped to a bool that indicates if the item should be highlighted
+        /// </summary>
+        private Dictionary<GameObject, bool> _hierarchyItems;
+
+        /// <summary>
+        ///     The item selected before the currently selected one
+        /// </summary>
+        private GameObject _lastSelectedItem;
 
         /// <summary>
         ///     The root element of the hierarchy view
@@ -55,17 +63,19 @@ namespace MainScreen.HierarchyView
         /// <param name="item">The item which is going to be added</param>
         public void AddItem(GameObject item)
         {
-            if (!_hierarchyItems.ContainsKey(item));
-                _hierarchyItems.Add(item, IsUnselected);
-
-            if (!_hierarchyItemNames.ContainsKey(item.name))
-                _hierarchyItemNames.Add(item.name, item);
+            _hierarchyItems.Add(item, IsUnselected);
+            _hierarchyItemNames.Add(item.name, item);
+            _entriesInOrder.Add(item);
         }
 
+        /// <summary>
+        ///     Initializes all necessary lists
+        /// </summary>
         public void InitializeLists()
         {
             _hierarchyItems = new Dictionary<GameObject, bool>();
             _hierarchyItemNames = new Dictionary<string, GameObject>();
+            _entriesInOrder = new List<GameObject>();
         }
 
         /// <summary>
@@ -97,14 +107,36 @@ namespace MainScreen.HierarchyView
         /// </summary>
         private void UpdateItems()
         {
+            var trans = _projectManager.CurrentProject.ObjectModel.transform;
             var list = new List<GameObject>();
             foreach (var item in _hierarchyItems)
                 if (item.Value)
-                    list.Add(_projectManager.CurrentProject.ObjectModel.transform.Find(item.Key.name).gameObject);
-            var s = ProjectManager.Instance.CurrentProject.ObjectModel;
+                    list.Add(FindDeepChild(trans, item.Key.name).gameObject);
+
             componentHighlighting.HighlightGameObjects(list);
             foreach (var item in _hierarchyItems.Keys)
                 HighlightItem(item);
+        }
+
+        /// <summary>
+        ///     Finds a deep child of a parent with the given string as search term
+        /// </summary>
+        /// <param name="parent">The parent transform which is going to be searched</param>
+        /// <param name="searchValue">The search value</param>
+        /// <returns></returns>
+        private static Transform FindDeepChild(Transform parent, string searchValue)
+        {
+            for (var i = 0; i < parent.childCount; i++)
+            {
+                if (searchValue.Equals(parent.GetChild(i).name))
+                    return parent.GetChild(i);
+
+                var childTransform = FindDeepChild(parent.GetChild(i), searchValue);
+                if (!(childTransform is null))
+                    return childTransform;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -132,7 +164,7 @@ namespace MainScreen.HierarchyView
         ///     Toggles the item status
         /// </summary>
         /// <param name="item">The item which status is going to be changed</param>
-        public void ToggleItemStatus(GameObject item)
+        private void ToggleItemStatus(GameObject item)
         {
             _hierarchyItems[item] = !_hierarchyItems[item];
         }
@@ -147,6 +179,11 @@ namespace MainScreen.HierarchyView
             _hierarchyItems[item] = status;
         }
 
+        /// <summary>
+        ///     Handles the possible OnClick modifiers
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="mod"></param>
         public void ClickItem(GameObject item, KeyCode mod)
         {
             switch (mod)
@@ -156,9 +193,11 @@ namespace MainScreen.HierarchyView
                     break;
                 case KeyCode.LeftControl:
                     ControlSelection(item);
+                    _lastSelectedItem = item;
                     break;
                 default:
                     NoModSelection(item);
+                    _lastSelectedItem = item;
                     break;
             }
 
@@ -175,70 +214,56 @@ namespace MainScreen.HierarchyView
             ToggleItemStatus(item);
         }
 
+        /// <summary>
+        ///     Adds one item to the currently selected items or removes one of the item is already selected
+        /// </summary>
+        /// <param name="item"></param>
         private void ControlSelection(GameObject item)
         {
-            var itemsToReplace = GetItemsOnDifHierarchyLevel(item);
-            foreach (var replaceItem in itemsToReplace) ToggleItemStatus(replaceItem);
+            if (null != _lastSelectedItem && !item.transform.parent.Equals(_lastSelectedItem.transform.parent))
+                ResetAllItemStatus();
 
             ToggleItemStatus(item);
         }
 
+        /// <summary>
+        ///     Selects the items from the last items index to the current items index
+        /// </summary>
+        /// <param name="item">The currently selected item</param>
         private void ShiftSelection(GameObject item)
         {
+            ResetAllItemStatus();
+            if (null != _lastSelectedItem && !item.transform.parent.Equals(_lastSelectedItem.transform.parent))
+            {
+                ToggleItemStatus(item);
+            }
+            else
+            {
+                var parent = item.transform.parent;
+                var lastItemIndex = _lastSelectedItem.transform.GetSiblingIndex();
+                var currentItemIndex = item.transform.GetSiblingIndex();
+
+                if (lastItemIndex >= currentItemIndex)
+                    for (var i = currentItemIndex; i <= lastItemIndex; i++)
+                        SetItemStatus(parent.GetChild(i).gameObject, IsSelected);
+                else
+                    for (var i = lastItemIndex; i <= currentItemIndex; i++)
+                        SetItemStatus(parent.GetChild(i).gameObject, IsSelected);
+            }
         }
 
         /// <summary>
-        ///     Returns a list of items that are selected and on a different hierarchy level than the given item
+        ///     Return the selected GameObjects as a list in the right order
         /// </summary>
-        /// <param name="item">The item which parents and children are going to be checked</param>
         /// <returns></returns>
-        private Collection<GameObject> GetItemsOnDifHierarchyLevel(GameObject item)
+        public List<GameObject> GetSelectedEntriesOrdered()
         {
-            var parentToReplace = GetParentInHierarchyView(item.transform);
-            var itemsToReplace = item.transform.childCount > 0
-                ? GetChildrenInDictionary(item.transform)
-                : new Collection<GameObject>();
-            if (null != parentToReplace)
-                itemsToReplace.Add(parentToReplace);
-            return itemsToReplace;
-        }
-
-        /// <summary>
-        ///     Searches all child elements for elements that are selected in the hierarchy View and returns them in
-        ///     a collection
-        /// </summary>
-        /// <param name="parent">The element whose children have to be checked</param>
-        /// <returns></returns>
-        private Collection<GameObject> GetChildrenInDictionary(Transform parent)
-        {
-            var ret = new Collection<GameObject>();
-            var children = parent.GetComponentsInChildren<Transform>();
-
-            // Loop has to start at 1 because the first array element is the parent
-            for (var i = 1; i < children.Length; i++)
-                if (_hierarchyItems.ContainsKey(children[i].gameObject) && _hierarchyItems[children[i].gameObject])
-                    ret.Add(children[i].gameObject);
+            var ret = _entriesInOrder;
+            foreach (var item in _hierarchyItems)
+                if (!item.Value)
+                    ret.Remove(item.Key);
 
             return ret;
-        }
-
-        /// <summary>
-        ///     Checks if any of a Transform's parent elements are selected
-        /// </summary>
-        /// <param name="child">The child element which parents have to be checked</param>
-        /// <returns>GameObject of the parent element that is already in the dictionary</returns>
-        private GameObject GetParentInHierarchyView(Transform child)
-        {
-            var parent = child.parent;
-            while (parent != null)
-            {
-                if (_hierarchyItems.ContainsKey(parent.gameObject) && _hierarchyItems[parent.gameObject])
-                    return parent.gameObject;
-
-                parent = parent.parent;
-            }
-
-            return null;
         }
     }
 }

@@ -1,13 +1,12 @@
 ﻿using Services;
 using Shared;
-using Shared.Toast;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MainScreen
 {
-    public class UIController : MonoBehaviour
+    public class MainController : MonoBehaviour
     {
         /// <summary>
         ///     The main camera
@@ -30,19 +29,9 @@ namespace MainScreen
         public Canvas mainCanvas;
 
         /// <summary>
-        ///     The two screens
-        /// </summary>
-        public GameObject startScreen, mainScreen;
-
-        /// <summary>
         ///     The dialog controller
         /// </summary>
         public DialogController dialog;
-
-        /// <summary>
-        ///     The toast controller
-        /// </summary>
-        public ToastController toast;
 
         /// <summary>
         ///     The title view
@@ -58,11 +47,6 @@ namespace MainScreen
         ///     A default hierarchy view item
         /// </summary>
         public GameObject defaultHierarchyViewItem;
-
-        /// <summary>
-        ///     The configuration manager
-        /// </summary>
-        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
 
         /// <summary>
         ///     The project manager
@@ -149,6 +133,15 @@ namespace MainScreen
         }
 
         /// <summary>
+        ///     Reset the camera
+        /// </summary>
+        public void ResetCamera()
+        {
+            _width = 0;
+            mainCamera.rect = new Rect(0, 0, 1, 1);
+        }
+
+        /// <summary>
         ///     Load the object model into the hierarchy view
         /// </summary>
         private void LoadModelIntoHierarchyView()
@@ -213,54 +206,6 @@ namespace MainScreen
                 // fill the new item recursively with children
                 LoadElementWithChildren(itemController.childrenContainer, child, depth + 16);
             }
-        }
-
-        /// <summary>
-        ///     Save the current project
-        /// </summary>
-        public void SaveProject()
-        {
-            var (success, message) = _projectManager.SaveProject();
-            if (!success)
-            {
-                toast.Error(Toast.Short, message);
-                return;
-            }
-
-            // Show that the saving was successful
-            _projectManager.Saved = true;
-            title.text = _projectManager.CurrentProject.Name;
-            toast.Success(Toast.Short, "Project was saved successfully!");
-        }
-
-        /// <summary>
-        ///     Close a project
-        /// </summary>
-        public void CloseProject()
-        {
-            var description = _projectManager.Saved ? "Are you sure?" : "Unsaved changes! Are you sure?";
-            dialog.Show(
-                "Close Project",
-                description,
-                () =>
-                {
-                    // Remove the last opened project 
-                    _configManager.Config.lastProject = "";
-                    _configManager.SaveConfig();
-                    _projectManager.Saved = true;
-
-                    // Reset camera
-                    _width = 0;
-                    mainCamera.rect = new Rect(0, 0, 1, 1);
-
-                    // Remove GameObject of current project
-                    Destroy(_projectManager.CurrentProject.ObjectModel);
-
-                    // Show the start screen
-                    mainScreen.SetActive(false);
-                    startScreen.SetActive(true);
-                }
-            );
         }
     }
 }

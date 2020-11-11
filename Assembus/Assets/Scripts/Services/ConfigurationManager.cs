@@ -59,16 +59,17 @@ namespace Services
         ///     Writes ConfigFileStruct FileStruct to XML file.
         ///     If writing fails, return false and write to debug log
         /// </summary>
-        public void SaveConfig()
+        /// <returns>True if the saving was successful</returns>
+        public bool SaveConfig()
         {
             try
             {
-                // Write object to XML
                 _xmlDeSerializer.SerializeData(FileName, Config);
+                return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Debug.Log("Couldn't write XML file!: " + e.Message);
+                return false;
             }
         }
     }

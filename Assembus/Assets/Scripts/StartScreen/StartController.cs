@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace StartScreen
 {
-    public class UIController : MonoBehaviour
+    public class StartController : MonoBehaviour
     {
         /// <summary>
         ///     The input fields for the project creation
@@ -378,7 +378,7 @@ namespace StartScreen
             if (!success) return;
 
             // Load the OBJ model
-            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+            var (loadSuccess, _) = _projectManager.LoadGameObject(false);
             if (!loadSuccess) return;
 
             // Show the main screen

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MainScreen.HierarchyView;
+using MainScreen.Sidebar.HierarchyView;
 using UnityEngine;
 
 namespace MainScreen
@@ -215,13 +215,14 @@ namespace MainScreen
             gameObjects.ForEach(
                 g =>
                 {
-                    var material = g.GetComponent<Renderer>();
+                    var itemRenderer = g.GetComponent<Renderer>();
+                    if (itemRenderer == null) return;
 
                     // Add to selection list and save original color
-                    _selectedGameObjects.Add(g, material.material.color);
+                    _selectedGameObjects.Add(g, itemRenderer.material.color);
 
                     // Highlight selection
-                    material.material.color = color;
+                    itemRenderer.material.color = color;
                 }
             );
         }

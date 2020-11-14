@@ -3,7 +3,7 @@ using Shared.Toast;
 using TMPro;
 using UnityEngine;
 
-namespace MainScreen
+namespace MainScreen.Sidebar
 {
     public class SettingsController : MonoBehaviour
     {
@@ -18,14 +18,14 @@ namespace MainScreen
         public TMP_InputField historyLengthInput;
 
         /// <summary>
-        ///     The configuration manager
-        /// </summary>
-        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
-
-        /// <summary>
         ///     The toast controller
         /// </summary>
         public ToastController toast;
+
+        /// <summary>
+        ///     The configuration manager
+        /// </summary>
+        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
 
         /// <summary>
         ///     The project manager
@@ -55,13 +55,9 @@ namespace MainScreen
             {
                 _configManager.Config.undoHistoryLimit = newValue;
                 if (!_configManager.SaveConfig())
-                {
                     toast.Error(Toast.Short, "Couldn't save new settings!");
-                }
                 else
-                {
                     toast.Success(Toast.Short, "Settings saved successfully!");
-                }
             }
             else
             {

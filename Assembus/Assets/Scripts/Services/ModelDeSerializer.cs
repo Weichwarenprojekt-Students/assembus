@@ -102,9 +102,12 @@ namespace Services
                     // Override original parent with new parent in new outputData data structure
                     originalObject.transform.parent = newParent.transform;
 
-                    //Overwrite additional GameObject configuration defaults
-                    originalObject.GetComponent<ItemInfoController>().ItemInfo = importedItemData.itemInfo;
+                    // Check if the object already has an item info controller
+                    if (originalObject.GetComponent<ItemInfoController>() is null)
+                        originalObject.AddComponent<ItemInfoController>();
 
+                    // Overwrite additional GameObject configuration defaults
+                    originalObject.GetComponent<ItemInfoController>().ItemInfo = importedItemData.itemInfo;
                 }
                 else
                 {

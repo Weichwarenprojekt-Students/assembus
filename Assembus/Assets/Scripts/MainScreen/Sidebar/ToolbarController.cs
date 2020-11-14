@@ -6,7 +6,7 @@ using Shared.Toast;
 using TMPro;
 using UnityEngine;
 
-namespace MainScreen
+namespace MainScreen.Sidebar
 {
     public class ToolbarController : MonoBehaviour
     {
@@ -66,27 +66,11 @@ namespace MainScreen
         private readonly UndoService _undoService = UndoService.Instance;
 
         /// <summary>
-        ///     Set the callback for new commands and add some example commands
+        ///     Set the callback for new commands
         /// </summary>
         private void Start()
         {
             _undoService.OnNewCommand = OnEnable;
-            _undoService.AddCommand(
-                new Command(
-                    new[] {new ItemState("", "", "", 0)},
-                    new[] {new ItemState("", "", "", 0)},
-                    item => Debug.Log("redo1"),
-                    item => Debug.Log("undo1")
-                )
-            );
-            _undoService.AddCommand(
-                new Command(
-                    new[] {new ItemState("", "", "", 0)},
-                    new[] {new ItemState("", "", "", 0)},
-                    item => Debug.Log("redo2"),
-                    item => Debug.Log("undo2")
-                )
-            );
         }
 
         /// <summary>
@@ -154,9 +138,9 @@ namespace MainScreen
                     mainController.ResetCamera();
 
                     // Remove GameObject of current project
-                    Destroy(_projectManager.CurrentProject.ObjectModel);
                     componentHighlighting.ResetHighlighting();
-                    
+                    Destroy(_projectManager.CurrentProject.ObjectModel);
+
                     // Show the start screen
                     mainScreen.SetActive(false);
                     startScreen.SetActive(true);
@@ -169,7 +153,7 @@ namespace MainScreen
         /// </summary>
         public void Settings()
         {
-            settings.Show();            
+            settings.Show();
         }
     }
 }

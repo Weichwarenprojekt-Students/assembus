@@ -1,5 +1,6 @@
-﻿using MainScreen.HierarchyView;
+﻿using MainScreen.Sidebar.HierarchyView;
 using Services;
+using Services.UndoRedo;
 using Shared;
 using TMPro;
 using UnityEngine;
@@ -132,10 +133,15 @@ namespace MainScreen
         /// </summary>
         private void OnEnable()
         {
+            // Show the title
             _projectManager.Saved = false;
             title.text = _projectManager.CurrentProject.Name + "*";
             hierarchyViewController.InitializeLists();
 
+            // Initialize the command executor
+            ActionCreator.Initialize(_projectManager.CurrentProject.ObjectModel, hierarchyView);
+
+            // Load the model
             LoadModelIntoHierarchyView();
         }
 
@@ -190,7 +196,7 @@ namespace MainScreen
         /// <param name="containingListView">The container of the list view</param>
         /// <param name="parent">The parent item on the actual model</param>
         /// <param name="depth">The margin to the left side</param>
-        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 0)
+        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 32)
         {
             for (var i = 0; i < parent.transform.childCount; i++)
             {
@@ -213,7 +219,7 @@ namespace MainScreen
                 var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
 
                 // initialize the item
-                itemController.Initialize(child.name, depth, hierarchyView);
+                itemController.Initialize(child, depth, hierarchyView);
 
                 // fill the new item recursively with children
                 LoadElementWithChildren(itemController.childrenContainer, child, depth + 16);

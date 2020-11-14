@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Services;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MainScreen.HierarchyView
+namespace MainScreen.Sidebar.HierarchyView
 {
     public class HierarchyViewController : MonoBehaviour
     {
@@ -23,14 +24,14 @@ namespace MainScreen.HierarchyView
         public ComponentHighlighting componentHighlighting;
 
         /// <summary>
+        ///     The colors for the item
+        /// </summary>
+        public Color selectedColor, normalColor;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
-
-        /// <summary>
-        ///     The color for an unselected button
-        /// </summary>
-        private readonly Color32 _unselectedColor = new Color32(53, 73, 103, 255);
 
         /// <summary>
         ///     A list of the GameObject in Insertion Order
@@ -111,32 +112,11 @@ namespace MainScreen.HierarchyView
             var list = new List<GameObject>();
             foreach (var item in _hierarchyItems)
                 if (item.Value)
-                    list.Add(FindDeepChild(trans, item.Key.name).gameObject);
+                    list.Add(Utility.FindChild(trans, item.Key.name).gameObject);
 
             componentHighlighting.HighlightGameObjects(list);
             foreach (var item in _hierarchyItems.Keys)
                 HighlightItem(item);
-        }
-
-        /// <summary>
-        ///     Finds a deep child of a parent with the given string as search term
-        /// </summary>
-        /// <param name="parent">The parent transform which is going to be searched</param>
-        /// <param name="searchValue">The search value</param>
-        /// <returns></returns>
-        private static Transform FindDeepChild(Transform parent, string searchValue)
-        {
-            for (var i = 0; i < parent.childCount; i++)
-            {
-                if (searchValue.Equals(parent.GetChild(i).name))
-                    return parent.GetChild(i);
-
-                var childTransform = FindDeepChild(parent.GetChild(i), searchValue);
-                if (!(childTransform is null))
-                    return childTransform;
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -156,7 +136,7 @@ namespace MainScreen.HierarchyView
         private void SetColor(Selectable selectable, bool selected)
         {
             var colors = selectable.colors;
-            colors.normalColor = selected ? colors.highlightedColor : (Color) _unselectedColor;
+            colors.normalColor = selected ? selectedColor : normalColor;
             selectable.colors = colors;
         }
 
@@ -258,12 +238,7 @@ namespace MainScreen.HierarchyView
         /// <returns></returns>
         public List<GameObject> GetSelectedEntriesOrdered()
         {
-            var ret = _entriesInOrder;
-            foreach (var item in _hierarchyItems)
-                if (!item.Value)
-                    ret.Remove(item.Key);
-
-            return ret;
+            return _entriesInOrder.Where(item => _hierarchyItems[item]).ToList();
         }
     }
 }

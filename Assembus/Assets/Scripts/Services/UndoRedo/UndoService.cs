@@ -49,11 +49,15 @@ namespace Services.UndoRedo
 
             // Update the current element
             _current = _current.Next;
+            if (_current?.Next != null) _linkedList.Remove(_current.Next);
 
             // Remove first entry if greater than configured length
             if (_linkedList.Count > _configManager.Config.undoHistoryLimit) _linkedList.RemoveFirst();
 
-            // Execute the new command callback
+            // Execute the new action
+            _current?.Value.CallRedo();
+
+            // Notify the UI that new action was added
             OnNewCommand?.Invoke();
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace MainScreen.HierarchyView
+namespace MainScreen.Sidebar.HierarchyView
 {
     public class ContextMenuController : MonoBehaviour, IPointerDownHandler
     {
@@ -22,6 +22,15 @@ namespace MainScreen.HierarchyView
         ///     Hide the context menu
         /// </summary>
         private void OnMouseDown()
+        {
+            gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Hide the context menu if the user clicked outside of the panel
+        /// </summary>
+        /// <param name="eventData">The event data</param>
+        public void OnPointerDown(PointerEventData eventData)
         {
             gameObject.SetActive(false);
         }
@@ -53,7 +62,8 @@ namespace MainScreen.HierarchyView
                 var nameText = newListViewItem.transform.Find("Name").GetComponent<TextMeshProUGUI>();
                 nameText.text = names[i];
                 var index = i;
-                newListViewItem.GetComponent<Button>().onClick.AddListener(() =>
+                newListViewItem.GetComponent<Button>().onClick.AddListener(
+                    () =>
                     {
                         actions[index]();
                         gameObject.SetActive(false);
@@ -63,18 +73,9 @@ namespace MainScreen.HierarchyView
 
             // Hide the default item
             defaultItem.SetActive(false);
-            
+
             // Show the context menu
             gameObject.SetActive(true);
-        }
-
-        /// <summary>
-        ///     Hide the context menu if the user clicked outside of the panel
-        /// </summary>
-        /// <param name="eventData">The event data</param>
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            gameObject.SetActive(false);
         }
     }
 }

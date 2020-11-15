@@ -1,5 +1,6 @@
 ﻿using System;
 using MainScreen.Sidebar.HierarchyView;
+using Models.Project;
 using UnityEngine;
 
 namespace Services.UndoRedo
@@ -38,6 +39,9 @@ namespace Services.UndoRedo
             {
                 case Command.Move:
                     return Move;
+                
+                case Command.Rename:
+                    return Rename;
 
                 default:
                     return item => { };
@@ -55,6 +59,9 @@ namespace Services.UndoRedo
             {
                 case Command.Move:
                     return Move;
+                
+                case Command.Rename:
+                    return Rename;
 
                 default:
                     return item => { };
@@ -64,6 +71,7 @@ namespace Services.UndoRedo
         /// <summary>
         ///     The action for moving an item
         /// </summary>
+        /// <param name="state">The item state</param>
         private static void Move(ItemState state)
         {
             // Get the item and the parent
@@ -101,6 +109,23 @@ namespace Services.UndoRedo
             if (modelParent == null) modelParent = _model.transform;
             modelItem.SetParent(modelParent);
             modelItem.SetSiblingIndex(state.SiblingIndex);
+        }
+
+        /// <summary>
+        ///     Rename an item
+        /// </summary>
+        /// <param name="state">The item state</param>
+        private static void Rename(ItemState state)
+        {
+            // Get the item and change the name on it
+            var listItem = Utility.FindChild(_hierarchyView.transform, state.ID);
+            var nameLabel = listItem.GetComponent<HierarchyItemController>().nameText;
+            nameLabel.text = state.Name;
+            
+            // Change the display name in the actual object
+            var modelItem = Utility.FindChild(_model.transform, state.ID);
+            var itemInfo = modelItem.GetComponent<ItemInfoController>().ItemInfo;
+            itemInfo.displayName = state.Name;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Models.Project;
 using Services.UndoRedo;
+using Shared.Toast;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -50,6 +51,16 @@ namespace MainScreen.Sidebar.HierarchyView
         public TextMeshProUGUI nameText;
 
         /// <summary>
+        ///     The input field for renaming an item
+        /// </summary>
+        public TMP_InputField nameInput;
+
+        /// <summary>
+        ///     The matching game objects for the name label and input
+        /// </summary>
+        public GameObject nameTextObject, nameInputObject;
+
+        /// <summary>
         ///     The rect transform of the name
         /// </summary>
         public RectTransform nameRect;
@@ -90,9 +101,14 @@ namespace MainScreen.Sidebar.HierarchyView
         public GameObject dragPreview;
 
         /// <summary>
+        ///     The toast controller
+        /// </summary>
+        public ToastController toast;
+
+        /// <summary>
         ///     The item of the actual model
         /// </summary>
-        public GameObject item;
+        [HideInInspector] public GameObject item;
 
         /// <summary>
         ///     The undo redo service
@@ -237,15 +253,62 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     Open the context menu on right click
         /// </summary>
         /// <param name="data">The event data</param>
-        public void OpenContextMenu(BaseEventData data)
+        public void ItemClick(BaseEventData data)
         {
-            // Execute the right click action
+            // Check if it was a right click
             var pointerData = (PointerEventData) data;
             if (pointerData.button == PointerEventData.InputButton.Right)
-                contextMenu.Show(new[] {"Test"}, new Action[] {() => Debug.Log("Test")});
+                contextMenu.Show(new[] {"Rename"}, new Action[] {RenameItem});
 
             // Select the item 
             SelectItem();
+        }
+
+        /// <summary>
+        ///     Start a renaming action
+        /// </summary>
+        private void RenameItem()
+        {
+            nameInput.text = nameText.text;
+            nameInputObject.SetActive(true);
+            nameInput.Select();
+            nameTextObject.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Cancel a rename action
+        /// </summary>
+        public void CancelRenaming()
+        {
+            nameInputObject.SetActive(false);
+            nameTextObject.SetActive(true);
+        }
+
+        /// <summary>
+        ///     Apply a rename action
+        /// </summary>
+        public void ApplyRenaming()
+        {
+            // Check if there's a name given
+            var newName = nameInput.text;
+            if (newName == "")
+            {
+                toast.Error(Toast.Short, "Name cannot be empty!");
+                return;
+            }
+
+            // Save the old item state
+            var oldState = new[]{ItemState.FromListItem(gameObject)};
+            
+            // Create the new item state
+            var newState = new []{new ItemState(oldState[0]){Name = newName}};
+            
+            // Hide the input field an show the name field
+            nameInputObject.SetActive(false);
+            nameTextObject.SetActive(true);
+
+            // Add the new action to the undo redo service
+            _undoService.AddCommand(new Command(newState, oldState, Command.Rename));
         }
 
         /// <summary>

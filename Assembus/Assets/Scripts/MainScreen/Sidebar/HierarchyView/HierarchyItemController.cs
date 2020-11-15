@@ -30,6 +30,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private static HierarchyItemController _dragItem;
 
         /// <summary>
+        ///     The selected items before starting a drag
+        /// </summary>
+        private static List<GameObject> _selectedItems = new List<GameObject>();
+
+        /// <summary>
         ///     The colors for the item
         /// </summary>
         public Color highlightedColor, normalColor;
@@ -103,11 +108,6 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     The root element of the hierarchy view
         /// </summary>
         private RectTransform _rectTransform;
-
-        /// <summary>
-        ///     The selected items before starting a drag
-        /// </summary>
-        private List<GameObject> _selectedItems = new List<GameObject>();
 
         /// <summary>
         ///     True if the hierarchy view needs to be updated
@@ -322,18 +322,18 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="data">Event data</param>
         public void PutAbove(BaseEventData data)
         {
+            // Change the color
+            var selected = _selectedItems.Contains(gameObject);
+            var colors = background.colors;
+            colors.highlightedColor = _dragging && !selected ? normalColor : highlightedColor;
+            background.colors = colors;
+
             // Show the moving indicator
-            movingIndicator.SetActive(_dragging);
+            movingIndicator.SetActive(_dragging && !selected);
 
             // Save the item and the action
             _insertion = false;
-            _dragItem = this;
-
-            // Change the color
-            var colors = background.colors;
-            var selected = _selectedItems.Contains(gameObject);
-            colors.highlightedColor = _dragging && !selected ? normalColor : highlightedColor;
-            background.colors = colors;
+            _dragItem = selected ? null : this;
         }
 
         /// <summary>
@@ -353,16 +353,16 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="data">Event data</param>
         public void InsertItem(BaseEventData data)
         {
-            // Save the item and the action if item is compatible
-            var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
-            _insertion = true;
-            _dragItem = isGroup ? this : null;
-
             // Change the color
+            var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
             var colors = background.colors;
             var selected = _selectedItems.Contains(gameObject);
             colors.highlightedColor = _dragging && !isGroup && !selected ? normalColor : highlightedColor;
             background.colors = colors;
+
+            // Save the item and the action if item is compatible
+            _insertion = true;
+            _dragItem = isGroup && !selected ? this : null;
         }
 
         /// <summary>

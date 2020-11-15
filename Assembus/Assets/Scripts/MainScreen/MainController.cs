@@ -2,7 +2,6 @@
 using Services;
 using Services.UndoRedo;
 using Shared;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,11 +33,6 @@ namespace MainScreen
         ///     The dialog controller
         /// </summary>
         public DialogController dialog;
-
-        /// <summary>
-        ///     The title view
-        /// </summary>
-        public TextMeshProUGUI title;
 
         /// <summary>
         ///     The hierarchy view
@@ -133,9 +127,7 @@ namespace MainScreen
         /// </summary>
         private void OnEnable()
         {
-            // Show the title
-            _projectManager.Saved = false;
-            title.text = _projectManager.CurrentProject.Name + "*";
+            // Initialize the lists of the view controller
             hierarchyViewController.InitializeLists();
 
             // Initialize the command executor

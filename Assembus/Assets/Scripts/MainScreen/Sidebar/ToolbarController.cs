@@ -70,14 +70,29 @@ namespace MainScreen.Sidebar
         /// </summary>
         private void Start()
         {
-            _undoService.OnNewCommand = OnEnable;
+            _undoService.OnNewCommand = () => UpdateProjectView(false);
         }
 
         /// <summary>
-        ///     Update the buttons
+        ///     Update the buttons and the title
         /// </summary>
         private void OnEnable()
         {
+            UpdateProjectView(true);
+        }
+
+        /// <summary>
+        ///     Update the buttons and the title
+        /// </summary>
+        /// <param name="saved">True if the project is in a saved state</param>
+        private void UpdateProjectView(bool saved)
+        {
+            // Show the title
+            _projectManager.Saved = saved;
+            title.text = _projectManager.CurrentProject.Name;
+            if (!saved) title.text += "*";
+
+            // Enable the buttons
             undo.Enable(_undoService.HasUndo());
             redo.Enable(_undoService.HasRedo());
         }
@@ -88,7 +103,7 @@ namespace MainScreen.Sidebar
         public void UndoAction()
         {
             _undoService.Undo();
-            OnEnable();
+            UpdateProjectView(false);
         }
 
         /// <summary>
@@ -97,7 +112,7 @@ namespace MainScreen.Sidebar
         public void RedoAction()
         {
             _undoService.Redo();
-            OnEnable();
+            UpdateProjectView(false);
         }
 
         /// <summary>

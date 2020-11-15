@@ -74,6 +74,22 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
+        ///     Check if either CTRL-Z, CTRL-Y or CTRL-SHIFT_Z was used
+        /// </summary>
+        private void Update()
+        {
+            // Check which keys were pressed
+            var ctrlZ = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z);
+            var ctrlShiftZ = ctrlZ && Input.GetKey(KeyCode.LeftShift);
+            var ctrlY = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y);
+                
+            // Check if an action should be redone
+            if (ctrlShiftZ || ctrlY) RedoAction();
+            // Check if an action should be undone
+            else if (ctrlZ) UndoAction();
+        }
+
+        /// <summary>
         ///     Update the buttons and the title
         /// </summary>
         private void OnEnable()

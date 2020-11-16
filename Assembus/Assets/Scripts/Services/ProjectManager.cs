@@ -285,7 +285,7 @@ namespace Services
         {
             // Add the default assembly station
             var defaultStation = new GameObject {name = DefaultStationName};
-            var info = new ItemInfo {displayName = DefaultStationName, isGroup = false};
+            var info = new ItemInfo {displayName = DefaultStationName, isGroup = true};
 
             defaultStation.AddComponent<ItemInfoController>();
             defaultStation.GetComponent<ItemInfoController>().ItemInfo = info;

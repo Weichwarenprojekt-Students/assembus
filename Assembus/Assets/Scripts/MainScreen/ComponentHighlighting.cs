@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
+using Models.Project;
+using Services;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MainScreen
 {
@@ -18,19 +21,9 @@ namespace MainScreen
         public HierarchyViewController hierarchyViewController;
 
         /// <summary>
-        ///     Hovering color
+        ///     Highlighting colors
         /// </summary>
-        private readonly Color _colorHover = Color.yellow;
-
-        /// <summary>
-        ///     Group selection color
-        /// </summary>
-        private readonly Color _colorSelectedGroup = Color.blue;
-
-        /// <summary>
-        ///     Single selection color
-        /// </summary>
-        private readonly Color _colorSelectedSingle = Color.red;
+        public Color colorHover, colorSelectedGroup, colorSelectedSingle;
 
         /// <summary>
         ///     List of selected game objects and their initial color value
@@ -125,7 +118,7 @@ namespace MainScreen
             _hoveredOriginalColor = material.color;
 
             // Set highlighting color
-            material.color = _colorHover;
+            material.color = colorHover;
         }
 
         /// <summary>
@@ -136,7 +129,7 @@ namespace MainScreen
         private void HighlightSelection(GameObject clickedObject, bool multipleSelectionsAllowed)
         {
             // Clicked object is not selected yet
-            if (!_selectedGameObjects.ContainsKey(clickedObject))
+            if (!_selectedGameObjects.ContainsKey(clickedObject) || !multipleSelectionsAllowed)
             {
                 // Reset previously selected objects if multiple selection is not enabled
                 if (_selectedGameObjects.Count > 0 && !multipleSelectionsAllowed) ResetPreviousSelections();
@@ -151,7 +144,7 @@ namespace MainScreen
                 if (_selectedGameObjects.Count > 1)
                     HighlightGameObjects(_selectedGameObjects.Keys.ToList());
                 else
-                    clickedObject.GetComponent<Renderer>().material.color = _colorSelectedSingle;
+                    clickedObject.GetComponent<Renderer>().material.color = colorSelectedSingle;
             }
             // Clicked object was selected before already
             else
@@ -197,7 +190,7 @@ namespace MainScreen
             _selectedGameObjects.Add(gameObjects, material.material.color);
 
             // Highlight selection
-            material.material.color = _colorSelectedSingle;
+            material.material.color = colorSelectedSingle;
         }
 
         /// <summary>
@@ -208,9 +201,13 @@ namespace MainScreen
         {
             // Clear current selection, to preserve original color invariance
             ResetPreviousSelections();
+            
+            // Is the given game object a grouping object -> Get children inside
+            if (gameObjects[0].GetComponent<ItemInfoController>().ItemInfo.isGroup)
+                gameObjects = Utility.GetAllGameObjects(gameObjects[0]).ToList();
 
             // Single selection or group selection
-            var color = gameObjects.Count > 1 ? _colorSelectedGroup : _colorSelectedSingle;
+            var color = gameObjects.Count > 1 ? colorSelectedGroup : colorSelectedSingle;
 
             gameObjects.ForEach(
                 g =>

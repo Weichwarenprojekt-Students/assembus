@@ -4,7 +4,6 @@ using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
 using Services;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MainScreen
 {

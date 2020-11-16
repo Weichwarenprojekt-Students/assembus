@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Dummiesman;
 using Models.Project;
 using UnityEngine;
@@ -14,15 +13,14 @@ namespace Services
         /// </summary>
         /// <param name="objPath">Path to the object model</param>
         /// <returns>
-        ///     Returns a tuple consisting of the parent of the object models hierarchy and a list of all the elements inside
-        ///     the parent
+        ///     Returns parent of the object model
         /// </returns>
-        public static (GameObject, List<GameObject>) LoadObject(string objPath)
+        public static GameObject LoadObject(string objPath)
         {
             var parent = LoadObjectModel(objPath);
-            var children = LoadChildrenGameObjects(parent);
+            LoadChildrenGameObjects(parent);
 
-            return (parent, children);
+            return parent;
         }
 
         /// <summary>
@@ -41,10 +39,8 @@ namespace Services
         ///     Collects the elements, that the object model contains
         /// </summary>
         /// <returns>List of all game objects inside the object model</returns>
-        private static List<GameObject> LoadChildrenGameObjects(GameObject parent)
+        private static void LoadChildrenGameObjects(GameObject parent)
         {
-            var children = new List<GameObject>();
-
             for (var i = 0; i < parent.transform.childCount; i++)
             {
                 var child = parent.transform.GetChild(i).gameObject;
@@ -64,11 +60,7 @@ namespace Services
 
                 // Add the default additional GameObject configuration to the GameObject's originator
                 child.GetComponent<ItemInfoController>().ItemInfo = defaultMemento;
-
-                children.Add(child);
             }
-
-            return children;
         }
     }
 }

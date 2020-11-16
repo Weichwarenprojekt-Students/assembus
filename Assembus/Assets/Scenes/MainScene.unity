@@ -6046,6 +6046,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hierarchyViewController: {fileID: 2006810628}
+  colorHover: {r: 0.4862745, g: 0.5529412, b: 0.654902, a: 1}
+  colorSelectedGroup: {r: 0.12941177, g: 0.20392157, b: 0.31764707, a: 1}
+  colorSelectedSingle: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
 --- !u!224 &973023894 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2065074576797381153, guid: 0760d4c278b4b2149b12c08fcda2ce00,
@@ -7415,8 +7418,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.000003814712
-  m_Size: 0.9747635
+  m_Value: 0
+  m_Size: 0.9747634
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

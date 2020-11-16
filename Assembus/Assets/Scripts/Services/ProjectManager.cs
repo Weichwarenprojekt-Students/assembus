@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Models;
 using Models.Project;
 using UnityEngine;
 
@@ -268,8 +267,7 @@ namespace Services
         {
             try
             {
-                GameObject importObject;
-                (importObject, _) = ObjectLoader.LoadObject(importPath);
+                var importObject = ObjectLoader.LoadObject(importPath);
                 return (true, "", importObject);
             }
             catch (Exception)

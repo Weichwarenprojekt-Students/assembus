@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Models.Project;
 using Services.UndoRedo;
 using Shared.Toast;
@@ -249,18 +248,38 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Open the context menu on right click
+        ///     Handle clicks on the item
         /// </summary>
         /// <param name="data">The event data</param>
         public void ItemClick(BaseEventData data)
         {
             // Check if it was a right click
             var pointerData = (PointerEventData) data;
-            if (pointerData.button == PointerEventData.InputButton.Right)
-                contextMenu.Show(new[] {"Rename"}, new Action[] {RenameItem});
+            if (pointerData.button == PointerEventData.InputButton.Right) ShowContextMenu();
 
             // Select the item 
             SelectItem();
+        }
+
+        /// <summary>
+        ///     Open the context menu on right click
+        /// </summary>
+        private void ShowContextMenu()
+        {
+            var rename = new ContextMenuController.Item
+            {
+                Icon = contextMenu.edit,
+                Name = "Rename",
+                Action = RenameItem
+            };
+            var visible = item.activeSelf;
+            var visibility = new ContextMenuController.Item
+            {
+                Icon = visible ? contextMenu.hide : contextMenu.show,
+                Name = visible ? "Hide Item" : "Show Item",
+                Action = () => item.SetActive(!visible)
+            };
+            contextMenu.Show(new[] {rename, visibility});
         }
 
         /// <summary>
@@ -297,11 +316,11 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             // Save the old item state
-            var oldState = new[]{ItemState.FromListItem(this)};
-            
+            var oldState = new[] {ItemState.FromListItem(this)};
+
             // Create the new item state
-            var newState = new []{new ItemState(oldState[0]){Name = newName}};
-            
+            var newState = new[] {new ItemState(oldState[0]) {Name = newName}};
+
             // Hide the input field an show the name field
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
@@ -354,8 +373,9 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Get the new parent and the new sibling id
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
-            var siblingIndex = _insertion ? 
-                _dragItem.childrenContainer.transform.childCount : _dragItem.item.transform.GetSiblingIndex();
+            var siblingIndex = _insertion
+                ? _dragItem.childrenContainer.transform.childCount
+                : _dragItem.item.transform.GetSiblingIndex();
 
             // Save the old item states
             var oldStates = new ItemState[_selectedItems.Count];
@@ -368,10 +388,10 @@ namespace MainScreen.Sidebar.HierarchyView
             var offset = 0;
             for (var i = 0; i < newStates.Length; i++)
             {
-                var sameParent  = newParent == _selectedItems[i].transform.parent;
+                var sameParent = newParent == _selectedItems[i].transform.parent;
                 var smallerIndex = _dragItem.transform.GetSiblingIndex() >
                                    _selectedItems[i].transform.GetSiblingIndex();
-                if(sameParent && smallerIndex) offset--;
+                if (sameParent && smallerIndex) offset--;
                 newStates[i] = new ItemState(oldStates[i])
                     {ParentID = parent, SiblingIndex = siblingIndex + i + offset};
             }
@@ -406,7 +426,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StopPuttingAbove(BaseEventData data)
         {
             movingIndicator.SetActive(false);
-            if(!hierarchyViewController.Contains(this)) background.color = normalColor;
+            if (!hierarchyViewController.Contains(this)) background.color = normalColor;
             _dragItem = null;
         }
 
@@ -434,7 +454,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StopInsertingItem(BaseEventData data)
         {
             _dragItem = null;
-            if(!hierarchyViewController.Contains(this)) background.color = normalColor;
+            if (!hierarchyViewController.Contains(this)) background.color = normalColor;
         }
     }
 }

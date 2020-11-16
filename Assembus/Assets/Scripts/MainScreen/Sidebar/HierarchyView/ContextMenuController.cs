@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,6 +9,11 @@ namespace MainScreen.Sidebar.HierarchyView
 {
     public class ContextMenuController : MonoBehaviour, IPointerDownHandler
     {
+        /// <summary>
+        ///     The available icons
+        /// </summary>
+        public Texture delete, add, show, hide, edit;
+
         /// <summary>
         ///     The default item
         /// </summary>
@@ -38,9 +44,8 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Show the context menu
         /// </summary>
-        /// <param name="names">The names of the items</param>
-        /// <param name="actions">The on click actions for the items</param>
-        public void Show(string[] names, Action[] actions)
+        /// <param name="items">The items to be shown</param>
+        public void Show(IEnumerable<Item> items)
         {
             listView.position = Input.mousePosition;
             // Hide the panel
@@ -53,19 +58,20 @@ namespace MainScreen.Sidebar.HierarchyView
             defaultItem.SetActive(true);
 
             // Apply data to listview. Iterate oldProjects list backwards
-            for (var i = 0; i < names.Length; i++)
+            foreach (var item in items)
             {
                 // Create new listview item by instantiating a new prefab
                 var newListViewItem = Instantiate(defaultItem, listView, true);
 
                 // Set the new values
                 var nameText = newListViewItem.transform.Find("Name").GetComponent<TextMeshProUGUI>();
-                nameText.text = names[i];
-                var index = i;
+                nameText.text = item.Name;
+                var iconImage = newListViewItem.transform.Find("Icon").GetComponent<RawImage>();
+                iconImage.texture = item.Icon;
                 newListViewItem.GetComponent<Button>().onClick.AddListener(
                     () =>
                     {
-                        actions[index]();
+                        item.Action();
                         gameObject.SetActive(false);
                     }
                 );
@@ -76,6 +82,27 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Show the context menu
             gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        ///     The class for one context menu entry
+        /// </summary>
+        public class Item
+        {
+            /// <summary>
+            ///     The action of the entry
+            /// </summary>
+            public Action Action;
+
+            /// <summary>
+            ///     The icon of the entry
+            /// </summary>
+            public Texture Icon;
+
+            /// <summary>
+            ///     The name of the entry
+            /// </summary>
+            public string Name;
         }
     }
 }

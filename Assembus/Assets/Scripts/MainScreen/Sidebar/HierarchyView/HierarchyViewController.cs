@@ -45,6 +45,40 @@ namespace MainScreen.Sidebar.HierarchyView
         private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
+        ///     The context menu controller
+        /// </summary>
+        public ContextMenuController contextMenu;
+
+        /// <summary>
+        ///     Open the context menu for the list view
+        /// </summary>
+        public void ShowContextMenu()
+        {
+            var showAll = new ContextMenuController.Item
+            {
+                Icon = contextMenu.show,
+                Name = "Show All",
+                Action = () => SetObjectVisibility(true)
+            };
+            var hideAll = new ContextMenuController.Item
+            {
+                Icon = contextMenu.hide,
+                Name = "Hide All",
+                Action = () => SetObjectVisibility(false)
+            };
+            contextMenu.Show(new []{showAll, hideAll});
+        }
+
+        /// <summary>
+        ///     Show or hide the model
+        /// </summary>
+        /// <param name="visible">True if the model shall be shown</param>
+        private void SetObjectVisibility(bool visible)
+        {
+            Utility.ToggleVisibility(_projectManager.CurrentProject.ObjectModel.transform, visible);
+        }
+        
+        /// <summary>
         ///     Set the status of all the given items in a list
         /// </summary>
         /// <param name="items">The item names</param>

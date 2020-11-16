@@ -24,5 +24,19 @@ namespace Services
 
             return null;
         }
+
+        /// <summary>
+        ///     Toggle the visibility of an object group
+        /// </summary>
+        /// <param name="parent">The parent of the object group</param>
+        /// <param name="visible">True if the group should be shown</param>
+        public static void ToggleVisibility(Transform parent, bool visible)
+        {
+            for (var i = 0; i < parent.childCount; i++)
+            {
+                parent.GetChild(i).gameObject.SetActive(visible);
+                ToggleVisibility(parent.GetChild(i), visible);
+            }
+        }
     }
 }

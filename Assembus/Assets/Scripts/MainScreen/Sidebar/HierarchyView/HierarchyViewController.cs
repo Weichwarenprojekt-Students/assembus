@@ -1,32 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Models.Project;
 using Services;
+using Shared.Toast;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MainScreen.Sidebar.HierarchyView
 {
     public class HierarchyViewController : MonoBehaviour
     {
         /// <summary>
-        ///     The boolean value that indicates a selected field
-        /// </summary>
-        private const bool IsSelected = true;
-
-        /// <summary>
-        ///     The boolean value that indicates a unselected field
-        /// </summary>
-        private const bool IsUnselected = false;
-
-        /// <summary>
         ///     The component highlighting
         /// </summary>
         public ComponentHighlighting componentHighlighting;
 
         /// <summary>
+        ///     The toast controller
+        /// </summary>
+        public ToastController toast;
+
+        /// <summary>
         ///     The colors for the item
         /// </summary>
         public Color selectedColor, normalColor;
+
+        /// <summary>
+        ///     The root element of the hierarchy view
+        /// </summary>
+        public Transform rootView;
 
         /// <summary>
         ///     The project manager
@@ -36,135 +37,88 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     A list of the GameObject in Insertion Order
         /// </summary>
-        private List<GameObject> _entriesInOrder;
-
-        /// <summary>
-        ///     Names of the items mapped to their GameObject
-        /// </summary>
-        private Dictionary<string, GameObject> _hierarchyItemNames;
-
-        /// <summary>
-        ///     Dictionary of hierarchy items mapped to a bool that indicates if the item should be highlighted
-        /// </summary>
-        private Dictionary<GameObject, bool> _hierarchyItems;
+        private readonly List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
 
         /// <summary>
         ///     The item selected before the currently selected one
         /// </summary>
-        private GameObject _lastSelectedItem;
-
-        /// <summary>
-        ///     The root element of the hierarchy view
-        /// </summary>
-        private Transform _rootView;
-
-        /// <summary>
-        ///     Add one item to the hierarchy list
-        /// </summary>
-        /// <param name="item">The item which is going to be added</param>
-        public void AddItem(GameObject item)
-        {
-            _hierarchyItems.Add(item, IsUnselected);
-            _hierarchyItemNames.Add(item.name, item);
-            _entriesInOrder.Add(item);
-        }
-
-        /// <summary>
-        ///     Initializes all necessary lists
-        /// </summary>
-        public void InitializeLists()
-        {
-            _hierarchyItems = new Dictionary<GameObject, bool>();
-            _hierarchyItemNames = new Dictionary<string, GameObject>();
-            _entriesInOrder = new List<GameObject>();
-        }
+        private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
         ///     Set the status of all the given items in a list
         /// </summary>
-        /// <param name="items"></param>
+        /// <param name="items">The item names</param>
         public void SetItemStatusFromList(IEnumerable<string> items)
         {
-            ResetAllItemStatus();
+            DeselectItems();
 
             // Set the ones contained in the given list to highlighted
             foreach (var item in items)
-                SetItemStatus(_hierarchyItemNames[item], IsSelected);
-
-            UpdateItems();
+                SelectItem(Utility.FindChild(rootView, item).GetComponent<HierarchyItemController>());
         }
 
         /// <summary>
-        ///     Resets the status of all the items back to unselected
+        ///     Adds the given item to the list and highlights it
         /// </summary>
-        private void ResetAllItemStatus()
+        /// <param name="item">The given item</param>
+        private void SelectItem(HierarchyItemController item)
         {
-            foreach (var item in _hierarchyItemNames)
-                SetItemStatus(item.Value, IsUnselected);
+            _selectedItems.Add(item);
+            SetColor(item, true);
         }
 
         /// <summary>
-        ///     This function is to be called when the hierarchy list has been changed
+        ///     Removes the given item from the list and removes the highlighting
         /// </summary>
-        private void UpdateItems()
+        /// <param name="item">The given item</param>
+        private void DeselectItem(HierarchyItemController item)
+        {
+            _selectedItems.Remove(item);
+            SetColor(item, false);
+        }
+
+        /// <summary>
+        ///     Removes items from list and removes the highlighting
+        /// </summary>
+        private void DeselectItems()
+        {
+            foreach (var item in _selectedItems) SetColor(item, false);
+
+            _selectedItems.Clear();
+        }
+
+        /// <summary>
+        ///     Highlight the matching objects in the model
+        /// </summary>
+        private void HighlightModel()
         {
             var trans = _projectManager.CurrentProject.ObjectModel.transform;
-            var list = new List<GameObject>();
-            foreach (var item in _hierarchyItems)
-                if (item.Value)
-                    list.Add(Utility.FindChild(trans, item.Key.name).gameObject);
+            var list = _selectedItems.Select(item => Utility.FindChild(trans, item.name).gameObject).ToList();
 
             componentHighlighting.HighlightGameObjects(list);
-            foreach (var item in _hierarchyItems.Keys)
-                HighlightItem(item);
-        }
-
-        /// <summary>
-        ///     Highlight the given item
-        /// </summary>
-        /// <param name="item">The item to be highlighted</param>
-        private void HighlightItem(GameObject item)
-        {
-            SetColor(item.GetComponentInChildren<Button>(), _hierarchyItems[item]);
         }
 
         /// <summary>
         ///     Will set the color of the given selectable based on the selected flag given
         /// </summary>
-        /// <param name="selectable"></param>
+        /// <param name="item"></param>
         /// <param name="selected">The flag that indicates if the item is selected</param>
-        private void SetColor(Selectable selectable, bool selected)
+        private void SetColor(HierarchyItemController item, bool selected)
         {
-            var colors = selectable.colors;
-            colors.normalColor = selected ? selectedColor : normalColor;
-            selectable.colors = colors;
+            item.background.color = selected ? selectedColor : normalColor;
         }
 
-        /// <summary>
-        ///     Toggles the item status
-        /// </summary>
-        /// <param name="item">The item which status is going to be changed</param>
-        private void ToggleItemStatus(GameObject item)
+        public bool Contains(HierarchyItemController item)
         {
-            _hierarchyItems[item] = !_hierarchyItems[item];
-        }
-
-        /// <summary>
-        ///     Sets the status of a given item to a given status
-        /// </summary>
-        /// <param name="item">the item which status is going to be changed</param>
-        /// <param name="status">the status it should be changed to</param>
-        private void SetItemStatus(GameObject item, bool status)
-        {
-            _hierarchyItems[item] = status;
+            return _selectedItems.Contains(item);
         }
 
         /// <summary>
         ///     Handles the possible OnClick modifiers
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="mod"></param>
-        public void ClickItem(GameObject item, KeyCode mod)
+        /// <param name="item">The selected item</param>
+        /// <param name="mod">The modifier that is used</param>
+        public void ClickItem(HierarchyItemController item, KeyCode mod)
         {
             switch (mod)
             {
@@ -181,54 +135,63 @@ namespace MainScreen.Sidebar.HierarchyView
                     break;
             }
 
-            UpdateItems();
+            HighlightModel();
         }
 
         /// <summary>
         ///     Removes the previously selected items from the selection and adds the currently selected item to it
         /// </summary>
-        /// <param name="item"></param>
-        private void NoModSelection(GameObject item)
+        /// <param name="item">the selected item</param>
+        private void NoModSelection(HierarchyItemController item)
         {
-            ResetAllItemStatus();
-            ToggleItemStatus(item);
+            DeselectItems();
+            _selectedItems.Add(item);
+            SetColor(item, true);
         }
 
         /// <summary>
         ///     Adds one item to the currently selected items or removes one of the item is already selected
         /// </summary>
-        /// <param name="item"></param>
-        private void ControlSelection(GameObject item)
+        /// <param name="item">the selected item</param>
+        private void ControlSelection(HierarchyItemController item)
         {
-            if (null != _lastSelectedItem && !item.transform.parent.Equals(_lastSelectedItem.transform.parent))
-                ResetAllItemStatus();
+            var isGroup = item.item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
+            if (isGroup) DeselectChildren(item.childrenContainer.transform);
+            else DeselectParent(item.transform);
 
-            ToggleItemStatus(item);
+            var selected = _selectedItems.Contains(item);
+            if (selected) _selectedItems.Remove(item);
+            else _selectedItems.Add(item);
+            SetColor(item, !selected);
         }
 
         /// <summary>
         ///     Selects the items from the last items index to the current items index
         /// </summary>
-        /// <param name="item">The currently selected item</param>
-        private void ShiftSelection(GameObject item)
+        /// <param name="item">The selected item</param>
+        private void ShiftSelection(HierarchyItemController item)
         {
-            ResetAllItemStatus();
-            if (null != _lastSelectedItem && !item.transform.parent.Equals(_lastSelectedItem.transform.parent))
+            if (_lastSelectedItem == null)
             {
-                ToggleItemStatus(item);
+                NoModSelection(item);
+            }
+            else if (_lastSelectedItem.transform.parent != item.transform.parent)
+            {
+                toast.Error(Toast.Short, "Please stay on the\nsame hierarchy level");
             }
             else
             {
+                DeselectItems();
                 var parent = item.transform.parent;
                 var lastItemIndex = _lastSelectedItem.transform.GetSiblingIndex();
                 var currentItemIndex = item.transform.GetSiblingIndex();
 
                 if (lastItemIndex >= currentItemIndex)
                     for (var i = currentItemIndex; i <= lastItemIndex; i++)
-                        SetItemStatus(parent.GetChild(i).gameObject, IsSelected);
+                        SelectItem(parent.GetChild(i).GetComponent<HierarchyItemController>());
                 else
                     for (var i = lastItemIndex; i <= currentItemIndex; i++)
-                        SetItemStatus(parent.GetChild(i).gameObject, IsSelected);
+                        SelectItem(parent.GetChild(i).GetComponent<HierarchyItemController>());
             }
         }
 
@@ -236,9 +199,36 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     Return the selected GameObjects as a list in the right order
         /// </summary>
         /// <returns></returns>
-        public List<GameObject> GetSelectedEntriesOrdered()
+        public List<HierarchyItemController> GetSelectedItems()
         {
-            return _entriesInOrder.Where(item => _hierarchyItems[item]).ToList();
+            return _selectedItems.OrderByDescending(item => item.nameRect.position.y).ToList();
+        }
+
+        /// <summary>
+        ///     Searches all child elements for elements that are selected in the hierarchy View and removes them
+        /// </summary>
+        /// <param name="parent">The element whose children have to be checked</param>
+        private void DeselectChildren(Transform parent)
+        {
+            for (var i = 0; i < parent.childCount; i++)
+            {
+                var child = parent.GetChild(i).GetComponent<HierarchyItemController>();
+                if (_selectedItems.Contains(child)) DeselectItem(child);
+                else DeselectChildren(child.childrenContainer.transform);
+            }
+        }
+
+        /// <summary>
+        ///     Checks if any of a Transform's parent elements are selected and removes them from selection
+        /// </summary>
+        /// <param name="child">The child element which parents have to be checked</param>
+        /// <returns>GameObject of the parent element that is already in the dictionary</returns>
+        private void DeselectParent(Transform child)
+        {
+            var parent = child.parent.parent.GetComponent<HierarchyItemController>();
+            if (parent == null) return;
+            if (_selectedItems.Contains(parent)) DeselectItem(parent);
+            else DeselectParent(parent.transform);
         }
     }
 }

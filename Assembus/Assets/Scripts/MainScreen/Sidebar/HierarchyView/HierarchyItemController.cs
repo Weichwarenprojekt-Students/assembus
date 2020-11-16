@@ -33,7 +33,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     The selected items before starting a drag
         /// </summary>
-        private static List<GameObject> _selectedItems = new List<GameObject>();
+        private static List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
 
         /// <summary>
         ///     The colors for the item
@@ -88,7 +88,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     The background of the item
         /// </summary>
-        public Selectable background;
+        public Image background;
 
         /// <summary>
         ///     The text for the preview of a list drag
@@ -224,15 +224,15 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Item Selection if left control is used
             if (Input.GetKey(KeyCode.LeftControl))
-                hierarchyViewController.ClickItem(gameObject, KeyCode.LeftControl);
+                hierarchyViewController.ClickItem(this, KeyCode.LeftControl);
 
             // Item selection if the left shift key is used
             else if (Input.GetKey(KeyCode.LeftShift))
-                hierarchyViewController.ClickItem(gameObject, KeyCode.LeftShift);
+                hierarchyViewController.ClickItem(this, KeyCode.LeftShift);
 
             // Item Selection if No modifier is used
             else
-                hierarchyViewController.ClickItem(gameObject, KeyCode.None);
+                hierarchyViewController.ClickItem(this, KeyCode.None);
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             // Save the old item state
-            var oldState = new[]{ItemState.FromListItem(gameObject)};
+            var oldState = new[]{ItemState.FromListItem(this)};
             
             // Create the new item state
             var newState = new []{new ItemState(oldState[0]){Name = newName}};
@@ -318,8 +318,8 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StartDraggingItem(BaseEventData data)
         {
             // Get the selected items
-            _selectedItems = hierarchyViewController.GetSelectedEntriesOrdered();
-            if (_selectedItems.Count == 0 || !_selectedItems.Contains(gameObject)) return;
+            _selectedItems = hierarchyViewController.GetSelectedItems();
+            if (_selectedItems.Count == 0 || !_selectedItems.Contains(this)) return;
 
             // Show which items are dragged
             var firstName = item.GetComponent<ItemInfoController>().ItemInfo.displayName;
@@ -355,8 +355,8 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Get the new parent and the new sibling id
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
-            var siblingIndex =
-                _insertion ? _dragItem.transform.childCount : _dragItem.item.transform.GetSiblingIndex();
+            var siblingIndex = _insertion ? 
+                _dragItem.childrenContainer.transform.childCount : _dragItem.item.transform.GetSiblingIndex();
 
             // Save the old item states
             var oldStates = new ItemState[_selectedItems.Count];
@@ -365,12 +365,13 @@ namespace MainScreen.Sidebar.HierarchyView
             // Create the new item states
             var newStates = new ItemState[_selectedItems.Count];
             var newParent = _dragItem.gameObject.transform.parent;
+            var offset = 0;
             for (var i = 0; i < newStates.Length; i++)
             {
-                var sameParent = _selectedItems[i].transform.parent;
+                var sameParent  = newParent == _selectedItems[i].transform.parent;
                 var smallerIndex = _dragItem.transform.GetSiblingIndex() >
                                    _selectedItems[i].transform.GetSiblingIndex();
-                var offset = newParent == sameParent && smallerIndex ? -1 : 0;
+                if(sameParent && smallerIndex) offset--;
                 newStates[i] = new ItemState(oldStates[i])
                     {ParentID = parent, SiblingIndex = siblingIndex + i + offset};
             }
@@ -386,10 +387,9 @@ namespace MainScreen.Sidebar.HierarchyView
         public void PutAbove(BaseEventData data)
         {
             // Change the color
-            var selected = _selectedItems.Contains(gameObject);
-            var colors = background.colors;
-            colors.highlightedColor = _dragging && !selected ? normalColor : highlightedColor;
-            background.colors = colors;
+            var selected = hierarchyViewController.Contains(this);
+            background.color = _dragging && !selected ? normalColor : highlightedColor;
+
 
             // Show the moving indicator
             movingIndicator.SetActive(_dragging && !selected);
@@ -406,6 +406,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StopPuttingAbove(BaseEventData data)
         {
             movingIndicator.SetActive(false);
+            if(!hierarchyViewController.Contains(this)) background.color = normalColor;
             _dragItem = null;
         }
 
@@ -418,10 +419,8 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Change the color
             var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
-            var colors = background.colors;
-            var selected = _selectedItems.Contains(gameObject);
-            colors.highlightedColor = _dragging && !isGroup && !selected ? normalColor : highlightedColor;
-            background.colors = colors;
+            var selected = hierarchyViewController.Contains(this);
+            background.color = _dragging && !isGroup && !selected ? normalColor : highlightedColor;
 
             // Save the item and the action if item is compatible
             _insertion = true;
@@ -435,6 +434,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StopInsertingItem(BaseEventData data)
         {
             _dragItem = null;
+            if(!hierarchyViewController.Contains(this)) background.color = normalColor;
         }
     }
 }

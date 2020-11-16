@@ -1761,7 +1761,7 @@ MonoBehaviour:
   childrenContainer: {fileID: 1569549510}
   contextMenu: {fileID: 1647295334}
   movingIndicator: {fileID: 1151740808}
-  background: {fileID: 1470141360}
+  background: {fileID: 1143211392}
   dragPreviewText: {fileID: 1888735004}
   dragPreview: {fileID: 1306572735}
   toast: {fileID: 1305548565}
@@ -2822,8 +2822,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   componentHighlighting: {fileID: 963194230}
+  toast: {fileID: 1305548565}
   selectedColor: {r: 0.30588236, g: 0.3882353, b: 0.50980395, a: 1}
   normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
+  rootView: {fileID: 441038524}
 --- !u!1001 &458767403
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6167,7 +6169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6763,8 +6765,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.000003814712
-  m_Size: 0.9747635
+  m_Value: -0.0000038146973
+  m_Size: 0.9747634
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7716,7 +7718,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 137407310}
   m_HandleRect: {fileID: 137407309}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7769,7 +7771,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1470141359}
   - component: {fileID: 1470141361}
-  - component: {fileID: 1470141360}
   m_Layer: 5
   m_Name: Item
   m_TagString: Untagged
@@ -7802,49 +7803,6 @@ RectTransform:
   m_AnchoredPosition: {x: 210, y: -20}
   m_SizeDelta: {x: 420, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1470141360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1470141358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
-    m_HighlightedColor: {r: 0.30588236, g: 0.3882353, b: 0.50980395, a: 1}
-    m_PressedColor: {r: 0.4862745, g: 0.5529412, b: 0.654902, a: 1}
-    m_SelectedColor: {r: 0.4862745, g: 0.5529412, b: 0.654902, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1143211392}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!222 &1470141361
 CanvasRenderer:
   m_ObjectHideFlags: 0

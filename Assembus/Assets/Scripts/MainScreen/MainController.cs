@@ -127,9 +127,6 @@ namespace MainScreen
         /// </summary>
         private void OnEnable()
         {
-            // Initialize the lists of the view controller
-            hierarchyViewController.InitializeLists();
-
             // Initialize the command executor
             ActionCreator.Initialize(_projectManager.CurrentProject.ObjectModel, hierarchyView);
 
@@ -203,9 +200,6 @@ namespace MainScreen
                 );
 
                 newHierarchyItem.name = child.name;
-
-                // Add the item to the HierarchyViewController
-                hierarchyViewController.AddItem(newHierarchyItem);
 
                 // get the script of the new item
                 var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();

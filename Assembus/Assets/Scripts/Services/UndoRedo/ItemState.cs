@@ -1,6 +1,5 @@
 ﻿using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
-using UnityEngine;
 
 namespace Services.UndoRedo
 {
@@ -61,9 +60,9 @@ namespace Services.UndoRedo
         /// </summary>
         /// <param name="item">The item of the hierarchy view</param>
         /// <returns>The created item state</returns>
-        public static ItemState FromListItem(GameObject item)
+        public static ItemState FromListItem(HierarchyItemController item)
         {
-            var gameItem = item.GetComponent<HierarchyItemController>().item;
+            var gameItem = item.item;
             var itemInfo = gameItem.GetComponent<ItemInfoController>().ItemInfo;
             return new ItemState(
                 gameItem.name,

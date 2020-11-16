@@ -45,6 +45,11 @@ namespace MainScreen
         public GameObject defaultHierarchyViewItem;
 
         /// <summary>
+        ///     The hierarchy view controller
+        /// </summary>
+        public HierarchyViewController hierarchyViewController;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -123,7 +128,12 @@ namespace MainScreen
         private void OnEnable()
         {
             // Initialize the command executor
-            ActionCreator.Initialize(_projectManager.CurrentProject.ObjectModel, hierarchyView);
+            ActionCreator.Initialize(
+                _projectManager.CurrentProject.ObjectModel,
+                hierarchyView,
+                this,
+                hierarchyViewController
+            );
 
             // Load the model
             LoadModelIntoHierarchyView();
@@ -180,31 +190,67 @@ namespace MainScreen
         /// <param name="containingListView">The container of the list view</param>
         /// <param name="parent">The parent item on the actual model</param>
         /// <param name="depth">The margin to the left side</param>
-        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 0)
+        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, float depth = 0)
         {
             for (var i = 0; i < parent.transform.childCount; i++)
             {
-                // for every child element
                 var child = parent.transform.GetChild(i).gameObject;
 
-                // generate a new hierarchy item in the hierarchy view
-                var newHierarchyItem = Instantiate(
-                    defaultHierarchyViewItem,
-                    containingListView.transform,
-                    true
-                );
+                // Add list item
+                var itemController = AddListItem(containingListView, child, depth);
 
-                newHierarchyItem.name = child.name;
-
-                // get the script of the new item
-                var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
-
-                // initialize the item
-                itemController.Initialize(child, depth, hierarchyView);
-
-                // fill the new item recursively with children
+                // Fill the new item recursively with children
                 LoadElementWithChildren(itemController.childrenContainer, child, depth + 16);
             }
+        }
+
+        /// <summary>
+        ///     Add a list view item
+        /// </summary>
+        /// <param name="parent">The parent container</param>
+        /// <param name="item">The actual model</param>
+        /// <param name="depth">The depth of indention</param>
+        /// <returns>The newly created item controller</returns>
+        private HierarchyItemController AddListItem(GameObject parent, GameObject item, float depth)
+        {
+            // generate a new hierarchy item in the hierarchy view
+            var newHierarchyItem = Instantiate(
+                defaultHierarchyViewItem,
+                parent.transform,
+                true
+            );
+
+            newHierarchyItem.name = item.name;
+
+            // get the script of the new item
+            var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
+
+            // initialize the item
+            itemController.Initialize(item, depth, hierarchyView);
+
+            return itemController;
+        }
+
+        /// <summary>
+        ///     Add a single list view item
+        /// </summary>
+        /// <param name="parent">The parent container</param>
+        /// <param name="item">The actual model</param>
+        /// <param name="depth">The depth of indention</param>
+        public void AddSingleListItem(GameObject parent, GameObject item, float depth)
+        {
+            defaultHierarchyViewItem.SetActive(true);
+            AddListItem(parent, item, depth);
+            defaultHierarchyViewItem.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Remove a game object
+        /// </summary>
+        /// <param name="item">The game object that shall be removed</param>
+        public void DeleteObject(GameObject item)
+        {
+            Destroy(item);
         }
     }
 }

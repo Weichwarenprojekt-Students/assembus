@@ -47,7 +47,7 @@ namespace Services.UndoRedo
         /// <param name="name">Name of the item</param>
         /// <param name="parentID">Parent ID of the item</param>
         /// <param name="siblingIndex">The sibling index</param>
-        private ItemState(string id, string name, string parentID, int siblingIndex)
+        public ItemState(string id, string name, string parentID, int siblingIndex)
         {
             ID = id;
             Name = name;

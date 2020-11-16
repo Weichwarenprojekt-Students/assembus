@@ -6615,6 +6615,7 @@ MonoBehaviour:
   dialog: {fileID: 1258558055}
   hierarchyView: {fileID: 441038523}
   defaultHierarchyViewItem: {fileID: 168202933}
+  hierarchyViewController: {fileID: 2006810628}
 --- !u!114 &1135199801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7418,7 +7419,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 0.000005722046
   m_Size: 0.9747634
   m_NumberOfSteps: 0
   m_OnValueChanged:

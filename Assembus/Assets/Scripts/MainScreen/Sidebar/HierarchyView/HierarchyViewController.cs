@@ -2,6 +2,7 @@
 using System.Linq;
 using Models.Project;
 using Services;
+using Services.UndoRedo;
 using Shared.Toast;
 using UnityEngine;
 
@@ -30,6 +31,11 @@ namespace MainScreen.Sidebar.HierarchyView
         public Transform rootView;
 
         /// <summary>
+        ///     The context menu controller
+        /// </summary>
+        public ContextMenuController contextMenu;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -37,7 +43,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     A list of the GameObject in Insertion Order
         /// </summary>
-        private readonly List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
+        public readonly List<HierarchyItemController> SelectedItems = new List<HierarchyItemController>();
 
         /// <summary>
         ///     The item selected before the currently selected one
@@ -45,15 +51,29 @@ namespace MainScreen.Sidebar.HierarchyView
         private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
-        ///     The context menu controller
+        ///     The undo redo service
         /// </summary>
-        public ContextMenuController contextMenu;
+        private readonly UndoService _undoService = UndoService.Instance;
+
+        /// <summary>
+        ///     Clear the selections
+        /// </summary>
+        private void OnEnable()
+        {
+            SelectedItems.Clear();
+        }
 
         /// <summary>
         ///     Open the context menu for the list view
         /// </summary>
         public void ShowContextMenu()
         {
+            var createStation = new ContextMenuController.Item
+            {
+                Icon = contextMenu.add,
+                Name = "Create Station",
+                Action = CreateAssemblyStation
+            };
             var showAll = new ContextMenuController.Item
             {
                 Icon = contextMenu.show,
@@ -66,7 +86,22 @@ namespace MainScreen.Sidebar.HierarchyView
                 Name = "Hide All",
                 Action = () => SetObjectVisibility(false)
             };
-            contextMenu.Show(new []{showAll, hideAll});
+            contextMenu.Show(new[] {createStation, showAll, hideAll});
+        }
+
+        /// <summary>
+        ///     Create an assembly station
+        /// </summary>
+        private void CreateAssemblyStation()
+        {
+            var oldState = new[]{new ItemState(
+                _projectManager.GetNextGroupID(),
+                "Assembly Station",
+                _projectManager.CurrentProject.ObjectModel.name,
+                _projectManager.CurrentProject.ObjectModel.transform.childCount
+            )};
+            var newState = new[]{new ItemState(oldState[0])};
+            _undoService.AddCommand(new Command(newState, oldState, Command.Create));
         }
 
         /// <summary>
@@ -77,7 +112,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             Utility.ToggleVisibility(_projectManager.CurrentProject.ObjectModel.transform, visible);
         }
-        
+
         /// <summary>
         ///     Set the status of all the given items in a list
         /// </summary>
@@ -97,7 +132,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="item">The given item</param>
         private void SelectItem(HierarchyItemController item)
         {
-            _selectedItems.Add(item);
+            SelectedItems.Add(item);
             SetColor(item, true);
         }
 
@@ -107,7 +142,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="item">The given item</param>
         private void DeselectItem(HierarchyItemController item)
         {
-            _selectedItems.Remove(item);
+            SelectedItems.Remove(item);
             SetColor(item, false);
         }
 
@@ -116,9 +151,9 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void DeselectItems()
         {
-            foreach (var item in _selectedItems) SetColor(item, false);
+            foreach (var item in SelectedItems) SetColor(item, false);
 
-            _selectedItems.Clear();
+            SelectedItems.Clear();
         }
 
         /// <summary>
@@ -127,7 +162,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void HighlightModel()
         {
             var trans = _projectManager.CurrentProject.ObjectModel.transform;
-            var list = _selectedItems.Select(item => Utility.FindChild(trans, item.name).gameObject).ToList();
+            var list = SelectedItems.Select(item => Utility.FindChild(trans, item.name).gameObject).ToList();
 
             componentHighlighting.HighlightGameObjects(list);
         }
@@ -144,7 +179,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
         public bool Contains(HierarchyItemController item)
         {
-            return _selectedItems.Contains(item);
+            return SelectedItems.Contains(item);
         }
 
         /// <summary>
@@ -179,7 +214,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void NoModSelection(HierarchyItemController item)
         {
             DeselectItems();
-            _selectedItems.Add(item);
+            SelectedItems.Add(item);
             SetColor(item, true);
         }
 
@@ -193,9 +228,9 @@ namespace MainScreen.Sidebar.HierarchyView
             if (isGroup) DeselectChildren(item.childrenContainer.transform);
             else DeselectParent(item.transform);
 
-            var selected = _selectedItems.Contains(item);
-            if (selected) _selectedItems.Remove(item);
-            else _selectedItems.Add(item);
+            var selected = SelectedItems.Contains(item);
+            if (selected) SelectedItems.Remove(item);
+            else SelectedItems.Add(item);
             SetColor(item, !selected);
         }
 
@@ -235,7 +270,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <returns></returns>
         public List<HierarchyItemController> GetSelectedItems()
         {
-            return _selectedItems.OrderByDescending(item => item.itemContent.position.y).ToList();
+            return SelectedItems.OrderByDescending(item => item.itemContent.position.y).ToList();
         }
 
         /// <summary>
@@ -247,7 +282,7 @@ namespace MainScreen.Sidebar.HierarchyView
             for (var i = 0; i < parent.childCount; i++)
             {
                 var child = parent.GetChild(i).GetComponent<HierarchyItemController>();
-                if (_selectedItems.Contains(child)) DeselectItem(child);
+                if (SelectedItems.Contains(child)) DeselectItem(child);
                 else DeselectChildren(child.childrenContainer.transform);
             }
         }
@@ -261,7 +296,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             var parent = child.parent.parent.GetComponent<HierarchyItemController>();
             if (parent == null) return;
-            if (_selectedItems.Contains(parent)) DeselectItem(parent);
+            if (SelectedItems.Contains(parent)) DeselectItem(parent);
             else DeselectParent(parent.transform);
         }
     }

@@ -158,7 +158,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="modelItem">The item of the actual model</param>
         /// <param name="indentionDepth">Depth of indentation inside the listview</param>
         /// <param name="mainHierarchyView">Reference to the root of the hierarchy view</param>
-        public void Initialize(GameObject modelItem, int indentionDepth, GameObject mainHierarchyView)
+        public void Initialize(GameObject modelItem, float indentionDepth, GameObject mainHierarchyView)
         {
             // Save the actual item
             item = modelItem;

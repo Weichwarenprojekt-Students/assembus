@@ -363,7 +363,8 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Create the new item states
             var newStates = new ItemState[_selectedItems.Count];
-            var newParent = _dragItem.gameObject.transform.parent;
+            var newParent =
+                _insertion ? _dragItem.childrenContainer.transform : _dragItem.gameObject.transform.parent;
             var offset = 0;
             for (var i = 0; i < newStates.Length; i++)
             {

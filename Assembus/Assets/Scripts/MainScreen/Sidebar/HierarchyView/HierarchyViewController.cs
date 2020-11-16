@@ -201,7 +201,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <returns></returns>
         public List<HierarchyItemController> GetSelectedItems()
         {
-            return _selectedItems.OrderByDescending(item => item.nameRect.position.y).ToList();
+            return _selectedItems.OrderByDescending(item => item.itemContent.position.y).ToList();
         }
 
         /// <summary>

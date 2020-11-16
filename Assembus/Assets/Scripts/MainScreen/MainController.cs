@@ -45,11 +45,6 @@ namespace MainScreen
         public GameObject defaultHierarchyViewItem;
 
         /// <summary>
-        ///     The hierarchy view controller
-        /// </summary>
-        public HierarchyViewController hierarchyViewController;
-
-        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -185,7 +180,7 @@ namespace MainScreen
         /// <param name="containingListView">The container of the list view</param>
         /// <param name="parent">The parent item on the actual model</param>
         /// <param name="depth">The margin to the left side</param>
-        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 32)
+        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, int depth = 0)
         {
             for (var i = 0; i < parent.transform.childCount; i++)
             {

@@ -92,7 +92,7 @@ namespace Services.UndoRedo
             if (oldParentItem != null) oldParentItem.ExpandItem(true);
 
             // Expand the parent and indent the item
-            var indentionDepth = 32f;
+            var indentionDepth = 0f;
             if (listParent != null)
             {
                 var parentItem = listParent.GetComponent<HierarchyItemController>();

@@ -61,9 +61,9 @@ namespace MainScreen.Sidebar.HierarchyView
         public GameObject nameTextObject, nameInputObject;
 
         /// <summary>
-        ///     The rect transform of the name
+        ///     The rect transform of the item's content
         /// </summary>
-        public RectTransform nameRect;
+        public RectTransform itemContent;
 
         /// <summary>
         ///     The expand button
@@ -180,8 +180,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="indentionDepth">Depth of indentation inside the listview</param>
         public void IndentItem(float indentionDepth)
         {
-            nameRect.offsetMin = new Vector2(indentionDepth, 0);
-            expandButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(indentionDepth - 32, 0);
+            itemContent.offsetMin = new Vector2(indentionDepth, 0);
         }
 
         /// <summary>
@@ -190,7 +189,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <returns>The indention depth</returns>
         public float GetIndention()
         {
-            return nameRect.offsetMin.x;
+            return itemContent.offsetMin.x;
         }
 
         /// <summary>

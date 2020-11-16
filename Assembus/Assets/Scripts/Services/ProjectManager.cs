@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Models;
+using Models.Project;
 using UnityEngine;
 
 namespace Services
@@ -16,6 +17,11 @@ namespace Services
         ///     Filename for the serialized 3D model
         /// </summary>
         private const string ProjectModelFile = "projectModel.xml";
+
+        /// <summary>
+        ///     Constant string which specifies the name of the source/default assembly station
+        /// </summary>
+        private const string DefaultStationName = "Default Station";
 
         /// <summary>
         ///     The configuration manager
@@ -226,8 +232,12 @@ namespace Services
             if (!success) return (false, message);
             CurrentProject.ObjectModel = objectModel;
 
-            // If it was the first time try to save the project
-            if (firstTime) return SaveProject();
+            // If it was the first time, move all components to default station and try to save the project
+            if (firstTime)
+            {
+                InitDefaultStation();
+                return SaveProject();
+            }
 
             // Otherwise try to load the object hierarchy
             try
@@ -266,6 +276,36 @@ namespace Services
             {
                 return (false, "Object could not \n be imported!", null);
             }
+        }
+
+        /// <summary>
+        ///     Moves all loaded OBJ GameObjects into the default assembly station
+        /// </summary>
+        private void InitDefaultStation()
+        {
+            // Add the default assembly station
+            var defaultStation = new GameObject {name = DefaultStationName};
+            var info = new ItemInfo {displayName = DefaultStationName, isGroup = false};
+
+            defaultStation.AddComponent<ItemInfoController>();
+            defaultStation.GetComponent<ItemInfoController>().ItemInfo = info;
+            defaultStation.transform.parent = CurrentProject.ObjectModel.transform;
+
+            var children = Utility.GetAllGameObjects(CurrentProject.ObjectModel);
+
+            // Move all children to the default assembly station
+            foreach (var child in children)
+                if (child.name != DefaultStationName)
+                    child.transform.parent = defaultStation.transform;
+        }
+
+        /// <summary>
+        ///     Returns a unique ID for newly created component groups
+        /// </summary>
+        /// <returns></returns>
+        public string GetNextGroupID()
+        {
+            return "AssembusCompGroup_" + CurrentProject.CurrentGroupIdx++;
         }
     }
 }

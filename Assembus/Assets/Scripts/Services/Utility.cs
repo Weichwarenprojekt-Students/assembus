@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Services
 {
@@ -37,6 +38,33 @@ namespace Services
                 parent.GetChild(i).gameObject.SetActive(visible);
                 ToggleVisibility(parent.GetChild(i), visible);
             }
+        }
+
+        /// <summary>
+        ///     Traverse through the entire GameObject hierarchy recursively and return all child GameObjects
+        /// </summary>
+        /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
+        /// <param name="outputData">Contains all child GameObjects of provided input GameObject</param>
+        private static void GetAllGameObjects(GameObject inputObject, ICollection<GameObject> outputData)
+        {
+            // Add new child to the GameObject list
+            outputData.Add(inputObject);
+
+            // Recursively traverse to children
+            foreach (Transform child in inputObject.transform) GetAllGameObjects(child.gameObject, outputData);
+        }
+
+        /// <summary>
+        ///     Get all children of an GameObject
+        /// </summary>
+        /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
+        /// <returns>Returns list of all child GameObjects of provided input GameObject</returns>
+        public static ICollection<GameObject> GetAllGameObjects(GameObject inputObject)
+        {
+            var list = new List<GameObject>();
+            GetAllGameObjects(inputObject, list);
+
+            return list;
         }
     }
 }

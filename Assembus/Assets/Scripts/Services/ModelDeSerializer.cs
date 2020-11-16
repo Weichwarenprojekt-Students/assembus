@@ -24,8 +24,7 @@ namespace Services
         public void SerializeGameObject(string filePath, GameObject rootObject)
         {
             // Extract all child GameObjects/hierarchy from the provided root GameObject recursively
-            var allOriginalChildren = new List<GameObject>();
-            GetAllGameObjects(rootObject, allOriginalChildren);
+            var allOriginalChildren = Utility.GetAllGameObjects(rootObject);
 
             // List which stores the GameObject description of all child GameObjects
             var fileData = new List<FileModel>();
@@ -74,8 +73,7 @@ namespace Services
             var outputData = new List<GameObject>();
 
             // Load all components described in XML file from the original GameObject
-            var allOriginalChildren = new List<GameObject>();
-            GetAllGameObjects(inputData, allOriginalChildren);
+            var allOriginalChildren = Utility.GetAllGameObjects(inputData);
 
             // Destroy the existing hierarchy to avoid incorrect referencing
             foreach (var go in allOriginalChildren)
@@ -90,8 +88,12 @@ namespace Services
                 // Get the original GameObject by its name.
                 var originalObject = GetChildByName(allOriginalChildren, importedItemData.id);
 
-                // Object not existing in original GameObject list --> New/own grouping
-                if (originalObject == null) originalObject = new GameObject {name = importedItemData.id};
+                // Object not existing in original GameObject list --> New/own component group
+                if (originalObject == null)
+                    originalObject = new GameObject
+                    {
+                        name = importedItemData.id
+                    };
 
                 // Check if we loaded the root object or a child object
                 if (importedItemData.parentId != "null")
@@ -103,6 +105,9 @@ namespace Services
                     originalObject.transform.parent = newParent.transform;
 
                     // Check if the object already has an item info controller
+                    // This is not the case if originalObject is a component group
+                    // as only GameObjects from the OBJLoader got assigned a
+                    // ItemInfoController
                     if (originalObject.GetComponent<ItemInfoController>() is null)
                         originalObject.AddComponent<ItemInfoController>();
 
@@ -121,20 +126,6 @@ namespace Services
 
             // Return root node/instance
             return rootObject;
-        }
-
-        /// <summary>
-        ///     Traverse through the entire GameObject hierarchy recursively and return all child GameObjects
-        /// </summary>
-        /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
-        /// <param name="outputData">Contains all child GameObjects of provided input GameObject</param>
-        private static void GetAllGameObjects(GameObject inputObject, ICollection<GameObject> outputData)
-        {
-            // Add new child to the GameObject list
-            outputData.Add(inputObject);
-
-            // Recursively traverse to children
-            foreach (Transform child in inputObject.transform) GetAllGameObjects(child.gameObject, outputData);
         }
 
         /// <summary>

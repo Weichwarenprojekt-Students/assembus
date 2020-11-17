@@ -57,9 +57,9 @@ namespace Services.UndoRedo
             // Add element after current
             _linkedList.AddAfter(_current, command);
 
-            // Update the current element
+            // Update the current element and delete all the commands that were undone
             _current = _current.Next;
-            if (_current?.Next != null) _linkedList.Remove(_current.Next);
+            while (_current?.Next != null) _linkedList.Remove(_current.Next);
 
             // Remove first entry if greater than configured length
             if (_linkedList.Count > _configManager.Config.undoHistoryLimit) _linkedList.RemoveFirst();

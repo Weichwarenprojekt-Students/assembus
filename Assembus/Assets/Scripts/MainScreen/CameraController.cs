@@ -99,7 +99,7 @@ namespace MainScreen
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))
                 clickDetector.Click();
-            
+
             //Check for second click
             clickDetector.CheckForSecondClick();
 
@@ -146,22 +146,25 @@ namespace MainScreen
             GameObject o;
             var transformGameObject = (o = hit.transform.gameObject).GetComponent<Renderer>().bounds.center;
 
+            if (!MouseOverViewport) return;
+
             componentHighlighting.HighlightGameObject(o);
             SetFocus(transformGameObject);
             StoreLastMousePosition();
             CalculateNewCameraTransform();
         }
+
         public void UpdateCameraFocus(GameObject go)
         {
             if (_cam is null) return;
-            
-            var transformGameObject = (go.transform.gameObject).GetComponent<Renderer>().bounds.center;
-            
+
+            var transformGameObject = go.transform.gameObject.GetComponent<Renderer>().bounds.center;
+
             SetFocus(transformGameObject);
             StoreLastMousePosition();
             CalculateNewCameraTransform();
         }
-        
+
         /// <summary>
         ///     Calculates the new camera position based on the mouse position
         /// </summary>

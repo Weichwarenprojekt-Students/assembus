@@ -99,9 +99,8 @@ namespace MainScreen
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))
                 clickDetector.Click();
-
-            if(MouseOverViewport)
-                clickDetector.CheckForSecondClick();
+            
+            clickDetector.CheckForSecondClick();
 
             // detect scrolling
             if (Input.mouseScrollDelta.y != 0) Zoom(Input.mouseScrollDelta.y);

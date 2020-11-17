@@ -126,6 +126,11 @@ namespace MainScreen.Sidebar.HierarchyView
         public DoubleClickDetector clickDetector;
 
         /// <summary>
+        ///     The text colors for visible and invisible items
+        /// </summary>
+        public Color visibleColor, invisibleColor;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -205,6 +210,16 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // set the root hierarchy view
             _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
+        }
+
+        /// <summary>
+        ///     Change the text color of an item
+        /// </summary>
+        /// <param name="show">True if the item should be shown</param>
+        public void ShowItem(bool show)
+        {
+            nameText.color = show ? visibleColor : invisibleColor;
+            if (item != null) item.SetActive(show);
         }
 
         /// <summary>
@@ -310,16 +325,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void ShowContextMenu()
         {
-            var entries = new List<ContextMenuController.Item>();
-
-            entries.Add(
-                new ContextMenuController.Item
-                {
-                    Icon = contextMenu.edit,
-                    Name = "Rename",
-                    Action = RenameItem
-                }
-            );
+            var entries = new List<ContextMenuController.Item>
+            {
+                new ContextMenuController.Item {Icon = contextMenu.edit, Name = "Rename", Action = RenameItem}
+            };
 
             var visible = item.activeSelf;
             entries.Add(
@@ -327,9 +336,22 @@ namespace MainScreen.Sidebar.HierarchyView
                 {
                     Icon = visible ? contextMenu.hide : contextMenu.show,
                     Name = visible ? "Hide Item" : "Show Item",
-                    Action = () => item.SetActive(!visible)
+                    Action = () => ShowItem(!visible)
                 }
             );
+
+            var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
+            if (isGroup)
+            {
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
+                        Icon = contextMenu.show,
+                        Name = "Show All",
+                        Action = ShowGroup
+                    }
+                );
+            }
 
             if (hierarchyViewController.SelectedItems.Contains(this))
                 entries.Add(
@@ -341,7 +363,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     }
                 );
 
-            if (item.GetComponent<ItemInfoController>().ItemInfo.isGroup)
+            if (isGroup)
             {
                 entries.Add(
                     new ContextMenuController.Item
@@ -364,7 +386,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             contextMenu.Show(entries);
         }
-
+        
         /// <summary>
         ///     Start a renaming action
         /// </summary>
@@ -397,6 +419,15 @@ namespace MainScreen.Sidebar.HierarchyView
                 // Add the new action to the undo redo service
                 _undoService.AddCommand(new Command(newState, oldState, Command.Delete));
             }
+        }
+
+        /// <summary>
+        ///     Show a whole group
+        /// </summary>
+        private void ShowGroup()
+        {
+            ShowItem(true);
+            Utility.ToggleVisibility(childrenContainer.transform, true);
         }
 
         /// <summary>

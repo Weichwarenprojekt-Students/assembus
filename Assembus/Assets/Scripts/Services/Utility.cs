@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MainScreen.Sidebar.HierarchyView;
 using UnityEngine;
 
 namespace Services
@@ -35,8 +36,10 @@ namespace Services
         {
             for (var i = 0; i < parent.childCount; i++)
             {
-                parent.GetChild(i).gameObject.SetActive(visible);
-                ToggleVisibility(parent.GetChild(i), visible);
+                var item = parent.GetChild(i).GetComponent<HierarchyItemController>();
+                if (item == null) continue;
+                item.ShowItem(visible);
+                ToggleVisibility(item.childrenContainer.transform, visible);
             }
         }
 

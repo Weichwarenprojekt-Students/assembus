@@ -42,11 +42,6 @@ namespace MainScreen.Sidebar.HierarchyView
         public Color selectedColor, normalColor;
 
         /// <summary>
-        ///     The root element of the hierarchy view
-        /// </summary>
-        public Transform rootView;
-
-        /// <summary>
         ///     The context menu controller
         /// </summary>
         public ContextMenuController contextMenu;
@@ -267,7 +262,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="visible">True if the model shall be shown</param>
         private void SetObjectVisibility(bool visible)
         {
-            Utility.ToggleVisibility(_projectManager.CurrentProject.ObjectModel.transform, visible);
+            Utility.ToggleVisibility(hierarchyView.transform, visible);
         }
 
         /// <summary>
@@ -280,7 +275,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Set the ones contained in the given list to highlighted
             foreach (var item in items)
-                SelectItem(Utility.FindChild(rootView, item).GetComponent<HierarchyItemController>());
+                SelectItem(Utility.FindChild(hierarchyView.transform, item).GetComponent<HierarchyItemController>());
         }
 
         /// <summary>

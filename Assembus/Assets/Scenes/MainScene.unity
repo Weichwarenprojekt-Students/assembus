@@ -1234,21 +1234,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 168202939}
-          m_MethodName: ItemClick
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
@@ -1330,6 +1315,21 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 168202939}
           m_MethodName: OnScroll
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 168202939}
+          m_MethodName: ItemClick
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1967,6 +1967,8 @@ MonoBehaviour:
   item: {fileID: 0}
   cameraController: {fileID: 963194229}
   clickDetector: {fileID: 168202935}
+  visibleColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+  invisibleColor: {r: 0.6509804, g: 0.6509804, b: 0.6509804, a: 1}
 --- !u!1 &187689806
 GameObject:
   m_ObjectHideFlags: 0
@@ -5608,21 +5610,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 168202939}
-          m_MethodName: ItemClick
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
@@ -5704,6 +5691,21 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 168202939}
           m_MethodName: OnScroll
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 168202939}
+          m_MethodName: ItemClick
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -6637,21 +6639,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 168202939}
-          m_MethodName: ItemClick
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
@@ -6733,6 +6720,21 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 168202939}
           m_MethodName: OnScroll
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 168202939}
+          m_MethodName: ItemClick
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -8893,21 +8895,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 168202939}
-          m_MethodName: ItemClick
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
@@ -8989,6 +8976,21 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 168202939}
           m_MethodName: OnScroll
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 168202939}
+          m_MethodName: ItemClick
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -10939,7 +10941,6 @@ MonoBehaviour:
   defaultHierarchyViewItem: {fileID: 168202933}
   selectedColor: {r: 0.30588236, g: 0.3882353, b: 0.50980395, a: 1}
   normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
-  rootView: {fileID: 441038524}
   contextMenu: {fileID: 1647295334}
 --- !u!224 &2006810629
 RectTransform:

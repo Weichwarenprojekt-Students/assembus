@@ -6864,9 +6864,6 @@ MonoBehaviour:
   sidebar: {fileID: 431994765}
   mainCanvas: {fileID: 1135199803}
   dialog: {fileID: 1258558055}
-  hierarchyView: {fileID: 441038523}
-  defaultHierarchyViewItem: {fileID: 168202933}
-  hierarchyViewController: {fileID: 2006810628}
 --- !u!114 &1135199801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7259,7 +7256,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1883572204}
   m_HandleRect: {fileID: 1883572203}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7670,8 +7667,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.0000038146827
-  m_Size: 0.97476333
+  m_Value: -0.000003814712
+  m_Size: 0.9747635
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10936,6 +10933,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   componentHighlighting: {fileID: 963194230}
   toast: {fileID: 1305548565}
+  hierarchyView: {fileID: 441038523}
+  defaultHierarchyViewItem: {fileID: 168202933}
   selectedColor: {r: 0.30588236, g: 0.3882353, b: 0.50980395, a: 1}
   normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
   rootView: {fileID: 441038524}

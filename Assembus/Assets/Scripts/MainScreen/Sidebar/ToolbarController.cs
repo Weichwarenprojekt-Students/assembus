@@ -82,7 +82,7 @@ namespace MainScreen.Sidebar
             var ctrlZ = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z);
             var ctrlShiftZ = ctrlZ && Input.GetKey(KeyCode.LeftShift);
             var ctrlY = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y);
-                
+
             // Check if an action should be redone
             if (ctrlShiftZ || ctrlY) RedoAction();
             // Check if an action should be undone
@@ -160,6 +160,9 @@ namespace MainScreen.Sidebar
                 description,
                 () =>
                 {
+                    // Reset the undo redo queue
+                    _undoService.Reset();
+
                     // Remove the last opened project 
                     _configManager.Config.lastProject = "";
                     _configManager.SaveConfig();

@@ -5,11 +5,17 @@ using Services;
 using Services.UndoRedo;
 using Shared.Toast;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MainScreen.Sidebar.HierarchyView
 {
     public class HierarchyViewController : MonoBehaviour
     {
+        /// <summary>
+        ///     The indention of the items
+        /// </summary>
+        public const float Indention = 16f;
+
         /// <summary>
         ///     The component highlighting
         /// </summary>
@@ -19,6 +25,16 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     The toast controller
         /// </summary>
         public ToastController toast;
+
+        /// <summary>
+        ///     The hierarchy view
+        /// </summary>
+        public GameObject hierarchyView;
+
+        /// <summary>
+        ///     A default hierarchy view item
+        /// </summary>
+        public GameObject defaultHierarchyViewItem;
 
         /// <summary>
         ///     The colors for the item
@@ -41,6 +57,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
 
         /// <summary>
+        ///     The undo redo service
+        /// </summary>
+        private readonly UndoService _undoService = UndoService.Instance;
+
+        /// <summary>
         ///     A list of the GameObject in Insertion Order
         /// </summary>
         public readonly List<HierarchyItemController> SelectedItems = new List<HierarchyItemController>();
@@ -51,9 +72,18 @@ namespace MainScreen.Sidebar.HierarchyView
         private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
-        ///     The undo redo service
+        ///     True if hierarchy view needs to be updated
         /// </summary>
-        private readonly UndoService _undoService = UndoService.Instance;
+        private bool _updateHierarchyView;
+
+        /// <summary>
+        ///     Late update of the UI
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (_updateHierarchyView)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView.GetComponent<RectTransform>());
+        }
 
         /// <summary>
         ///     Clear the selections
@@ -61,6 +91,16 @@ namespace MainScreen.Sidebar.HierarchyView
         private void OnEnable()
         {
             SelectedItems.Clear();
+
+            // Initialize the command executor
+            ActionCreator.Initialize(
+                _projectManager.CurrentProject.ObjectModel,
+                hierarchyView,
+                this
+            );
+
+            // Load the model
+            LoadModelIntoHierarchyView();
         }
 
         /// <summary>
@@ -90,17 +130,129 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
+        ///     Load the object model into the hierarchy view
+        /// </summary>
+        private void LoadModelIntoHierarchyView()
+        {
+            defaultHierarchyViewItem.SetActive(true);
+
+            // Get the root element of the object model
+            var parent = _projectManager.CurrentProject.ObjectModel;
+
+            // Remove the old children
+            RemoveElementWithChildren(hierarchyView.transform, true);
+
+            // Execute the recursive loading of game objects
+            LoadElementWithChildren(hierarchyView, parent);
+
+            // Force hierarchy view update
+            _updateHierarchyView = true;
+
+            defaultHierarchyViewItem.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Remove all previous list view items
+        /// </summary>
+        /// <param name="parent">The parent of the children that shall be removed</param>
+        /// <param name="first">True if it is the first (to make sure that the default item isn't deleted)</param>
+        private static void RemoveElementWithChildren(Transform parent, bool first)
+        {
+            for (var i = first ? 1 : 0; i < parent.childCount; i++)
+            {
+                RemoveElementWithChildren(parent.GetChild(i).transform, false);
+                Destroy(parent.GetChild(i).gameObject);
+            }
+        }
+
+        /// <summary>
+        ///     Load all elements of the game object and add them to the list
+        /// </summary>
+        /// <param name="containingListView">The container of the list view</param>
+        /// <param name="parent">The parent item on the actual model</param>
+        /// <param name="depth">The margin to the left side</param>
+        private void LoadElementWithChildren(GameObject containingListView, GameObject parent, float depth = 0)
+        {
+            for (var i = 0; i < parent.transform.childCount; i++)
+            {
+                var child = parent.transform.GetChild(i).gameObject;
+
+                // Add list item
+                var itemController = AddListItem(containingListView, child, depth);
+
+                // Fill the new item recursively with children
+                LoadElementWithChildren(
+                    itemController.childrenContainer,
+                    child,
+                    depth + Indention
+                );
+            }
+        }
+
+        /// <summary>
+        ///     Add a list view item
+        /// </summary>
+        /// <param name="parent">The parent container</param>
+        /// <param name="item">The actual model</param>
+        /// <param name="depth">The depth of indention</param>
+        /// <returns>The newly created item controller</returns>
+        private HierarchyItemController AddListItem(GameObject parent, GameObject item, float depth)
+        {
+            // generate a new hierarchy item in the hierarchy view
+            var newHierarchyItem = Instantiate(
+                defaultHierarchyViewItem,
+                parent.transform,
+                true
+            );
+
+            newHierarchyItem.name = item.name;
+
+            // get the script of the new item
+            var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
+
+            // initialize the item
+            itemController.Initialize(item, depth, hierarchyView);
+
+            return itemController;
+        }
+
+        /// <summary>
+        ///     Add a single list view item
+        /// </summary>
+        /// <param name="parent">The parent container</param>
+        /// <param name="item">The actual model</param>
+        /// <param name="depth">The depth of indention</param>
+        public void AddSingleListItem(GameObject parent, GameObject item, float depth)
+        {
+            defaultHierarchyViewItem.SetActive(true);
+            AddListItem(parent, item, depth);
+            defaultHierarchyViewItem.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Remove a game object
+        /// </summary>
+        /// <param name="item">The game object that shall be removed</param>
+        public void DeleteObject(GameObject item)
+        {
+            Destroy(item);
+        }
+
+        /// <summary>
         ///     Create an assembly station
         /// </summary>
         private void CreateAssemblyStation()
         {
-            var oldState = new[]{new ItemState(
-                _projectManager.GetNextGroupID(),
-                "Assembly Station",
-                _projectManager.CurrentProject.ObjectModel.name,
-                _projectManager.CurrentProject.ObjectModel.transform.childCount
-            )};
-            var newState = new[]{new ItemState(oldState[0])};
+            var oldState = new[]
+            {
+                new ItemState(
+                    _projectManager.GetNextGroupID(),
+                    "Assembly Station",
+                    _projectManager.CurrentProject.ObjectModel.name,
+                    _projectManager.CurrentProject.ObjectModel.transform.childCount
+                )
+            };
+            var newState = new[] {new ItemState(oldState[0])};
             _undoService.AddCommand(new Command(newState, oldState, Command.Create));
         }
 
@@ -177,6 +329,11 @@ namespace MainScreen.Sidebar.HierarchyView
             item.background.color = selected ? selectedColor : normalColor;
         }
 
+        /// <summary>
+        ///     Check if an item is selected
+        /// </summary>
+        /// <param name="item">The item</param>
+        /// <returns>True if item is contained</returns>
         public bool Contains(HierarchyItemController item)
         {
             return SelectedItems.Contains(item);

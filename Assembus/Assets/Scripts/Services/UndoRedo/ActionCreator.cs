@@ -1,5 +1,4 @@
 ﻿using System;
-using MainScreen;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
 using UnityEngine;
@@ -19,11 +18,6 @@ namespace Services.UndoRedo
         private static GameObject _hierarchyView;
 
         /// <summary>
-        ///     A default hierarchy view item
-        /// </summary>
-        private static MainController _main;
-
-        /// <summary>
         ///     The hierarchy view controller
         /// </summary>
         private static HierarchyViewController _hierarchyController;
@@ -33,14 +27,12 @@ namespace Services.UndoRedo
         /// </summary>
         /// <param name="model">The actual model</param>
         /// <param name="hierarchyView">The list view</param>
-        /// <param name="main">The main controller</param>
         /// <param name="hierarchyController">The hierarchy view controller</param>
-        public static void Initialize(GameObject model, GameObject hierarchyView, MainController main,
+        public static void Initialize(GameObject model, GameObject hierarchyView,
             HierarchyViewController hierarchyController)
         {
             _model = model;
             _hierarchyView = hierarchyView;
-            _main = main;
             _hierarchyController = hierarchyController;
         }
 
@@ -124,12 +116,12 @@ namespace Services.UndoRedo
             if (listParent != null)
             {
                 var parentItem = listParent.GetComponent<HierarchyItemController>();
+                indentionDepth = parentItem.GetIndention() + 16f;
                 parentItem.ExpandItem(true);
                 parentItem.childrenContainer.SetActive(true);
-                indentionDepth = parentItem.GetIndention() + 16f;
             }
 
-            listItem.GetComponent<HierarchyItemController>().IndentItem(indentionDepth);
+            IndentItems(listItem, indentionDepth);
 
             // Move the item in the actual object
             var modelItem = Utility.FindChild(_model.transform, state.ID);
@@ -137,6 +129,23 @@ namespace Services.UndoRedo
             if (modelParent == null) modelParent = _model.transform;
             modelItem.SetParent(modelParent);
             modelItem.SetSiblingIndex(state.SiblingIndex);
+        }
+
+        /// <summary>
+        ///     Recursively indent the items
+        /// </summary>
+        /// <param name="item">The item to be corrected</param>
+        /// <param name="indentionDepth">The indention depth</param>
+        private static void IndentItems(Transform item, float indentionDepth)
+        {
+            // Indent the children
+            var listItem = item.GetComponent<HierarchyItemController>();
+            var childrenContainer = listItem.childrenContainer.transform;
+            for (var i = 0; i < childrenContainer.childCount; i++)
+                IndentItems(childrenContainer.GetChild(i), indentionDepth + HierarchyViewController.Indention);
+
+            // Indent the item
+            listItem.IndentItem(indentionDepth);
         }
 
         /// <summary>
@@ -163,19 +172,18 @@ namespace Services.UndoRedo
         private static void Create(ItemState state)
         {
             // Create the object
-            var isRootParent = state.ParentID == _model.name;
-            var parent = isRootParent ? _model.transform : Utility.FindChild(_model.transform, state.ParentID);
             var newObject = new GameObject(state.ID);
             newObject.AddComponent<ItemInfoController>();
             newObject.GetComponent<ItemInfoController>().ItemInfo
                 = new ItemInfo {displayName = state.Name, isGroup = true};
-            newObject.transform.parent = parent;
+            newObject.transform.parent = _model.transform;
+            newObject.transform.SetSiblingIndex(state.SiblingIndex);
 
             // Create the list view item
-            var listParent =
-                isRootParent ? _hierarchyView : Utility.FindChild(_hierarchyView.transform, state.ParentID).gameObject;
-            var indention = isRootParent ? 0 : listParent.GetComponent<HierarchyItemController>().GetIndention();
-            _main.AddSingleListItem(listParent, newObject, indention);
+            _hierarchyController.AddSingleListItem(_hierarchyView, newObject, 0);
+
+            // Move the item
+            Move(state);
         }
 
         /// <summary>
@@ -187,11 +195,11 @@ namespace Services.UndoRedo
             // Delete the actual object
             var item = Utility.FindChild(_hierarchyView.transform, state.ID);
             var hierarchyItem = item.GetComponent<HierarchyItemController>();
-            _main.DeleteObject(hierarchyItem.item);
-            
+            _hierarchyController.DeleteObject(hierarchyItem.item);
+
             // Delete the list view item and the selection
             _hierarchyController.SelectedItems.Remove(hierarchyItem);
-            _main.DeleteObject(item.gameObject);
+            _hierarchyController.DeleteObject(item.gameObject);
         }
     }
 }

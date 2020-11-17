@@ -116,19 +116,34 @@ namespace MainScreen.Sidebar.HierarchyView
         [HideInInspector] public GameObject item;
 
         /// <summary>
+        ///     The camera controller
+        /// </summary>
+        public CameraController cameraController;
+
+        /// <summary>
+        ///     The click detector instance
+        /// </summary>
+        public DoubleClickDetector clickDetector;
+
+        /// <summary>
+        ///     The undo redo service
+        /// </summary>
+        private readonly ProjectManager _projectManager = ProjectManager.Instance;
+
+        /// <summary>
         ///     The undo redo service
         /// </summary>
         private readonly UndoService _undoService = UndoService.Instance;
 
         /// <summary>
+        ///     The root element of the hierarchy view
+        /// </summary>
+        private RectTransform _hierarchyView;
+
+        /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
         /// </summary>
         private bool _isExpanded = true;
-
-        /// <summary>
-        ///     The root element of the hierarchy view
-        /// </summary>
-        private RectTransform _rectTransform;
 
         /// <summary>
         ///     True if the hierarchy view needs to be updated
@@ -139,16 +154,6 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     True if the item has children
         /// </summary>
         private bool HasChildren => childrenContainer.transform.childCount > 0;
-        
-        /// <summary>
-        ///     The camera controller
-        /// </summary>
-        public CameraController cameraController;
-
-        /// <summary>
-        ///     The click detector instance
-        /// </summary>
-        public DoubleClickDetector clickDetector;
 
         /// <summary>
         ///     Update the expand button to display the correct icon
@@ -167,8 +172,8 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // force update of the hierarchy view if the item expansion changed
             if (_updateHierarchy)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
-            
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_hierarchyView);
+
             clickDetector.CheckForSecondClick();
         }
 
@@ -190,7 +195,7 @@ namespace MainScreen.Sidebar.HierarchyView
             IndentItem(indentionDepth);
 
             // set the root hierarchy view
-            _rectTransform = mainHierarchyView.GetComponent<RectTransform>();
+            _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
         }
 
         /// <summary>
@@ -273,16 +278,22 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="data">The event data</param>
         public void ItemClick(BaseEventData data)
         {
-            // Check if it was a right click
-            var pointerData = (PointerEventData) data;
-            if (pointerData.button == PointerEventData.InputButton.Right)
-                ShowContextMenu();
-            //Check if it was a left click and increment left-click counter
-            else if (pointerData.button == PointerEventData.InputButton.Left)
-                clickDetector.Click();
-            
             // Select the item 
-            SelectItem();
+            var pointerData = (PointerEventData) data;
+            if (!hierarchyViewController.Contains(this) ||
+                pointerData.button != PointerEventData.InputButton.Right)
+                SelectItem();
+
+            // Check what type of click happened
+            switch (pointerData.button)
+            {
+                case PointerEventData.InputButton.Right:
+                    ShowContextMenu();
+                    break;
+                case PointerEventData.InputButton.Left:
+                    clickDetector.Click();
+                    break;
+            }
         }
 
         /// <summary>
@@ -303,6 +314,18 @@ namespace MainScreen.Sidebar.HierarchyView
                 Name = visible ? "Hide Item" : "Show Item",
                 Action = () => item.SetActive(!visible)
             };
+            if (hierarchyViewController.SelectedItems.Contains(this))
+            {
+                var groupUp = new ContextMenuController.Item
+                {
+                    Icon = contextMenu.add,
+                    Name = "Group Selection",
+                    Action = MoveToNewGroup
+                };
+                contextMenu.Show(new[] {groupUp, rename, visibility});
+                return;
+            }
+
             contextMenu.Show(new[] {rename, visibility});
         }
 
@@ -315,6 +338,32 @@ namespace MainScreen.Sidebar.HierarchyView
             nameInputObject.SetActive(true);
             nameInput.Select();
             nameTextObject.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Create a new group and move the items into the group
+        /// </summary>
+        private void MoveToNewGroup()
+        {
+            // Create the group
+            var oldState = new[]
+            {
+                new ItemState(
+                    _projectManager.GetNextGroupID(),
+                    "Group",
+                    item.transform.parent.name,
+                    item.transform.GetSiblingIndex()
+                )
+            };
+            var newState = new[] {new ItemState(oldState[0])};
+            _undoService.AddCommand(new Command(newState, oldState, Command.Create));
+
+            // Move the items
+            _dragItem =
+                Utility.FindChild(_hierarchyView.transform, newState[0].ID).GetComponent<HierarchyItemController>();
+            _insertion = true;
+            _selectedItems = hierarchyViewController.GetSelectedItems();
+            InsertItems();
         }
 
         /// <summary>
@@ -392,6 +441,15 @@ namespace MainScreen.Sidebar.HierarchyView
             dragPreview.SetActive(false);
             _dragging = false;
 
+            // Insert the items (Only if the dragged item was selected)
+            if (_selectedItems.Count != 0 && hierarchyViewController.Contains(this)) InsertItems();
+        }
+
+        /// <summary>
+        ///     Insert the currently selected items into a group
+        /// </summary>
+        private void InsertItems()
+        {
             // Check if the drag leads to a change
             if (_dragItem == null) return;
 

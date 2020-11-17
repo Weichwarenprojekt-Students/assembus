@@ -18,14 +18,14 @@ namespace Services.UndoRedo
         /// <summary>
         ///     Current element of the linked list
         /// </summary>
-        private LinkedListNode<Command> _current = new LinkedListNode<Command>(Command.Empty);
+        private LinkedListNode<Command> _current;
 
         /// <summary>
         ///     Singleton private constructor
         /// </summary>
         private UndoService()
         {
-            _linkedList.AddFirst(_current);
+            Reset();
         }
 
         /// <summary>
@@ -37,6 +37,16 @@ namespace Services.UndoRedo
         ///     Singleton instance
         /// </summary>
         public static UndoService Instance { get; } = new UndoService();
+
+        /// <summary>
+        ///     Reset the undo redo service
+        /// </summary>
+        public void Reset()
+        {
+            _current = new LinkedListNode<Command>(Command.Empty);
+            _linkedList.Clear();
+            _linkedList.AddFirst(_current);
+        }
 
         /// <summary>
         ///     Add a command to the history of commands

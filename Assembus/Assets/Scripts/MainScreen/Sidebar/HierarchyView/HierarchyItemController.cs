@@ -322,8 +322,8 @@ namespace MainScreen.Sidebar.HierarchyView
             {
                 entries.Add(new ContextMenuController.Item
                 {
-                    Icon = contextMenu.add,
-                    Name = "Group Selection",
+                    Icon = contextMenu.folder,
+                    Name = "Group Selected",
                     Action = MoveToNewGroup
                 });
             }

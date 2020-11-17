@@ -12,7 +12,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     The available icons
         /// </summary>
-        public Texture delete, add, show, hide, edit;
+        public Texture delete, add, show, hide, edit, folder;
 
         /// <summary>
         ///     The default item

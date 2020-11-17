@@ -9509,6 +9509,7 @@ MonoBehaviour:
   show: {fileID: 2800000, guid: fa60a29cc03815849abeca68d9f818e0, type: 3}
   hide: {fileID: 2800000, guid: 7f0b625ff06f53a40bb24aff58c81705, type: 3}
   edit: {fileID: 2800000, guid: 114683a1b1384d341a95edc45183a22d, type: 3}
+  folder: {fileID: 2800000, guid: 058a3afd608c109459ca0cd86d80c310, type: 3}
   defaultItem: {fileID: 523837211}
   listView: {fileID: 1699413149}
 --- !u!114 &1647295335

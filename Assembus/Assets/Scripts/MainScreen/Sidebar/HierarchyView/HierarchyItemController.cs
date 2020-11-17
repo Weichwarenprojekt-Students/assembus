@@ -105,6 +105,11 @@ namespace MainScreen.Sidebar.HierarchyView
         public ToastController toast;
 
         /// <summary>
+        ///     The scroll view
+        /// </summary>
+        public ScrollRect scrollRect;
+
+        /// <summary>
         ///     The item of the actual model
         /// </summary>
         [HideInInspector] public GameObject item;
@@ -455,6 +460,15 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             _dragItem = null;
             if (!hierarchyViewController.Contains(this)) background.color = normalColor;
+        }
+
+        /// <summary>
+        ///     Forward the scroll data
+        /// </summary>
+        /// <param name="data">Event data</param>
+        public void OnScroll(BaseEventData data)
+        {
+            scrollRect.OnScroll((PointerEventData) data);
         }
     }
 }

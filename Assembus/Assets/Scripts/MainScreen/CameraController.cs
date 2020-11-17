@@ -100,6 +100,7 @@ namespace MainScreen
             if (Input.GetMouseButtonUp(0))
                 clickDetector.Click();
             
+            //Check for second click
             clickDetector.CheckForSecondClick();
 
             // detect scrolling

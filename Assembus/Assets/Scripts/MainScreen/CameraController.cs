@@ -77,12 +77,12 @@ namespace MainScreen
             if (!(_cam is null)) _camTransform = _cam.transform;
             _centerPoint = new Vector3(0, 0, 0);
 
-            // this is needed! without this the camera "snaps" to another location on first right click
+            // This is needed! without this the camera "snaps" to another location on first right click
             StoreLastMousePosition();
             CalculateNewCameraTransform();
 
-            //Add the event handler. Update camera when double click occured
-            clickDetector.DoubleClickOccured += () => { UpdateCameraFocus(); };
+            // Add the event handler. Update camera when double click occured
+            clickDetector.DoubleClickOccured += UpdateCameraFocus;
         }
 
         /// <summary>
@@ -90,20 +90,20 @@ namespace MainScreen
         /// </summary>
         private void LateUpdate()
         {
-            // store position when right mouse button is clicked
+            // Store position when right mouse button is clicked
             if (Input.GetMouseButtonDown(1)) StoreLastMousePosition();
 
-            // when right mouse button is held rotate the camera
+            // When right mouse button is held rotate the camera
             if (Input.GetMouseButton(1)) CalculateNewCameraTransform();
 
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))
                 clickDetector.Click();
 
-            //Check for second click
+            // Check for second click
             clickDetector.CheckForSecondClick();
 
-            // detect scrolling
+            // Detect scrolling
             if (Input.mouseScrollDelta.y != 0) Zoom(Input.mouseScrollDelta.y);
         }
 
@@ -116,7 +116,7 @@ namespace MainScreen
             // Calculate the bounds of the game object
             var bounds = new Bounds(parent.transform.position, Vector3.zero);
 
-            //Get the bound of one GameObject with multiple children
+            // Get the bound of one GameObject with multiple children
             foreach (var r in parent.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
             var objectSizes = bounds.max - bounds.min;
 
@@ -197,11 +197,11 @@ namespace MainScreen
             // Don't zoom if mouse is not over viewport
             if (!MouseOverViewport) return;
 
-            // calculate camera distance
+            // Calculate camera distance
             _cameraDistance -= delta * _scrollSpeed;
             if (_cameraDistance < 0) _cameraDistance = 0;
 
-            // apply camera distance
+            // Apply camera distance
             StoreLastMousePosition();
             CalculateNewCameraTransform();
         }

@@ -44,6 +44,9 @@ namespace MainScreen
         /// </summary>
         private Color _hoveredOriginalColor;
 
+        /// <summary>
+        ///     True if mouse position is over viewport of 3D editor
+        /// </summary>
         private bool MouseOverViewport
         {
             get
@@ -209,6 +212,13 @@ namespace MainScreen
         /// </summary>
         private void ResetPreviousSelections()
         {
+            // Reset hover-highlighting on non-selected objects
+            if (!(_hoveredObject is null || _selectedGameObjects.ContainsKey(_hoveredObject)))
+            {
+                _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
+                _hoveredObject = null;
+            }
+
             // Go through selected game objects
             foreach (var keyValuePair in _selectedGameObjects)
                 // Reset to original color before selection

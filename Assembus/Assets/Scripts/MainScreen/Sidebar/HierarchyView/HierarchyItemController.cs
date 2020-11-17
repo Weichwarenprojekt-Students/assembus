@@ -162,7 +162,16 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             UpdateButton();
 
-            clickDetector.DoubleClickOccured += () => cameraController.ZoomOnObject(item);
+            clickDetector.DoubleClickOccured += () =>
+            {
+                // Focus on component group only when there are children in group
+                if (item.transform.childCount > 0)
+                    cameraController.ZoomOnObject(item);
+
+                //Focus on single component and make sure we have no empty group!
+                else if (item.GetComponent<ItemInfoController>().ItemInfo.isGroup == false)
+                    cameraController.UpdateCameraFocus(item);
+            };
         }
 
         /// <summary>
@@ -302,47 +311,55 @@ namespace MainScreen.Sidebar.HierarchyView
         private void ShowContextMenu()
         {
             var entries = new List<ContextMenuController.Item>();
-            
-            entries.Add(new ContextMenuController.Item
-            {
-                Icon = contextMenu.edit,
-                Name = "Rename",
-                Action = RenameItem
-            });
+
+            entries.Add(
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.edit,
+                    Name = "Rename",
+                    Action = RenameItem
+                }
+            );
 
             var visible = item.activeSelf;
-            entries.Add(new ContextMenuController.Item
-            {
-                Icon = visible ? contextMenu.hide : contextMenu.show,
-                Name = visible ? "Hide Item" : "Show Item",
-                Action = () => item.SetActive(!visible)
-            });
-            
-            if (hierarchyViewController.SelectedItems.Contains(this))
-            {
-                entries.Add(new ContextMenuController.Item
+            entries.Add(
+                new ContextMenuController.Item
                 {
-                    Icon = contextMenu.folder,
-                    Name = "Group Selected",
-                    Action = MoveToNewGroup
-                });
-            }
-            
+                    Icon = visible ? contextMenu.hide : contextMenu.show,
+                    Name = visible ? "Hide Item" : "Show Item",
+                    Action = () => item.SetActive(!visible)
+                }
+            );
+
+            if (hierarchyViewController.SelectedItems.Contains(this))
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
+                        Icon = contextMenu.folder,
+                        Name = "Group Selected",
+                        Action = MoveToNewGroup
+                    }
+                );
+
             if (item.GetComponent<ItemInfoController>().ItemInfo.isGroup)
             {
-                entries.Add(new ContextMenuController.Item
-                {
-                    Icon = contextMenu.add,
-                    Name = "Add Group",
-                    Action = AddGroup
-                });
-                
-                entries.Add(new ContextMenuController.Item
-                {
-                    Icon = contextMenu.delete,
-                    Name = "Delete",
-                    Action = DeleteItem
-                });
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
+                        Icon = contextMenu.add,
+                        Name = "Add Group",
+                        Action = AddGroup
+                    }
+                );
+
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
+                        Icon = contextMenu.delete,
+                        Name = "Delete",
+                        Action = DeleteItem
+                    }
+                );
             }
 
             contextMenu.Show(entries);

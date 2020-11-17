@@ -107,7 +107,7 @@ namespace MainScreen
         }
 
         /// <summary>
-        ///     Set focus on passed GameObject which can also be a component group
+        ///     Set focus on passed GameObject component group
         /// </summary>
         /// <param name="parent">The object that shall be shown</param>
         public void ZoomOnObject(GameObject parent)
@@ -115,7 +115,7 @@ namespace MainScreen
             // Calculate the bounds of the game object
             var bounds = new Bounds(parent.transform.position, Vector3.zero);
 
-            //Get the bound of one GameObject or one GameObject with multiple children
+            //Get the bound of one GameObject with multiple children
             foreach (var r in parent.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
             var objectSizes = bounds.max - bounds.min;
 
@@ -150,7 +150,17 @@ namespace MainScreen
             StoreLastMousePosition();
             CalculateNewCameraTransform();
         }
-
+        public void UpdateCameraFocus(GameObject go)
+        {
+            if (_cam is null) return;
+            
+            var transformGameObject = (go.transform.gameObject).GetComponent<Renderer>().bounds.center;
+            
+            SetFocus(transformGameObject);
+            StoreLastMousePosition();
+            CalculateNewCameraTransform();
+        }
+        
         /// <summary>
         ///     Calculates the new camera position based on the mouse position
         /// </summary>

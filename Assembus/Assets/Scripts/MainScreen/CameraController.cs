@@ -24,7 +24,7 @@ namespace MainScreen
         /// <summary>
         ///     The click detector instance
         /// </summary>
-        public DoubleClickDetector clickDetector;
+        public DoubleClickDetector doubleClickDetector;
 
         /// <summary>
         ///     Reference to the main camera
@@ -82,7 +82,7 @@ namespace MainScreen
             CalculateNewCameraTransform();
 
             // Add the event handler. Update camera when double click occured
-            clickDetector.DoubleClickOccured += UpdateCameraFocus;
+            doubleClickDetector.DoubleClickOccured += UpdateCameraFocus;
         }
 
         /// <summary>
@@ -98,10 +98,10 @@ namespace MainScreen
 
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))
-                clickDetector.Click();
+                doubleClickDetector.Click();
 
             // Check for second click
-            clickDetector.CheckForSecondClick();
+            doubleClickDetector.CheckForSecondClick();
 
             // Detect scrolling
             if (Input.mouseScrollDelta.y != 0) Zoom(Input.mouseScrollDelta.y);

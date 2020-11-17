@@ -165,7 +165,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void Start()
         {
-            UpdateButton();
+            UpdateExpandButton();
 
             clickDetector.DoubleClickOccured += () =>
             {
@@ -261,7 +261,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 _updateHierarchy = true;
             }
 
-            UpdateButton();
+            UpdateExpandButton();
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Update the expand button to display the correct icons
         /// </summary>
-        private void UpdateButton()
+        private void UpdateExpandButton()
         {
             // Enable/Disable the button
             expandButton.SetActive(HasChildren);

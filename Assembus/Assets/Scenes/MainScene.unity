@@ -6258,7 +6258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   componentHighlighting: {fileID: 963194230}
-  clickDetector: {fileID: 963194231}
+  doubleClickDetector: {fileID: 963194231}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0

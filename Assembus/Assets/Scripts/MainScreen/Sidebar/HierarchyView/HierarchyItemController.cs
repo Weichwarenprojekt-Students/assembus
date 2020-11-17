@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Models.Project;
+using Services;
 using Services.UndoRedo;
 using Shared.Toast;
 using TMPro;
@@ -138,6 +139,16 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     True if the item has children
         /// </summary>
         private bool HasChildren => childrenContainer.transform.childCount > 0;
+        
+        /// <summary>
+        ///     The camera controller
+        /// </summary>
+        public CameraController cameraController;
+
+        /// <summary>
+        ///     The click detector instance
+        /// </summary>
+        public DoubleClickDetector clickDetector;
 
         /// <summary>
         ///     Update the expand button to display the correct icon
@@ -145,6 +156,8 @@ namespace MainScreen.Sidebar.HierarchyView
         private void Start()
         {
             UpdateButton();
+
+            clickDetector.DoubleClickOccured += () => cameraController.ZoomOnObject(item);
         }
 
         /// <summary>
@@ -155,6 +168,8 @@ namespace MainScreen.Sidebar.HierarchyView
             // force update of the hierarchy view if the item expansion changed
             if (_updateHierarchy)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
+            
+            clickDetector.CheckForSecondClick();
         }
 
         /// <summary>
@@ -260,8 +275,12 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Check if it was a right click
             var pointerData = (PointerEventData) data;
-            if (pointerData.button == PointerEventData.InputButton.Right) ShowContextMenu();
-
+            if (pointerData.button == PointerEventData.InputButton.Right)
+                ShowContextMenu();
+            //Check if it was a left click and increment left-click counter
+            else if (pointerData.button == PointerEventData.InputButton.Left)
+                clickDetector.Click();
+            
             // Select the item 
             SelectItem();
         }

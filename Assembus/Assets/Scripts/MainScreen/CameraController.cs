@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using Services;
 using UnityEngine;
 
 namespace MainScreen
@@ -6,11 +6,6 @@ namespace MainScreen
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
     {
-        /// <summary>
-        ///     Time frame for double click detection
-        /// </summary>
-        private const float TimeBetweenClicks = 0.25f;
-
         /// <summary>
         ///     Rotation speed of the camera
         /// </summary>
@@ -25,6 +20,11 @@ namespace MainScreen
         ///     Reference to highlighting script
         /// </summary>
         public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
+        ///     The click detector instance
+        /// </summary>
+        public DoubleClickDetector clickDetector;
 
         /// <summary>
         ///     Reference to the main camera
@@ -45,21 +45,6 @@ namespace MainScreen
         ///     Point the camera rotates around
         /// </summary>
         private Vector3 _centerPoint;
-
-        /// <summary>
-        ///     Allow coroutine for double click detection
-        /// </summary>
-        private bool _coroutineAllowed = true;
-
-        /// <summary>
-        ///     Time when left mouse button is clicked first time
-        /// </summary>
-        private float _firstLeftClickTime;
-
-        /// <summary>
-        ///     Left mouse click counter for double click detection
-        /// </summary>
-        private int _leftClickCounter;
 
         /// <summary>
         ///     Camera position of previous frame. Used to calculate the new rotation
@@ -95,6 +80,9 @@ namespace MainScreen
             // this is needed! without this the camera "snaps" to another location on first right click
             StoreLastMousePosition();
             CalculateNewCameraTransform();
+
+            //Add the event handler. Update camera when double click occured
+            clickDetector.DoubleClickOccured += () => { UpdateCameraFocus(); };
         }
 
         /// <summary>
@@ -110,26 +98,24 @@ namespace MainScreen
 
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))
-                _leftClickCounter += 1;
+                clickDetector.Click();
 
-            if (_leftClickCounter == 1 && _coroutineAllowed)
-            {
-                _firstLeftClickTime = Time.time;
-                StartCoroutine(DoubleClickDetection());
-            }
+            clickDetector.CheckForSecondClick();
 
             // detect scrolling
             if (Input.mouseScrollDelta.y != 0) Zoom(Input.mouseScrollDelta.y);
         }
 
         /// <summary>
-        ///     Zoom camera on the given object
+        ///     Set focus on passed GameObject which can also be a component group
         /// </summary>
         /// <param name="parent">The object that shall be shown</param>
         public void ZoomOnObject(GameObject parent)
         {
             // Calculate the bounds of the game object
             var bounds = new Bounds(parent.transform.position, Vector3.zero);
+
+            //Get the bound of one GameObject or one GameObject with multiple children
             foreach (var r in parent.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
             var objectSizes = bounds.max - bounds.min;
 
@@ -143,28 +129,6 @@ namespace MainScreen
 
             // Recalculate the scroll speed
             _scrollSpeed = ScrollFactor * _cameraDistance;
-        }
-
-        /// <summary>
-        ///     Coroutine, detect double clicking
-        /// </summary>
-        private IEnumerator DoubleClickDetection()
-        {
-            _coroutineAllowed = false;
-            while (Time.time < _firstLeftClickTime + TimeBetweenClicks)
-            {
-                if (_leftClickCounter == 2)
-                {
-                    UpdateCameraFocus();
-                    break;
-                }
-
-                yield return new WaitForEndOfFrame();
-            }
-
-            _leftClickCounter = 0;
-            _firstLeftClickTime = 0f;
-            _coroutineAllowed = true;
         }
 
         /// <summary>

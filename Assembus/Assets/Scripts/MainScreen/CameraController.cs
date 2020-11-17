@@ -154,6 +154,10 @@ namespace MainScreen
             CalculateNewCameraTransform();
         }
 
+        /// <summary>
+        ///     Set focus on passed GameObject
+        /// </summary>
+        /// <param name="go">GameObject which should be focused</param>
         public void UpdateCameraFocus(GameObject go)
         {
             if (_cam is null) return;

@@ -7667,8 +7667,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0.000003814712
-  m_Size: 0.9747635
+  m_Value: -0.0000038146827
+  m_Size: 0.97476333
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -9512,6 +9512,7 @@ MonoBehaviour:
   folder: {fileID: 2800000, guid: 058a3afd608c109459ca0cd86d80c310, type: 3}
   defaultItem: {fileID: 523837211}
   listView: {fileID: 1699413149}
+  mainCanvas: {fileID: 1135199803}
 --- !u!114 &1647295335
 MonoBehaviour:
   m_ObjectHideFlags: 0

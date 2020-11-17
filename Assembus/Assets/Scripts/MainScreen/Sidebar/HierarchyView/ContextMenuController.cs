@@ -25,6 +25,33 @@ namespace MainScreen.Sidebar.HierarchyView
         public Transform listView;
 
         /// <summary>
+        ///     The main canvas
+        /// </summary>
+        public Canvas mainCanvas;
+
+        /// <summary>
+        ///     True if the context menu should be shown
+        /// </summary>
+        private bool _show;
+
+        /// <summary>
+        ///     Position the context menu and show it
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (!_show) return;
+            var rectListView = listView.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectListView);
+
+            // Position the item
+            listView.position = Input.mousePosition;
+            var height = (rectListView.rect.height + 16) * mainCanvas.transform.localScale.y;
+            var difference = listView.position.y - height;
+            if (difference < 0) listView.position += new Vector3(0, -difference, 0);
+            _show = false;
+        }
+
+        /// <summary>
         ///     Hide the context menu
         /// </summary>
         private void OnMouseDown()
@@ -47,7 +74,6 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="items">The items to be shown</param>
         public void Show(List<Item> items)
         {
-            listView.position = Input.mousePosition;
             // Hide the panel
             gameObject.SetActive(false);
 
@@ -82,6 +108,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Show the context menu
             gameObject.SetActive(true);
+            _show = true;
         }
 
         /// <summary>

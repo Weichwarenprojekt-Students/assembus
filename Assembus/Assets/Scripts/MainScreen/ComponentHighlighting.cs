@@ -200,10 +200,16 @@ namespace MainScreen
         {
             // Clear current selection, to preserve original color invariance
             ResetPreviousSelections();
-            
-            // Is the given game object a grouping object -> Get children inside
-            if (gameObjects[0].GetComponent<ItemInfoController>().ItemInfo.isGroup)
-                gameObjects = Utility.GetAllGameObjects(gameObjects[0]).ToList();
+
+            // Get all grouping objects in the list (if there are any) and their children
+            var groupedObjects = new List<GameObject>();
+            foreach (var g in gameObjects.Where(
+                g => g.GetComponent<ItemInfoController>().ItemInfo.isGroup
+            ))
+            {
+                groupedObjects.AddRange((Utility.GetAllGameObjects(g).ToList()));
+            }
+            gameObjects.AddRange(groupedObjects);
 
             // Single selection or group selection
             var color = gameObjects.Count > 1 ? colorSelectedGroup : colorSelectedSingle;
@@ -215,7 +221,8 @@ namespace MainScreen
                     if (itemRenderer == null) return;
 
                     // Add to selection list and save original color
-                    _selectedGameObjects.Add(g, itemRenderer.material.color);
+                    if (!_selectedGameObjects.ContainsKey(g))
+                        _selectedGameObjects.Add(g, itemRenderer.material.color);
 
                     // Highlight selection
                     itemRenderer.material.color = color;

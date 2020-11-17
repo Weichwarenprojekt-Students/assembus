@@ -108,25 +108,30 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         public void ShowContextMenu()
         {
-            var createStation = new ContextMenuController.Item
+            var entries = new List<ContextMenuController.Item>();
+            
+            entries.Add(new ContextMenuController.Item
             {
                 Icon = contextMenu.add,
                 Name = "Create Station",
                 Action = CreateAssemblyStation
-            };
-            var showAll = new ContextMenuController.Item
+            });
+            
+            entries.Add(new ContextMenuController.Item
             {
                 Icon = contextMenu.show,
                 Name = "Show All",
                 Action = () => SetObjectVisibility(true)
-            };
-            var hideAll = new ContextMenuController.Item
+            });
+            
+            entries.Add(new ContextMenuController.Item
             {
                 Icon = contextMenu.hide,
                 Name = "Hide All",
                 Action = () => SetObjectVisibility(false)
-            };
-            contextMenu.Show(new[] {createStation, showAll, hideAll});
+            });
+
+            contextMenu.Show(entries);
         }
 
         /// <summary>

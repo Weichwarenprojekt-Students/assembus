@@ -59,7 +59,7 @@ namespace Services
         /// </summary>
         /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
         /// <returns>Returns list of all child GameObjects of provided input GameObject</returns>
-        public static ICollection<GameObject> GetAllGameObjects(GameObject inputObject)
+        public static List<GameObject> GetAllGameObjects(GameObject inputObject)
         {
             var list = new List<GameObject>();
             GetAllGameObjects(inputObject, list);

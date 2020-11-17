@@ -45,7 +45,7 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     Show the context menu
         /// </summary>
         /// <param name="items">The items to be shown</param>
-        public void Show(IEnumerable<Item> items)
+        public void Show(List<Item> items)
         {
             listView.position = Input.mousePosition;
             // Hide the panel
@@ -57,7 +57,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Show the default item
             defaultItem.SetActive(true);
 
-            // Apply data to listview. Iterate oldProjects list backwards
+            // Apply data to listview
             foreach (var item in items)
             {
                 // Create new listview item by instantiating a new prefab

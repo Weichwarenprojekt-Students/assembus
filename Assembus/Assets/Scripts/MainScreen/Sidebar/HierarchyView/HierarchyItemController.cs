@@ -126,7 +126,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public DoubleClickDetector clickDetector;
 
         /// <summary>
-        ///     The undo redo service
+        ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
 
@@ -301,32 +301,51 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void ShowContextMenu()
         {
-            var rename = new ContextMenuController.Item
+            var entries = new List<ContextMenuController.Item>();
+            
+            entries.Add(new ContextMenuController.Item
             {
                 Icon = contextMenu.edit,
                 Name = "Rename",
                 Action = RenameItem
-            };
+            });
+
             var visible = item.activeSelf;
-            var visibility = new ContextMenuController.Item
+            entries.Add(new ContextMenuController.Item
             {
                 Icon = visible ? contextMenu.hide : contextMenu.show,
                 Name = visible ? "Hide Item" : "Show Item",
                 Action = () => item.SetActive(!visible)
-            };
+            });
+            
             if (hierarchyViewController.SelectedItems.Contains(this))
             {
-                var groupUp = new ContextMenuController.Item
+                entries.Add(new ContextMenuController.Item
                 {
                     Icon = contextMenu.add,
                     Name = "Group Selection",
                     Action = MoveToNewGroup
-                };
-                contextMenu.Show(new[] {groupUp, rename, visibility});
-                return;
+                });
+            }
+            
+            if (item.GetComponent<ItemInfoController>().ItemInfo.isGroup)
+            {
+                entries.Add(new ContextMenuController.Item
+                {
+                    Icon = contextMenu.add,
+                    Name = "Add Group",
+                    Action = AddGroup
+                });
+                
+                entries.Add(new ContextMenuController.Item
+                {
+                    Icon = contextMenu.delete,
+                    Name = "Delete",
+                    Action = DeleteItem
+                });
             }
 
-            contextMenu.Show(new[] {rename, visibility});
+            contextMenu.Show(entries);
         }
 
         /// <summary>
@@ -338,6 +357,52 @@ namespace MainScreen.Sidebar.HierarchyView
             nameInputObject.SetActive(true);
             nameInput.Select();
             nameTextObject.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Item deletion
+        /// </summary>
+        private void DeleteItem()
+        {
+            //Check if the group isn't empty
+            if (item.transform.childCount > 0)
+            {
+                toast.Error(Toast.Short, "Only empty groups can be deleted!");
+            }
+            else
+            {
+                // Save the old item state
+                var oldState = new[] {ItemState.FromListItem(this)};
+
+                // Create the new item state
+                var newState = new[] {new ItemState(oldState[0])};
+
+                // Add the new action to the undo redo service
+                _undoService.AddCommand(new Command(newState, oldState, Command.Delete));
+            }
+        }
+
+        /// <summary>
+        ///     Add new group
+        /// </summary>
+        private void AddGroup()
+        {
+            // Save the old item state
+            var oldState = new[]
+            {
+                new ItemState(
+                    _projectManager.GetNextGroupID(),
+                    "Group",
+                    item.name,
+                    item.transform.childCount
+                )
+            };
+
+            // Create the new item state
+            var newState = new[] {new ItemState(oldState[0])};
+
+            // Add the new action to the undo redo service
+            _undoService.AddCommand(new Command(newState, oldState, Command.Create));
         }
 
         /// <summary>

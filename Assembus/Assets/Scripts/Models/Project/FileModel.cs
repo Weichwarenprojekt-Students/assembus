@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine.Serialization;
 
 namespace Models.Project
 {
@@ -24,6 +23,6 @@ namespace Models.Project
         /// <summary>
         ///     Additional information about the GameObject which cannot be stored in the GameObject directly
         /// </summary>
-        [FormerlySerializedAs("goMemento")] public ItemInfo itemInfo;
+        public ItemInfo itemInfo;
     }
 }

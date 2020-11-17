@@ -100,7 +100,8 @@ namespace MainScreen
             if (Input.GetMouseButtonUp(0))
                 clickDetector.Click();
 
-            clickDetector.CheckForSecondClick();
+            if(MouseOverViewport)
+                clickDetector.CheckForSecondClick();
 
             // detect scrolling
             if (Input.mouseScrollDelta.y != 0) Zoom(Input.mouseScrollDelta.y);

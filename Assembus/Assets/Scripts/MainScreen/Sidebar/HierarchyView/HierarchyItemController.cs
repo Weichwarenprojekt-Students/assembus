@@ -151,6 +151,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _isExpanded = true;
 
         /// <summary>
+        ///     True if the item was actually clicked
+        /// </summary>
+        private bool _clicked;
+
+        /// <summary>
         ///     True if the hierarchy view needs to be updated
         /// </summary>
         private bool _updateHierarchy;
@@ -301,12 +306,17 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         /// <param name="data">The event data</param>
         public void ItemClick(BaseEventData data)
-        {
+        {   
+            // Set the clicked flag
+            _clicked = true;
+            
             // Select the item 
             var pointerData = (PointerEventData) data;
-            if (!hierarchyViewController.Contains(this) ||
-                pointerData.button != PointerEventData.InputButton.Right)
+            if (!hierarchyViewController.Contains(this))
+            {
                 SelectItem();
+                _clicked = false;
+            }
 
             // Check what type of click happened
             switch (pointerData.button)
@@ -318,6 +328,17 @@ namespace MainScreen.Sidebar.HierarchyView
                     clickDetector.Click();
                     break;
             }
+        }
+
+        /// <summary>
+        ///     Handle click release
+        /// </summary>
+        /// <param name="data">The event data</param>
+        public void ClickRelease(BaseEventData data)
+        {
+            var pointerData = (PointerEventData) data;
+            if (pointerData.button == PointerEventData.InputButton.Left && _clicked) SelectItem();
+            _clicked = false;
         }
 
         /// <summary>
@@ -521,6 +542,9 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="data">Event data</param>
         public void StartDraggingItem(BaseEventData data)
         {
+            // Set the clicked flag to false
+            _clicked = false;
+            
             // Get the selected items
             _selectedItems = hierarchyViewController.GetSelectedItems();
             if (_selectedItems.Count == 0 || !_selectedItems.Contains(this)) return;

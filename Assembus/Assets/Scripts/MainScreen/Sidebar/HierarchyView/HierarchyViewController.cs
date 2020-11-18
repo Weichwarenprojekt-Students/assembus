@@ -370,9 +370,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="item">the selected item</param>
         private void NoModSelection(HierarchyItemController item)
         {
+            var selected = Contains(item) && SelectedItems.Count <= 1;
             DeselectItems();
-            SelectedItems.Add(item);
-            SetColor(item, true);
+            if (!selected) SelectedItems.Add(item);
+            SetColor(item, !selected);
         }
 
         /// <summary>

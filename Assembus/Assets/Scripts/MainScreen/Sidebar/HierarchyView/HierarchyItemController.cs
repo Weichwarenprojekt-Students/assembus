@@ -215,6 +215,9 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // set the root hierarchy view
             _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
+            
+            // Show the item
+            ShowItem(true);
         }
 
         /// <summary>

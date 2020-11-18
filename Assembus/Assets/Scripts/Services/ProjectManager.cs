@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Models;
+using Models.Project;
 using UnityEngine;
 
 namespace Services
@@ -18,6 +18,11 @@ namespace Services
         private const string ProjectModelFile = "projectModel.xml";
 
         /// <summary>
+        ///     Constant string which specifies the name of the source/default assembly station
+        /// </summary>
+        private const string DefaultStationName = "Default Station";
+
+        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
@@ -25,7 +30,7 @@ namespace Services
         /// <summary>
         ///     The GameObject deserializer which initializes the loaded GameObject
         /// </summary>
-        private readonly GameObjectDeSerializer _gameObjectDeSerializer = new GameObjectDeSerializer();
+        private readonly ModelDeSerializer _modelDeSerializer = new ModelDeSerializer();
 
         /// <summary>
         ///     The XML writer/reader instance to store all non 3D-model settings
@@ -162,7 +167,7 @@ namespace Services
                 _xmlDeSerializer.SerializeData(Path.Combine(CurrentProjectDir, ProjectConfigFile), CurrentProject);
 
                 // Save the hierarchy of the GameObject 3D model
-                _gameObjectDeSerializer.SerializeGameObject(
+                _modelDeSerializer.SerializeGameObject(
                     Path.Combine(CurrentProjectDir, ProjectModelFile),
                     CurrentProject.ObjectModel
                 );
@@ -226,14 +231,18 @@ namespace Services
             if (!success) return (false, message);
             CurrentProject.ObjectModel = objectModel;
 
-            // If it was the first time try to save the project
-            if (firstTime) return SaveProject();
+            // If it was the first time, move all components to default station and try to save the project
+            if (firstTime)
+            {
+                InitDefaultStation();
+                return SaveProject();
+            }
 
             // Otherwise try to load the object hierarchy
             try
             {
                 // Load the 3D model hierarchy
-                CurrentProject.ObjectModel = _gameObjectDeSerializer.DeserializeGameObject(
+                CurrentProject.ObjectModel = _modelDeSerializer.DeserializeGameObject(
                     Path.Combine(CurrentProjectDir, ProjectModelFile),
                     CurrentProject.ObjectModel
                 );
@@ -258,14 +267,43 @@ namespace Services
         {
             try
             {
-                GameObject importObject;
-                (importObject, _) = ObjectLoader.LoadObject(importPath);
+                var importObject = ObjectLoader.LoadObject(importPath);
                 return (true, "", importObject);
             }
             catch (Exception)
             {
                 return (false, "Object could not \n be imported!", null);
             }
+        }
+
+        /// <summary>
+        ///     Moves all loaded OBJ GameObjects into the default assembly station
+        /// </summary>
+        private void InitDefaultStation()
+        {
+            // Add the default assembly station
+            var defaultStation = new GameObject {name = DefaultStationName};
+            var info = new ItemInfo {displayName = DefaultStationName, isGroup = true};
+
+            defaultStation.AddComponent<ItemInfoController>();
+            defaultStation.GetComponent<ItemInfoController>().ItemInfo = info;
+            defaultStation.transform.parent = CurrentProject.ObjectModel.transform;
+
+            var children = Utility.GetAllGameObjects(CurrentProject.ObjectModel);
+
+            // Move all children to the default assembly station
+            foreach (var child in children)
+                if (child.name != DefaultStationName)
+                    child.transform.parent = defaultStation.transform;
+        }
+
+        /// <summary>
+        ///     Returns a unique ID for newly created component groups
+        /// </summary>
+        /// <returns></returns>
+        public string GetNextGroupID()
+        {
+            return "AssembusCompGroup_" + CurrentProject.CurrentGroupIdx++;
         }
     }
 }

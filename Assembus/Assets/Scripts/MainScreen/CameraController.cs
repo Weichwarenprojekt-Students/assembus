@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using Services;
 using UnityEngine;
 
 namespace MainScreen
@@ -6,11 +6,6 @@ namespace MainScreen
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
     {
-        /// <summary>
-        ///     Time frame for double click detection
-        /// </summary>
-        private const float TimeBetweenClicks = 0.25f;
-
         /// <summary>
         ///     Rotation speed of the camera
         /// </summary>
@@ -20,6 +15,16 @@ namespace MainScreen
         ///     The factor between scroll speed and distance of the camera
         /// </summary>
         private const float ScrollFactor = 0.05f;
+
+        /// <summary>
+        ///     Reference to highlighting script
+        /// </summary>
+        public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
+        ///     The click detector instance
+        /// </summary>
+        public DoubleClickDetector doubleClickDetector;
 
         /// <summary>
         ///     Reference to the main camera
@@ -40,21 +45,6 @@ namespace MainScreen
         ///     Point the camera rotates around
         /// </summary>
         private Vector3 _centerPoint;
-
-        /// <summary>
-        ///     Allow coroutine for double click detection
-        /// </summary>
-        private bool _coroutineAllowed = true;
-
-        /// <summary>
-        ///     Time when left mouse button is clicked first time
-        /// </summary>
-        private float _firstLeftClickTime;
-
-        /// <summary>
-        ///     Left mouse click counter for double click detection
-        /// </summary>
-        private int _leftClickCounter;
 
         /// <summary>
         ///     Camera position of previous frame. Used to calculate the new rotation
@@ -87,9 +77,12 @@ namespace MainScreen
             if (!(_cam is null)) _camTransform = _cam.transform;
             _centerPoint = new Vector3(0, 0, 0);
 
-            // this is needed! without this the camera "snaps" to another location on first right click
+            // This is needed! without this the camera "snaps" to another location on first right click
             StoreLastMousePosition();
             CalculateNewCameraTransform();
+
+            // Add the event handler. Update camera when double click occured
+            doubleClickDetector.DoubleClickOccured += UpdateCameraFocus;
         }
 
         /// <summary>
@@ -97,34 +90,33 @@ namespace MainScreen
         /// </summary>
         private void LateUpdate()
         {
-            // store position when right mouse button is clicked
+            // Store position when right mouse button is clicked
             if (Input.GetMouseButtonDown(1)) StoreLastMousePosition();
 
-            // when right mouse button is held rotate the camera
+            // When right mouse button is held rotate the camera
             if (Input.GetMouseButton(1)) CalculateNewCameraTransform();
 
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))
-                _leftClickCounter += 1;
+                doubleClickDetector.Click();
 
-            if (_leftClickCounter == 1 && _coroutineAllowed)
-            {
-                _firstLeftClickTime = Time.time;
-                StartCoroutine(DoubleClickDetection());
-            }
+            // Check for second click
+            doubleClickDetector.CheckForSecondClick();
 
-            // detect scrolling
+            // Detect scrolling
             if (Input.mouseScrollDelta.y != 0) Zoom(Input.mouseScrollDelta.y);
         }
 
         /// <summary>
-        ///     Zoom camera on the given object
+        ///     Set focus on passed GameObject component group
         /// </summary>
         /// <param name="parent">The object that shall be shown</param>
         public void ZoomOnObject(GameObject parent)
         {
             // Calculate the bounds of the game object
             var bounds = new Bounds(parent.transform.position, Vector3.zero);
+
+            // Get the bound of one GameObject with multiple children
             foreach (var r in parent.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
             var objectSizes = bounds.max - bounds.min;
 
@@ -141,28 +133,6 @@ namespace MainScreen
         }
 
         /// <summary>
-        ///     Coroutine, detect double clicking
-        /// </summary>
-        private IEnumerator DoubleClickDetection()
-        {
-            _coroutineAllowed = false;
-            while (Time.time < _firstLeftClickTime + TimeBetweenClicks)
-            {
-                if (_leftClickCounter == 2)
-                {
-                    UpdateCameraFocus();
-                    break;
-                }
-
-                yield return new WaitForEndOfFrame();
-            }
-
-            _leftClickCounter = 0;
-            _firstLeftClickTime = 0f;
-            _coroutineAllowed = true;
-        }
-
-        /// <summary>
         ///     Set focus on clicked game object
         /// </summary>
         private void UpdateCameraFocus()
@@ -173,7 +143,26 @@ namespace MainScreen
 
             if (!Physics.Raycast(ray, out var hit, 10000)) return;
 
-            var transformGameObject = hit.transform.gameObject.GetComponent<Renderer>().bounds.center;
+            GameObject o;
+            var transformGameObject = (o = hit.transform.gameObject).GetComponent<Renderer>().bounds.center;
+
+            if (!MouseOverViewport) return;
+
+            componentHighlighting.HighlightGameObject(o);
+            SetFocus(transformGameObject);
+            StoreLastMousePosition();
+            CalculateNewCameraTransform();
+        }
+
+        /// <summary>
+        ///     Set focus on passed GameObject
+        /// </summary>
+        /// <param name="go">GameObject which should be focused</param>
+        public void UpdateCameraFocus(GameObject go)
+        {
+            if (_cam is null) return;
+
+            var transformGameObject = go.transform.gameObject.GetComponent<Renderer>().bounds.center;
 
             SetFocus(transformGameObject);
             StoreLastMousePosition();
@@ -212,11 +201,11 @@ namespace MainScreen
             // Don't zoom if mouse is not over viewport
             if (!MouseOverViewport) return;
 
-            // calculate camera distance
+            // Calculate camera distance
             _cameraDistance -= delta * _scrollSpeed;
             if (_cameraDistance < 0) _cameraDistance = 0;
 
-            // apply camera distance
+            // Apply camera distance
             StoreLastMousePosition();
             CalculateNewCameraTransform();
         }

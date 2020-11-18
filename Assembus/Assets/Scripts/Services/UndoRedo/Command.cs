@@ -1,9 +1,17 @@
-﻿using System;
-
-namespace Services.UndoRedo
+﻿namespace Services.UndoRedo
 {
     public class Command
     {
+        /// <summary>
+        ///     The available command types
+        /// </summary>
+        public const int Move = 1, Rename = 2, Delete = 3, Create = 4;
+
+        /// <summary>
+        ///     The command type
+        /// </summary>
+        private readonly int _commandType;
+
         /// <summary>
         ///     The new item states
         /// </summary>
@@ -13,16 +21,6 @@ namespace Services.UndoRedo
         ///     The old item states
         /// </summary>
         private readonly ItemState[] _oldStates;
-
-        /// <summary>
-        ///     The redo action
-        /// </summary>
-        private readonly Action<ItemState> _redo;
-
-        /// <summary>
-        ///     The undo action
-        /// </summary>
-        private readonly Action<ItemState> _undo;
 
         /// <summary>
         ///     True if the command is empty
@@ -42,14 +40,12 @@ namespace Services.UndoRedo
         /// </summary>
         /// <param name="newStates">The new item states</param>
         /// <param name="oldStates">The old item states</param>
-        /// <param name="redo">The redo action</param>
-        /// <param name="undo">The undo action</param>
-        public Command(ItemState[] newStates, ItemState[] oldStates, Action<ItemState> redo, Action<ItemState> undo)
+        /// <param name="commandType">The type of command the user wants to execute</param>
+        public Command(ItemState[] newStates, ItemState[] oldStates, int commandType)
         {
             _newStates = newStates;
             _oldStates = oldStates;
-            _redo = redo;
-            _undo = undo;
+            _commandType = commandType;
             IsEmpty = false;
         }
 
@@ -64,7 +60,10 @@ namespace Services.UndoRedo
         /// </summary>
         public void CallUndo()
         {
-            foreach (var oldState in _oldStates) _undo(oldState);
+            // Get the undo action
+            var undo = ActionCreator.GetUndoAction(_commandType);
+            // Iterate over the old states
+            foreach (var oldState in _oldStates) undo(oldState);
         }
 
         /// <summary>
@@ -72,7 +71,10 @@ namespace Services.UndoRedo
         /// </summary>
         public void CallRedo()
         {
-            foreach (var newState in _newStates) _redo(newState);
+            // Get the redo action
+            var redo = ActionCreator.GetRedoAction(_commandType);
+            // Iterate over the new states
+            foreach (var newState in _newStates) redo(newState);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Services.UndoRedo
+﻿using MainScreen.Sidebar.HierarchyView;
+using Models.Project;
+
+namespace Services.UndoRedo
 {
     /// <summary>
     ///     This class holds a snapshot of an item state
@@ -8,22 +11,34 @@
         /// <summary>
         ///     The ID of the item
         /// </summary>
-        public readonly string ID;
+        public string ID;
 
         /// <summary>
         ///     The name of the item
         /// </summary>
-        public readonly string Name;
+        public string Name;
 
         /// <summary>
         ///     The ID of the parent
         /// </summary>
-        public readonly string ParentID;
+        public string ParentID;
 
         /// <summary>
         ///     The sibling index
         /// </summary>
-        public readonly int SiblingIndex;
+        public int SiblingIndex;
+
+        /// <summary>
+        ///     Copy constructor
+        /// </summary>
+        /// <param name="item">The item to be copied</param>
+        public ItemState(ItemState item)
+        {
+            ID = item.ID;
+            Name = item.Name;
+            ParentID = item.ParentID;
+            SiblingIndex = item.SiblingIndex;
+        }
 
         /// <summary>
         ///     Constructor
@@ -38,6 +53,32 @@
             Name = name;
             ParentID = parentID;
             SiblingIndex = siblingIndex;
+        }
+
+        /// <summary>
+        ///     Create an item state snapshot from a list item
+        /// </summary>
+        /// <param name="item">The item of the hierarchy view</param>
+        /// <returns>The created item state</returns>
+        public static ItemState FromListItem(HierarchyItemController item)
+        {
+            var gameItem = item.item;
+            var itemInfo = gameItem.GetComponent<ItemInfoController>().ItemInfo;
+            return new ItemState(
+                gameItem.name,
+                itemInfo.displayName,
+                gameItem.transform.parent.name,
+                gameItem.transform.GetSiblingIndex()
+            );
+        }
+
+        /// <summary>
+        ///     Provide a human readable version of the object for debugging
+        /// </summary>
+        /// <returns>The object in string format</returns>
+        public override string ToString()
+        {
+            return "Item(id=" + ID + ", name=" + Name + ", parent=" + ParentID + ", index=" + SiblingIndex + ")";
         }
     }
 }

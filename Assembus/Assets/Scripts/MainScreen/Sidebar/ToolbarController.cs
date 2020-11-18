@@ -6,7 +6,7 @@ using Shared.Toast;
 using TMPro;
 using UnityEngine;
 
-namespace MainScreen
+namespace MainScreen.Sidebar
 {
     public class ToolbarController : MonoBehaviour
     {
@@ -46,6 +46,11 @@ namespace MainScreen
         public SettingsController settings;
 
         /// <summary>
+        ///     The component highlighting script
+        /// </summary>
+        public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
@@ -61,34 +66,49 @@ namespace MainScreen
         private readonly UndoService _undoService = UndoService.Instance;
 
         /// <summary>
-        ///     Set the callback for new commands and add some example commands
+        ///     Set the callback for new commands
         /// </summary>
         private void Start()
         {
-            _undoService.OnNewCommand = OnEnable;
-            _undoService.AddCommand(
-                new Command(
-                    new[] {new ItemState("", "", "", 0)},
-                    new[] {new ItemState("", "", "", 0)},
-                    item => Debug.Log("redo1"),
-                    item => Debug.Log("undo1")
-                )
-            );
-            _undoService.AddCommand(
-                new Command(
-                    new[] {new ItemState("", "", "", 0)},
-                    new[] {new ItemState("", "", "", 0)},
-                    item => Debug.Log("redo2"),
-                    item => Debug.Log("undo2")
-                )
-            );
+            _undoService.OnNewCommand = () => UpdateProjectView(false);
         }
 
         /// <summary>
-        ///     Update the buttons
+        ///     Check if either CTRL-Z, CTRL-Y or CTRL-SHIFT_Z was used
+        /// </summary>
+        private void Update()
+        {
+            // Check which keys were pressed
+            var ctrlZ = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z);
+            var ctrlShiftZ = ctrlZ && Input.GetKey(KeyCode.LeftShift);
+            var ctrlY = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y);
+
+            // Check if an action should be redone
+            if (ctrlShiftZ || ctrlY) RedoAction();
+            // Check if an action should be undone
+            else if (ctrlZ) UndoAction();
+        }
+
+        /// <summary>
+        ///     Update the buttons and the title
         /// </summary>
         private void OnEnable()
         {
+            UpdateProjectView(true);
+        }
+
+        /// <summary>
+        ///     Update the buttons and the title
+        /// </summary>
+        /// <param name="saved">True if the project is in a saved state</param>
+        private void UpdateProjectView(bool saved)
+        {
+            // Show the title
+            _projectManager.Saved = saved;
+            title.text = _projectManager.CurrentProject.Name;
+            if (!saved) title.text += "*";
+
+            // Enable the buttons
             undo.Enable(_undoService.HasUndo());
             redo.Enable(_undoService.HasRedo());
         }
@@ -99,7 +119,7 @@ namespace MainScreen
         public void UndoAction()
         {
             _undoService.Undo();
-            OnEnable();
+            UpdateProjectView(false);
         }
 
         /// <summary>
@@ -108,7 +128,7 @@ namespace MainScreen
         public void RedoAction()
         {
             _undoService.Redo();
-            OnEnable();
+            UpdateProjectView(false);
         }
 
         /// <summary>
@@ -140,6 +160,9 @@ namespace MainScreen
                 description,
                 () =>
                 {
+                    // Reset the undo redo queue
+                    _undoService.Reset();
+
                     // Remove the last opened project 
                     _configManager.Config.lastProject = "";
                     _configManager.SaveConfig();
@@ -149,6 +172,7 @@ namespace MainScreen
                     mainController.ResetCamera();
 
                     // Remove GameObject of current project
+                    componentHighlighting.ResetHighlighting();
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen
@@ -163,7 +187,7 @@ namespace MainScreen
         /// </summary>
         public void Settings()
         {
-            settings.Show();            
+            settings.Show();
         }
     }
 }

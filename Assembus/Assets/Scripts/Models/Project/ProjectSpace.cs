@@ -1,13 +1,20 @@
 ﻿using System.Xml.Serialization;
 using UnityEngine;
 
-namespace Models
+namespace Models.Project
 {
     /// <summary>
     ///     This class holds all project configuration data including the 3D model
     /// </summary>
     public class ProjectSpace
     {
+        /// <summary>
+        ///     Stores the current numerical index which
+        ///     acts as a postfix for newly created component groups
+        ///     and gets incremented each time a new group gets created
+        /// </summary>
+        public int CurrentGroupIdx;
+
         /// <summary>
         ///     The project's name
         /// </summary>
@@ -20,10 +27,11 @@ namespace Models
 
         /// <summary>
         ///     The actual GameObject which stores the imported OBJ file with the
-        ///     correct hierarchy which is loaded from the XMl config file.
+        ///     correct hierarchy and additional GameObject parameters
+        ///     which are loaded from the XMl config file.
         ///     This model will be serialized to a separate file
         /// </summary>
-        [XmlIgnoreAttribute] public GameObject ObjectModel;
+        [XmlIgnore] public GameObject ObjectModel;
 
         /// <summary>
         ///     Constructor
@@ -34,6 +42,7 @@ namespace Models
         {
             Name = name;
             ObjectFile = objectFile;
+            CurrentGroupIdx = 0;
         }
 
         /// <summary>

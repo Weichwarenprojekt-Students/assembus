@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Dummiesman;
+using Models.Project;
 using UnityEngine;
 
 namespace Services
@@ -13,15 +13,14 @@ namespace Services
         /// </summary>
         /// <param name="objPath">Path to the object model</param>
         /// <returns>
-        ///     Returns a tuple consisting of the parent of the object models hierarchy and a list of all the elements inside
-        ///     the parent
+        ///     Returns parent of the object model
         /// </returns>
-        public static (GameObject, List<GameObject>) LoadObject(string objPath)
+        public static GameObject LoadObject(string objPath)
         {
             var parent = LoadObjectModel(objPath);
-            var children = LoadChildrenGameObjects(parent);
+            LoadChildrenGameObjects(parent);
 
-            return (parent, children);
+            return parent;
         }
 
         /// <summary>
@@ -40,20 +39,28 @@ namespace Services
         ///     Collects the elements, that the object model contains
         /// </summary>
         /// <returns>List of all game objects inside the object model</returns>
-        private static List<GameObject> LoadChildrenGameObjects(GameObject parent)
+        private static void LoadChildrenGameObjects(GameObject parent)
         {
-            var children = new List<GameObject>();
-
             for (var i = 0; i < parent.transform.childCount; i++)
             {
                 var child = parent.transform.GetChild(i).gameObject;
 
                 child.AddComponent<MeshCollider>();
 
-                children.Add(child);
-            }
+                // Add empty originator for the GameObject data (holds the GameObject memento instance)
+                child.AddComponent<ItemInfoController>();
 
-            return children;
+                // Set default memento (display name equals fixed internal id) for project creation
+                // Default values will be overwritten when project gets loaded
+                var defaultMemento = new ItemInfo
+                {
+                    isGroup = false,
+                    displayName = child.name
+                };
+
+                // Add the default additional GameObject configuration to the GameObject's originator
+                child.GetComponent<ItemInfoController>().ItemInfo = defaultMemento;
+            }
         }
     }
 }

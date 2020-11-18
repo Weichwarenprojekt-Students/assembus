@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Models.Configuration;
+using Models.AppConfiguration;
 using UnityEngine;
 
 namespace Services

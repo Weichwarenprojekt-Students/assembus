@@ -18,14 +18,14 @@ namespace Services.UndoRedo
         /// <summary>
         ///     Current element of the linked list
         /// </summary>
-        private LinkedListNode<Command> _current = new LinkedListNode<Command>(Command.Empty);
+        private LinkedListNode<Command> _current;
 
         /// <summary>
         ///     Singleton private constructor
         /// </summary>
         private UndoService()
         {
-            _linkedList.AddFirst(_current);
+            Reset();
         }
 
         /// <summary>
@@ -39,6 +39,16 @@ namespace Services.UndoRedo
         public static UndoService Instance { get; } = new UndoService();
 
         /// <summary>
+        ///     Reset the undo redo service
+        /// </summary>
+        public void Reset()
+        {
+            _current = new LinkedListNode<Command>(Command.Empty);
+            _linkedList.Clear();
+            _linkedList.AddFirst(_current);
+        }
+
+        /// <summary>
         ///     Add a command to the history of commands
         /// </summary>
         /// <param name="command">The command to be added</param>
@@ -47,13 +57,17 @@ namespace Services.UndoRedo
             // Add element after current
             _linkedList.AddAfter(_current, command);
 
-            // Update the current element
+            // Update the current element and delete all the commands that were undone
             _current = _current.Next;
+            while (_current?.Next != null) _linkedList.Remove(_current.Next);
 
             // Remove first entry if greater than configured length
             if (_linkedList.Count > _configManager.Config.undoHistoryLimit) _linkedList.RemoveFirst();
 
-            // Execute the new command callback
+            // Execute the new action
+            _current?.Value.CallRedo();
+
+            // Notify the UI that new action was added
             OnNewCommand?.Invoke();
         }
 

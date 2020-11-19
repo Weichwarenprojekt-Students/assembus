@@ -296,6 +296,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             SelectedItems.Remove(item);
             SetColor(item, false);
+            _lastSelectedItem = null;
         }
 
         /// <summary>
@@ -304,7 +305,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void DeselectItems()
         {
             foreach (var item in SelectedItems) SetColor(item, false);
-
+            
             SelectedItems.Clear();
         }
 
@@ -353,11 +354,9 @@ namespace MainScreen.Sidebar.HierarchyView
                     break;
                 case KeyCode.LeftControl:
                     ControlSelection(item);
-                    _lastSelectedItem = item;
                     break;
                 default:
                     NoModSelection(item);
-                    _lastSelectedItem = item;
                     break;
             }
 
@@ -370,10 +369,11 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="item">the selected item</param>
         private void NoModSelection(HierarchyItemController item)
         {
+            _lastSelectedItem = item;
             var selected = Contains(item) && SelectedItems.Count <= 1;
             DeselectItems();
-            if (!selected) SelectedItems.Add(item);
-            SetColor(item, !selected);
+            if (!selected) SelectItem(item);
+            else _lastSelectedItem = null;
         }
 
         /// <summary>
@@ -382,14 +382,18 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="item">the selected item</param>
         private void ControlSelection(HierarchyItemController item)
         {
+            _lastSelectedItem = item;
             var isGroup = item.item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
             if (isGroup) DeselectChildren(item.childrenContainer.transform);
             else DeselectParent(item.transform);
 
             var selected = SelectedItems.Contains(item);
-            if (selected) SelectedItems.Remove(item);
-            else SelectedItems.Add(item);
-            SetColor(item, !selected);
+            if (selected)
+            {
+                DeselectItem(item);
+                if(SelectedItems.Count > 0) _lastSelectedItem = SelectedItems[SelectedItems.Count - 1];
+            }
+            else SelectItem(item);
         }
 
         /// <summary>

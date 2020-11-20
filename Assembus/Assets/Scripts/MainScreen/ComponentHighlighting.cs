@@ -70,16 +70,13 @@ namespace MainScreen
         /// </summary>
         private void LateUpdate()
         {
-            if (!MouseOverViewport)
-                return;
-
-            // View highlighting
-            if (_cam is null) return;
+            // Prevent highlighting updates when mouse is not over the 3d editor
+            if (!MouseOverViewport || _cam is null) return;
 
             // Create ray from mouse position
             var ray = _cam.ScreenPointToRay(Input.mousePosition);
 
-            // Check if has an intersection with a game object
+            // Check if the ray has an intersection with a game object
             var hitRegistered = Physics.Raycast(ray, out var hit, MAXSelectionDistance);
 
             if (hitRegistered)
@@ -101,9 +98,10 @@ namespace MainScreen
             // No hit was registered
             else
             {
-                // Reset hover-highlighting on non-selected objects
+                // No previously hovered object, or previously hovered has been selected: No need to reset
                 if (_hoveredObject is null || _selectedGameObjects.ContainsKey(_hoveredObject)) return;
 
+                // Reset hover-highlighting on non-selected objects
                 _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
 
                 // Reset previously hovered object
@@ -117,11 +115,13 @@ namespace MainScreen
         /// <param name="hoveredObject">Game object that the mouse is hovering over in the current frame</param>
         private void HighlightHover(GameObject hoveredObject)
         {
+            // Hovering over a selected game object after hovering over another one
             if (_selectedGameObjects.ContainsKey(hoveredObject) && _hoveredObject != null)
             {
-                // Reset highlighting when hovering over a selected game object
+                // Do nothing, if the previously hovered game object was a selected one
                 if (_selectedGameObjects.ContainsKey(_hoveredObject)) return;
 
+                // Remove highlighting of the previously hovered object
                 _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
 
                 // Reset previously hovered object
@@ -130,6 +130,7 @@ namespace MainScreen
                 return;
             }
 
+            // Do not hover-highlight a selected game object
             if (_selectedGameObjects.ContainsKey(hoveredObject))
                 return;
 
@@ -139,13 +140,14 @@ namespace MainScreen
                 if (!_selectedGameObjects.ContainsKey(_hoveredObject))
                     _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
 
-            // Save previous color and game object
+            // Reference to the objects material
             var material = hoveredObject.GetComponent<Renderer>().material;
 
+            // Set last hovered object and and safe its original color
             _hoveredObject = hoveredObject;
             _hoveredOriginalColor = material.color;
 
-            // Set highlighting color
+            // Set highlighting color on the hovered object
             material.color = colorHover;
         }
 
@@ -168,7 +170,7 @@ namespace MainScreen
                     : clickedObject.GetComponent<Renderer>().material.color;
                 _selectedGameObjects.Add(clickedObject, originalColor);
 
-                // Highlight
+                // Highlight either single or collection of clicked game objects
                 if (_selectedGameObjects.Count > 1)
                     HighlightGameObjects(_selectedGameObjects.Keys.ToList());
                 else
@@ -177,7 +179,7 @@ namespace MainScreen
             // Clicked object was selected before already
             else
             {
-                // Reselect item if clicked item was part of a multi-selection before
+                // Reselect item if clicked item was part of a multi-selection before (without ctrl)
                 if (_selectedGameObjects.Count > 1 && !multipleSelectionsAllowed)
                 {
                     ResetPreviousSelections();
@@ -186,12 +188,14 @@ namespace MainScreen
                     var originalColor = clickedObject == _hoveredObject
                         ? _hoveredOriginalColor
                         : clickedObject.GetComponent<Renderer>().material.color;
+
+                    // Add clicked object to selection
                     _selectedGameObjects.Add(clickedObject, originalColor);
 
                     // Highlight single object
                     clickedObject.GetComponent<Renderer>().material.color = colorSelectedSingle;
                 }
-                // Deselection when only one item is selected
+                // Only the clicked item was part of the selection before: Deselect
                 else
                 {
                     // Set original color before selection
@@ -199,6 +203,9 @@ namespace MainScreen
 
                     // Remove from selection group
                     _selectedGameObjects.Remove(clickedObject);
+
+                    // Reset hovering state so deselected object can be hovered again
+                    _hoveredObject = null;
                 }
             }
 
@@ -262,11 +269,13 @@ namespace MainScreen
             ))
                 groupedObjects.AddRange(Utility.GetAllGameObjects(g).ToList());
 
+            // Add the grouped objects to the list of objects to be highlighted
             gameObjects.AddRange(groupedObjects);
 
             // Single selection or group selection
             var color = gameObjects.Count > 1 ? colorSelectedGroup : colorSelectedSingle;
 
+            // Highlight every game object
             gameObjects.ForEach(
                 g =>
                 {

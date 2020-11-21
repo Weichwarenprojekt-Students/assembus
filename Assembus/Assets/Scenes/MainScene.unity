@@ -6288,6 +6288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   componentHighlighting: {fileID: 963194230}
+  hierarchyViewController: {fileID: 2006810628}
   doubleClickDetector: {fileID: 963194231}
 --- !u!114 &963194230
 MonoBehaviour:
@@ -7714,8 +7715,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.0000038146827
-  m_Size: 0.97476333
+  m_Value: 0.000011444092
+  m_Size: 0.9747634
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

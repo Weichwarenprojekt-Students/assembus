@@ -1,4 +1,5 @@
-﻿using Services;
+﻿using MainScreen.Sidebar.HierarchyView;
+using Services;
 using UnityEngine;
 
 namespace MainScreen
@@ -20,6 +21,11 @@ namespace MainScreen
         ///     Reference to highlighting script
         /// </summary>
         public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
+        ///     Reference to the hierarchy view controller
+        /// </summary>
+        public HierarchyViewController hierarchyViewController;
 
         /// <summary>
         ///     The click detector instance
@@ -149,6 +155,7 @@ namespace MainScreen
             if (!MouseOverViewport) return;
 
             componentHighlighting.HighlightGameObject(o);
+            hierarchyViewController.SetItemStatusFromList(new[] {o.name});
             SetFocus(transformGameObject);
             StoreLastMousePosition();
             CalculateNewCameraTransform();

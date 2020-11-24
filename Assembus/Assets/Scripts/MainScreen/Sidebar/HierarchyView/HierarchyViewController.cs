@@ -3,6 +3,8 @@ using System.Linq;
 using Models.Project;
 using Services;
 using Services.UndoRedo;
+using Services.UndoRedo.Commands;
+using Services.UndoRedo.Models;
 using Shared.Toast;
 using UnityEngine;
 using UnityEngine.UI;
@@ -88,7 +90,7 @@ namespace MainScreen.Sidebar.HierarchyView
             SelectedItems.Clear();
 
             // Initialize the command executor
-            ActionCreator.Initialize(
+            Command.Initialize(
                 _projectManager.CurrentProject.ObjectModel,
                 hierarchyView,
                 this
@@ -104,27 +106,33 @@ namespace MainScreen.Sidebar.HierarchyView
         public void ShowContextMenu()
         {
             var entries = new List<ContextMenuController.Item>();
-            
-            entries.Add(new ContextMenuController.Item
-            {
-                Icon = contextMenu.add,
-                Name = "Create Station",
-                Action = CreateAssemblyStation
-            });
-            
-            entries.Add(new ContextMenuController.Item
-            {
-                Icon = contextMenu.show,
-                Name = "Show All",
-                Action = () => SetObjectVisibility(true)
-            });
-            
-            entries.Add(new ContextMenuController.Item
-            {
-                Icon = contextMenu.hide,
-                Name = "Hide All",
-                Action = () => SetObjectVisibility(false)
-            });
+
+            entries.Add(
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.add,
+                    Name = "Create Station",
+                    Action = CreateAssemblyStation
+                }
+            );
+
+            entries.Add(
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.show,
+                    Name = "Show All",
+                    Action = () => SetObjectVisibility(true)
+                }
+            );
+
+            entries.Add(
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.hide,
+                    Name = "Hide All",
+                    Action = () => SetObjectVisibility(false)
+                }
+            );
 
             contextMenu.Show(entries);
         }
@@ -243,17 +251,13 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void CreateAssemblyStation()
         {
-            var oldState = new[]
-            {
-                new ItemState(
-                    _projectManager.GetNextGroupID(),
-                    "Assembly Station",
-                    _projectManager.CurrentProject.ObjectModel.name,
-                    _projectManager.CurrentProject.ObjectModel.transform.childCount
-                )
-            };
-            var newState = new[] {new ItemState(oldState[0])};
-            _undoService.AddCommand(new Command(newState, oldState, Command.Create));
+            var state = new ItemState(
+                _projectManager.GetNextGroupID(),
+                "Assembly Station",
+                _projectManager.CurrentProject.ObjectModel.name,
+                _projectManager.CurrentProject.ObjectModel.transform.childCount
+            );
+            _undoService.AddCommand(new CreateCommand(true, state));
         }
 
         /// <summary>
@@ -305,7 +309,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void DeselectItems()
         {
             foreach (var item in SelectedItems) SetColor(item, false);
-            
+
             SelectedItems.Clear();
         }
 
@@ -391,9 +395,12 @@ namespace MainScreen.Sidebar.HierarchyView
             if (selected)
             {
                 DeselectItem(item);
-                if(SelectedItems.Count > 0) _lastSelectedItem = SelectedItems[SelectedItems.Count - 1];
+                if (SelectedItems.Count > 0) _lastSelectedItem = SelectedItems[SelectedItems.Count - 1];
             }
-            else SelectItem(item);
+            else
+            {
+                SelectItem(item);
+            }
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
 
-namespace Services.UndoRedo
+namespace Services.UndoRedo.Models
 {
     /// <summary>
     ///     This class holds a snapshot of an item state
@@ -11,12 +11,12 @@ namespace Services.UndoRedo
         /// <summary>
         ///     The ID of the item
         /// </summary>
-        public string ID;
+        public readonly string ID;
 
         /// <summary>
         ///     The name of the item
         /// </summary>
-        public string Name;
+        public readonly string Name;
 
         /// <summary>
         ///     The ID of the parent
@@ -60,16 +60,14 @@ namespace Services.UndoRedo
         /// </summary>
         /// <param name="item">The item of the hierarchy view</param>
         /// <returns>The created item state</returns>
-        public static ItemState FromListItem(HierarchyItemController item)
+        public ItemState(HierarchyItemController item)
         {
             var gameItem = item.item;
             var itemInfo = gameItem.GetComponent<ItemInfoController>().ItemInfo;
-            return new ItemState(
-                gameItem.name,
-                itemInfo.displayName,
-                gameItem.transform.parent.name,
-                gameItem.transform.GetSiblingIndex()
-            );
+            ID = gameItem.name;
+            Name = itemInfo.displayName;
+            ParentID = gameItem.transform.parent.name;
+            SiblingIndex = gameItem.transform.GetSiblingIndex();
         }
 
         /// <summary>

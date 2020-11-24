@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Services.UndoRedo.Commands;
 
 namespace Services.UndoRedo
 {
@@ -43,7 +44,7 @@ namespace Services.UndoRedo
         /// </summary>
         public void Reset()
         {
-            _current = new LinkedListNode<Command>(Command.Empty);
+            _current = new LinkedListNode<Command>(null);
             _linkedList.Clear();
             _linkedList.AddFirst(_current);
         }
@@ -65,7 +66,7 @@ namespace Services.UndoRedo
             if (_linkedList.Count > _configManager.Config.undoHistoryLimit) _linkedList.RemoveFirst();
 
             // Execute the new action
-            _current?.Value.CallRedo();
+            _current?.Value.Redo();
 
             // Notify the UI that new action was added
             OnNewCommand?.Invoke();
@@ -92,7 +93,7 @@ namespace Services.UndoRedo
             _current = _current.Next;
 
             // Call redo function of the command
-            _current?.Value.CallRedo();
+            _current?.Value.Redo();
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace Services.UndoRedo
         /// <returns>True if undo possible</returns>
         public bool HasUndo()
         {
-            return !_current.Value.IsEmpty;
+            return _current.Value != null;
         }
 
         /// <summary>
@@ -113,12 +114,12 @@ namespace Services.UndoRedo
             if (!HasUndo()) return;
 
             // Call Undo function of command
-            _current.Value.CallUndo();
+            _current.Value.Undo();
 
             // Move back in linked list
             if (_current.Previous == null)
             {
-                var previous = new LinkedListNode<Command>(Command.Empty);
+                var previous = new LinkedListNode<Command>(null);
                 _linkedList.AddFirst(previous);
             }
 

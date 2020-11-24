@@ -58,7 +58,6 @@ namespace Services.UndoRedo.Commands
             newObject.GetComponent<ItemInfoController>().ItemInfo
                 = new ItemInfo {displayName = state.Name, isGroup = true};
             newObject.transform.parent = Model.transform;
-            newObject.transform.SetSiblingIndex(state.SiblingIndex);
 
             // Create the list view item
             HierarchyController.AddSingleListItem(HierarchyView, newObject, 0);

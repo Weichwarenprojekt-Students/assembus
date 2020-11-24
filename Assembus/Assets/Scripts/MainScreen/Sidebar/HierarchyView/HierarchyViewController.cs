@@ -255,7 +255,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.GetNextGroupID(),
                 "Assembly Station",
                 _projectManager.CurrentProject.ObjectModel.name,
-                _projectManager.CurrentProject.ObjectModel.transform.childCount
+                ItemState.Last
             );
             _undoService.AddCommand(new CreateCommand(true, state));
         }

@@ -69,5 +69,17 @@ namespace Services
 
             return list;
         }
+
+        /// <summary>
+        ///     Get the id of the lower neighbour of a given item
+        /// </summary>
+        /// <param name="item">The item</param>
+        /// <returns>The neighbour id</returns>
+        public static string GetNeighbourID(Transform item)
+        {
+            var neighbourID = "";
+            if (item.GetSiblingIndex() - 1 >= 0) neighbourID = item.parent.GetChild(item.GetSiblingIndex() - 1).name;
+            return neighbourID;
+        }
     }
 }

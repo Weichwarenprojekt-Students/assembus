@@ -9,6 +9,11 @@ namespace Services.UndoRedo.Models
     public class ItemState
     {
         /// <summary>
+        ///     Neighbour ID for an element that shall be in last place
+        /// </summary>
+        public const string Last = "Last";
+
+        /// <summary>
         ///     The ID of the item
         /// </summary>
         public readonly string ID;
@@ -19,14 +24,14 @@ namespace Services.UndoRedo.Models
         public readonly string Name;
 
         /// <summary>
+        ///     The id of the lower neighbour
+        /// </summary>
+        public string NeighbourID;
+
+        /// <summary>
         ///     The ID of the parent
         /// </summary>
         public string ParentID;
-
-        /// <summary>
-        ///     The sibling index
-        /// </summary>
-        public int SiblingIndex;
 
         /// <summary>
         ///     Copy constructor
@@ -37,7 +42,7 @@ namespace Services.UndoRedo.Models
             ID = item.ID;
             Name = item.Name;
             ParentID = item.ParentID;
-            SiblingIndex = item.SiblingIndex;
+            NeighbourID = item.NeighbourID;
         }
 
         /// <summary>
@@ -46,13 +51,13 @@ namespace Services.UndoRedo.Models
         /// <param name="id">ID of the item</param>
         /// <param name="name">Name of the item</param>
         /// <param name="parentID">Parent ID of the item</param>
-        /// <param name="siblingIndex">The sibling index</param>
-        public ItemState(string id, string name, string parentID, int siblingIndex)
+        /// <param name="neighbourID">The id of the lower neighbour</param>
+        public ItemState(string id, string name, string parentID, string neighbourID)
         {
             ID = id;
             Name = name;
             ParentID = parentID;
-            SiblingIndex = siblingIndex;
+            NeighbourID = neighbourID;
         }
 
         /// <summary>
@@ -67,7 +72,7 @@ namespace Services.UndoRedo.Models
             ID = gameItem.name;
             Name = itemInfo.displayName;
             ParentID = gameItem.transform.parent.name;
-            SiblingIndex = gameItem.transform.GetSiblingIndex();
+            NeighbourID = Utility.GetNeighbourID(gameItem.transform);
         }
 
         /// <summary>
@@ -76,7 +81,7 @@ namespace Services.UndoRedo.Models
         /// <returns>The object in string format</returns>
         public override string ToString()
         {
-            return "Item(id=" + ID + ", name=" + Name + ", parent=" + ParentID + ", index=" + SiblingIndex + ")";
+            return "Item(id=" + ID + ", name=" + Name + ", parent=" + ParentID + ", upper=" + NeighbourID + ")";
         }
     }
 }

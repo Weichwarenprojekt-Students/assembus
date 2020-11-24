@@ -52,11 +52,14 @@ namespace Services.UndoRedo.Commands
             if (listParent != null)
                 container = listParent.GetComponent<HierarchyItemController>().childrenContainer.transform;
 
+            // Get the sibling index
+            var siblingIndex = GetSiblingIndex(state, listItem, container);
+
             // Move the item
             var oldParent = listItem.parent.parent;
             listItem.SetParent(container);
             var offset = listParent == null ? 1 : 0;
-            listItem.SetSiblingIndex(state.SiblingIndex + offset);
+            listItem.SetSiblingIndex(siblingIndex + offset);
 
             // Check if the parent needs to be collapsed
             var oldParentItem = oldParent.GetComponent<HierarchyItemController>();
@@ -79,7 +82,37 @@ namespace Services.UndoRedo.Commands
             var modelParent = Utility.FindChild(Model.transform, state.ParentID);
             if (modelParent == null) modelParent = Model.transform;
             modelItem.SetParent(modelParent);
-            modelItem.SetSiblingIndex(state.SiblingIndex);
+            modelItem.SetSiblingIndex(siblingIndex);
+        }
+
+        /// <summary>
+        ///     Calculate the sibling index of an item
+        /// </summary>
+        /// <param name="state">The item state</param>
+        /// <param name="item">The actual item in the list view</param>
+        /// <param name="parent">The parent</param>
+        /// <returns>The sibling index</returns>
+        private static int GetSiblingIndex(ItemState state, Transform item, Transform parent)
+        {
+            // Check if item should be last
+            var siblingIndex = parent.childCount;
+            if (state.NeighbourID == ItemState.Last) return siblingIndex;
+
+            // Check if item should be first
+            var sibling = Utility.FindChild(
+                HierarchyView.transform,
+                state.NeighbourID
+            );
+            siblingIndex = 0;
+            if (sibling == null) return siblingIndex;
+
+            // Calculate the sibling index
+            var sameParent = item.parent == sibling.parent;
+            var lowerSibling = item.GetSiblingIndex() < sibling.transform.GetSiblingIndex();
+            var offset = sameParent && lowerSibling ? 0 : 1;
+            siblingIndex = sibling.GetSiblingIndex() + offset;
+
+            return siblingIndex;
         }
 
         /// <summary>

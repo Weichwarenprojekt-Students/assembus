@@ -455,7 +455,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.GetNextGroupID(),
                 "Group",
                 item.name,
-                item.transform.childCount
+                ItemState.Last
             );
 
             // Add the new action to the undo redo service
@@ -472,7 +472,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.GetNextGroupID(),
                 "Group",
                 item.transform.parent.name,
-                item.transform.GetSiblingIndex()
+                Utility.GetNeighbourID(item.transform)
             );
             _undoService.AddCommand(new CreateCommand(true, state));
 
@@ -568,29 +568,21 @@ namespace MainScreen.Sidebar.HierarchyView
             // Check if the drag leads to a change
             if (_dragItem == null) return;
 
-            // Get the new parent and the new sibling id
+            // Get the new parent and the new neighbour id
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
-            var siblingIndex = _insertion
-                ? _dragItem.childrenContainer.transform.childCount
-                : _dragItem.item.transform.GetSiblingIndex();
+            var neighbourID = _insertion ? ItemState.Last : Utility.GetNeighbourID(_dragItem.transform);
 
             // Save the old item states
             var oldStates = _selectedItems.Select(selected => new ItemState(selected)).ToList();
 
             // Create the new item states
             var newStates = new List<ItemState>();
-            var newParent =
-                _insertion ? _dragItem.childrenContainer.transform : _dragItem.gameObject.transform.parent;
-            var offset = 0;
             for (var i = 0; i < _selectedItems.Count; i++)
             {
-                var sameParent = newParent == _selectedItems[i].transform.parent;
-                var smallerIndex = _dragItem.transform.GetSiblingIndex() >
-                                   _selectedItems[i].transform.GetSiblingIndex();
-                if (sameParent && smallerIndex) offset--;
                 newStates.Add(
-                    new ItemState(oldStates[i]) {ParentID = parent, SiblingIndex = siblingIndex + i + offset}
+                    new ItemState(oldStates[i]) {ParentID = parent, NeighbourID = neighbourID}
                 );
+                if (neighbourID != ItemState.Last) neighbourID = newStates[i].ID;
             }
 
             // Add the new action to the undo redo service

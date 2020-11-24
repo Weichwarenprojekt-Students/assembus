@@ -3,6 +3,7 @@ using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
 using Services;
+using Shared;
 using UnityEngine;
 
 namespace MainScreen

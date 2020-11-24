@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Models.Project;
+using Shared;
 using UnityEngine;
 
-namespace Services
+namespace Services.Serialization
 {
     /// <summary>
     ///     This class serializes the GameObject configuration + hierarchy but not the GameObject itself.

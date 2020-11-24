@@ -3,7 +3,7 @@ using System.IO;
 using Models.AppConfiguration;
 using UnityEngine;
 
-namespace Services
+namespace Services.Serialization
 {
     public class ConfigurationManager
     {

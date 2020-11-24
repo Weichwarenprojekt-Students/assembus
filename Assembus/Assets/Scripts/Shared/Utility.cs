@@ -2,7 +2,7 @@
 using MainScreen.Sidebar.HierarchyView;
 using UnityEngine;
 
-namespace Services
+namespace Shared
 {
     public static class Utility
     {

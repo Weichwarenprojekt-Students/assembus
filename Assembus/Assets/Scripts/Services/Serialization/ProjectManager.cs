@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
 using Models.Project;
+using Shared;
 using UnityEngine;
 
-namespace Services
+namespace Services.Serialization
 {
     public class ProjectManager
     {

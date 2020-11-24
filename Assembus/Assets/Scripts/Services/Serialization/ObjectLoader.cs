@@ -3,7 +3,7 @@ using Dummiesman;
 using Models.Project;
 using UnityEngine;
 
-namespace Services
+namespace Services.Serialization
 {
     public static class ObjectLoader
     {

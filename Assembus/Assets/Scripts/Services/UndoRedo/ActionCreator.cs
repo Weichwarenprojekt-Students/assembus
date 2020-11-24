@@ -1,6 +1,7 @@
 ﻿using System;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
+using Shared;
 using UnityEngine;
 
 namespace Services.UndoRedo

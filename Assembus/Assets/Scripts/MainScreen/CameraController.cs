@@ -58,6 +58,11 @@ namespace MainScreen
         private Vector3 _prevPosition;
 
         /// <summary>
+        ///     True if right click occured over the viewport of the camera
+        /// </summary>
+        private bool _rightClickOverViewport;
+
+        /// <summary>
         ///     Scroll/Zoom speed of the camera
         /// </summary>
         private float _scrollSpeed = 20f;
@@ -97,10 +102,17 @@ namespace MainScreen
         private void LateUpdate()
         {
             // Store position when right mouse button is clicked
-            if (Input.GetMouseButtonDown(1)) StoreLastMousePosition();
+            if (Input.GetMouseButtonDown(1) && MouseOverViewport)
+            {
+                _rightClickOverViewport = true;
+                StoreLastMousePosition();
+            }
 
-            // When right mouse button is held rotate the camera
-            if (Input.GetMouseButton(1)) CalculateNewCameraTransform();
+            // Reset flag when right mouse button is released
+            if (Input.GetMouseButtonUp(1)) _rightClickOverViewport = false;
+
+            // When right mouse button is held and right click occured over the viewport, rotate the camera
+            if (Input.GetMouseButton(1) && _rightClickOverViewport) CalculateNewCameraTransform();
 
             // Focus camera if game object is double clicked
             if (Input.GetMouseButtonUp(0))

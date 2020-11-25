@@ -320,22 +320,14 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Select the item 
             var pointerData = (PointerEventData) data;
-            if (!hierarchyViewController.Contains(this))
+            if (!hierarchyViewController.IsSelected(this))
             {
                 SelectItem();
                 _clicked = false;
             }
 
             // Check what type of click happened
-            switch (pointerData.button)
-            {
-                case PointerEventData.InputButton.Right:
-                    ShowContextMenu();
-                    break;
-                case PointerEventData.InputButton.Left:
-                    clickDetector.Click();
-                    break;
-            }
+            if (pointerData.button == PointerEventData.InputButton.Left) clickDetector.Click();
         }
 
         /// <summary>
@@ -345,7 +337,16 @@ namespace MainScreen.Sidebar.HierarchyView
         public void ClickRelease(BaseEventData data)
         {
             var pointerData = (PointerEventData) data;
-            if (pointerData.button == PointerEventData.InputButton.Left && _clicked) SelectItem();
+            switch (pointerData.button)
+            {
+                case PointerEventData.InputButton.Left when _clicked:
+                    SelectItem();
+                    break;
+                case PointerEventData.InputButton.Right:
+                    ShowContextMenu();
+                    break;
+            }
+
             _clicked = false;
         }
 
@@ -559,7 +560,7 @@ namespace MainScreen.Sidebar.HierarchyView
             _dragging = false;
 
             // Insert the items (Only if the dragged item was selected)
-            if (_selectedItems.Count != 0 && hierarchyViewController.Contains(this)) InsertItems();
+            if (_selectedItems.Count != 0 && hierarchyViewController.IsSelected(this)) InsertItems();
         }
 
         /// <summary>
@@ -598,7 +599,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void PutAbove(BaseEventData data)
         {
             // Change the color
-            var selected = hierarchyViewController.Contains(this);
+            var selected = hierarchyViewController.IsSelected(this);
             background.color = _dragging && !selected ? normalColor : highlightedColor;
 
 
@@ -617,7 +618,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StopPuttingAbove(BaseEventData data)
         {
             movingIndicator.SetActive(false);
-            if (!hierarchyViewController.Contains(this)) background.color = normalColor;
+            if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;
             _dragItem = null;
         }
 
@@ -630,7 +631,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Change the color
             var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
-            var selected = hierarchyViewController.Contains(this);
+            var selected = hierarchyViewController.IsSelected(this);
             background.color = _dragging && !isGroup && !selected ? normalColor : highlightedColor;
 
             // Save the item and the action if item is compatible
@@ -645,7 +646,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void StopInsertingItem(BaseEventData data)
         {
             _dragItem = null;
-            if (!hierarchyViewController.Contains(this)) background.color = normalColor;
+            if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;
         }
 
         /// <summary>

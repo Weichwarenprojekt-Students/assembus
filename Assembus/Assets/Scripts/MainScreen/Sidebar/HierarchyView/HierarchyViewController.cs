@@ -340,7 +340,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         /// <param name="item">The item</param>
         /// <returns>True if item is contained</returns>
-        public bool Contains(HierarchyItemController item)
+        public bool IsSelected(HierarchyItemController item)
         {
             return SelectedItems.Contains(item);
         }
@@ -375,7 +375,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void NoModSelection(HierarchyItemController item)
         {
             _lastSelectedItem = item;
-            var selected = Contains(item) && SelectedItems.Count <= 1;
+            var selected = IsSelected(item) && SelectedItems.Count <= 1;
             DeselectItems();
             if (!selected) SelectItem(item);
             else _lastSelectedItem = null;

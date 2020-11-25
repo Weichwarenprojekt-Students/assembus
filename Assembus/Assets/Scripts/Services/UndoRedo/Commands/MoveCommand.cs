@@ -62,6 +62,13 @@ namespace Services.UndoRedo.Commands
             var offset = listParent == null ? 1 : 0;
             listItem.SetSiblingIndex(siblingIndex + offset);
 
+            // Move the item in the actual object
+            var modelItem = Utility.FindChild(Model.transform, state.ID);
+            var modelParent = Utility.FindChild(Model.transform, state.ParentID);
+            if (modelParent == null) modelParent = Model.transform;
+            modelItem.SetParent(modelParent);
+            modelItem.SetSiblingIndex(siblingIndex);
+
             // Check if the parent needs to be collapsed
             var oldParentItem = oldParent.GetComponent<HierarchyItemController>();
             if (oldParentItem != null) oldParentItem.ExpandItem(true);
@@ -77,13 +84,6 @@ namespace Services.UndoRedo.Commands
             }
 
             IndentItems(listItem, indentionDepth);
-
-            // Move the item in the actual object
-            var modelItem = Utility.FindChild(Model.transform, state.ID);
-            var modelParent = Utility.FindChild(Model.transform, state.ParentID);
-            if (modelParent == null) modelParent = Model.transform;
-            modelItem.SetParent(modelParent);
-            modelItem.SetSiblingIndex(siblingIndex);
         }
 
         /// <summary>

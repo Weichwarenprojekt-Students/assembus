@@ -16,6 +16,11 @@ namespace Shared.Tooltip
         public int offsetX, offsetY;
 
         /// <summary>
+        ///     True if the tooltip shall be centered
+        /// </summary>
+        public bool center;
+
+        /// <summary>
         ///     The controller for the tooltip
         /// </summary>
         public TooltipController tooltip;
@@ -32,7 +37,7 @@ namespace Shared.Tooltip
             var y = position.y + offsetY * scale.y;
 
             // Show the tooltip
-            tooltip.ShowTooltip(x, y, text);
+            tooltip.ShowTooltip(x, y, text, center, scale.x);
         }
 
         /// <summary>

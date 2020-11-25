@@ -3,7 +3,7 @@
 namespace Models.Project
 {
     /// <summary>
-    ///     This data structure stores additional information about a given GameObject.
+    ///     This data structure stores additional information about a given item.
     ///     Using a memento because class instances of ItemInfoController inherit from MonoBehaviour,
     ///     which cannot be serialized.
     /// </summary>
@@ -16,8 +16,13 @@ namespace Models.Project
         public string displayName;
 
         /// <summary>
-        ///     Stores if this GameObject is a component group
+        ///     Stores if this item is a component group
         /// </summary>
         public bool isGroup;
+
+        /// <summary>
+        ///     Stores if this group is fused
+        /// </summary>
+        public bool isFused;
     }
 }

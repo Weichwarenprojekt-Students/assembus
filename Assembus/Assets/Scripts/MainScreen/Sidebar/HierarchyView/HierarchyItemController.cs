@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Models.Project;
 using Services;
 using Services.Serialization;
 using Services.UndoRedo;
+using Services.UndoRedo.Commands;
+using Services.UndoRedo.Models;
 using Shared;
 using Shared.Toast;
 using TMPro;
@@ -143,6 +146,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private readonly UndoService _undoService = UndoService.Instance;
 
         /// <summary>
+        ///     True if the item was actually clicked
+        /// </summary>
+        private bool _clicked;
+
+        /// <summary>
         ///     The root element of the hierarchy view
         /// </summary>
         private RectTransform _hierarchyView;
@@ -151,11 +159,6 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     True if the child elements are expanded in the hierarchy view
         /// </summary>
         private bool _isExpanded = true;
-
-        /// <summary>
-        ///     True if the item was actually clicked
-        /// </summary>
-        private bool _clicked;
 
         /// <summary>
         ///     True if the hierarchy view needs to be updated
@@ -217,7 +220,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // set the root hierarchy view
             _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
-            
+
             // Show the item
             ShowItem(true);
         }
@@ -311,10 +314,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         /// <param name="data">The event data</param>
         public void ItemClick(BaseEventData data)
-        {   
+        {
             // Set the clicked flag
             _clicked = true;
-            
+
             // Select the item 
             var pointerData = (PointerEventData) data;
             if (!hierarchyViewController.Contains(this))
@@ -368,7 +371,6 @@ namespace MainScreen.Sidebar.HierarchyView
 
             var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
             if (isGroup)
-            {
                 entries.Add(
                     new ContextMenuController.Item
                     {
@@ -377,7 +379,6 @@ namespace MainScreen.Sidebar.HierarchyView
                         Action = ShowGroup
                     }
                 );
-            }
 
             if (hierarchyViewController.SelectedItems.Contains(this))
                 entries.Add(
@@ -412,7 +413,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             contextMenu.Show(entries);
         }
-        
+
         /// <summary>
         ///     Start a renaming action
         /// </summary>
@@ -431,20 +432,10 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             //Check if the group isn't empty
             if (item.transform.childCount > 0)
-            {
                 toast.Error(Toast.Short, "Only empty groups can be deleted!");
-            }
             else
-            {
-                // Save the old item state
-                var oldState = new[] {ItemState.FromListItem(this)};
-
-                // Create the new item state
-                var newState = new[] {new ItemState(oldState[0])};
-
-                // Add the new action to the undo redo service
-                _undoService.AddCommand(new Command(newState, oldState, Command.Delete));
-            }
+                // Add the new creation command to the undo redo service
+                _undoService.AddCommand(new CreateCommand(false, new ItemState(this)));
         }
 
         /// <summary>
@@ -461,22 +452,16 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void AddGroup()
         {
-            // Save the old item state
-            var oldState = new[]
-            {
-                new ItemState(
-                    _projectManager.GetNextGroupID(),
-                    "Group",
-                    item.name,
-                    item.transform.childCount
-                )
-            };
-
-            // Create the new item state
-            var newState = new[] {new ItemState(oldState[0])};
+            // Save the item state
+            var state = new ItemState(
+                _projectManager.GetNextGroupID(),
+                "Group",
+                item.name,
+                ItemState.Last
+            );
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new Command(newState, oldState, Command.Create));
+            _undoService.AddCommand(new CreateCommand(true, state));
         }
 
         /// <summary>
@@ -485,21 +470,17 @@ namespace MainScreen.Sidebar.HierarchyView
         private void MoveToNewGroup()
         {
             // Create the group
-            var oldState = new[]
-            {
-                new ItemState(
-                    _projectManager.GetNextGroupID(),
-                    "Group",
-                    item.transform.parent.name,
-                    item.transform.GetSiblingIndex()
-                )
-            };
-            var newState = new[] {new ItemState(oldState[0])};
-            _undoService.AddCommand(new Command(newState, oldState, Command.Create));
+            var state = new ItemState(
+                _projectManager.GetNextGroupID(),
+                "Group",
+                item.transform.parent.name,
+                Utility.GetNeighbourID(item.transform)
+            );
+            _undoService.AddCommand(new CreateCommand(true, state));
 
             // Move the items
             _dragItem =
-                Utility.FindChild(_hierarchyView.transform, newState[0].ID).GetComponent<HierarchyItemController>();
+                Utility.FindChild(_hierarchyView.transform, state.ID).GetComponent<HierarchyItemController>();
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
@@ -527,18 +508,12 @@ namespace MainScreen.Sidebar.HierarchyView
                 return;
             }
 
-            // Save the old item state
-            var oldState = new[] {ItemState.FromListItem(this)};
-
-            // Create the new item state
-            var newState = new[] {new ItemState(oldState[0]) {Name = newName}};
-
             // Hide the input field an show the name field
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new Command(newState, oldState, Command.Rename));
+            _undoService.AddCommand(new RenameCommand(item.name, nameText.text, newName));
         }
 
         /// <summary>
@@ -549,7 +524,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Set the clicked flag to false
             _clicked = false;
-            
+
             // Get the selected items
             _selectedItems = hierarchyViewController.GetSelectedItems();
             if (_selectedItems.Count == 0 || !_selectedItems.Contains(this)) return;
@@ -595,33 +570,25 @@ namespace MainScreen.Sidebar.HierarchyView
             // Check if the drag leads to a change
             if (_dragItem == null) return;
 
-            // Get the new parent and the new sibling id
+            // Get the new parent and the new neighbour id
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
-            var siblingIndex = _insertion
-                ? _dragItem.childrenContainer.transform.childCount
-                : _dragItem.item.transform.GetSiblingIndex();
+            var neighbourID = _insertion ? ItemState.Last : Utility.GetNeighbourID(_dragItem.transform);
 
             // Save the old item states
-            var oldStates = new ItemState[_selectedItems.Count];
-            for (var i = 0; i < oldStates.Length; i++) oldStates[i] = ItemState.FromListItem(_selectedItems[i]);
+            var oldStates = _selectedItems.Select(selected => new ItemState(selected)).ToList();
 
             // Create the new item states
-            var newStates = new ItemState[_selectedItems.Count];
-            var newParent =
-                _insertion ? _dragItem.childrenContainer.transform : _dragItem.gameObject.transform.parent;
-            var offset = 0;
-            for (var i = 0; i < newStates.Length; i++)
+            var newStates = new List<ItemState>();
+            for (var i = 0; i < _selectedItems.Count; i++)
             {
-                var sameParent = newParent == _selectedItems[i].transform.parent;
-                var smallerIndex = _dragItem.transform.GetSiblingIndex() >
-                                   _selectedItems[i].transform.GetSiblingIndex();
-                if (sameParent && smallerIndex) offset--;
-                newStates[i] = new ItemState(oldStates[i])
-                    {ParentID = parent, SiblingIndex = siblingIndex + i + offset};
+                newStates.Add(
+                    new ItemState(oldStates[i]) {ParentID = parent, NeighbourID = neighbourID}
+                );
+                if (neighbourID != ItemState.Last) neighbourID = newStates[i].ID;
             }
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new Command(newStates, oldStates, Command.Move));
+            _undoService.AddCommand(new MoveCommand(oldStates, newStates));
         }
 
         /// <summary>

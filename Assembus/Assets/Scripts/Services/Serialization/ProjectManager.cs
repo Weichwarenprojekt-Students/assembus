@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 using Models.Project;
-using Shared;
-using UnityEngine;
+using Services.Serialization.Shared;
 
 namespace Services.Serialization
 {
@@ -19,19 +18,9 @@ namespace Services.Serialization
         private const string ProjectModelFile = "projectModel.xml";
 
         /// <summary>
-        ///     Constant string which specifies the name of the source/default assembly station
-        /// </summary>
-        private const string DefaultStationName = "Default Station";
-
-        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
-
-        /// <summary>
-        ///     The GameObject deserializer which initializes the loaded GameObject
-        /// </summary>
-        private readonly ModelDeSerializer _modelDeSerializer = new ModelDeSerializer();
 
         /// <summary>
         ///     The XML writer/reader instance to store all non 3D-model settings
@@ -168,9 +157,9 @@ namespace Services.Serialization
                 _xmlDeSerializer.SerializeData(Path.Combine(CurrentProjectDir, ProjectConfigFile), CurrentProject);
 
                 // Save the hierarchy of the GameObject 3D model
-                _modelDeSerializer.SerializeGameObject(
+                ModelManager.SerializeModel(
                     Path.Combine(CurrentProjectDir, ProjectModelFile),
-                    CurrentProject.ObjectModel
+                    CurrentProject.ObjectModel.transform
                 );
 
                 return (true, "");
@@ -222,89 +211,46 @@ namespace Services.Serialization
         /// </summary>
         /// <param name="firstTime">True if the object is loaded for the first time</param>
         /// <returns>Return bool that indicates if the operation was successful and an error message</returns>
-        public (bool, string) LoadGameObject(bool firstTime)
+        public (bool, string) LoadModel(bool firstTime)
         {
-            // Create the import path
-            var importPath = Path.Combine(CurrentProjectDir, CurrentProject.ObjectFile);
-
-            // Load the object
-            var (success, message, objectModel) = LoadGameObjectsFromObj(importPath);
-            if (!success) return (false, message);
-            CurrentProject.ObjectModel = objectModel;
-
-            // If it was the first time, move all components to default station and try to save the project
-            if (firstTime)
-            {
-                InitDefaultStation();
-                return SaveProject();
-            }
-
-            // Otherwise try to load the object hierarchy
             try
             {
-                // Load the 3D model hierarchy
-                CurrentProject.ObjectModel = _modelDeSerializer.DeserializeGameObject(
-                    Path.Combine(CurrentProjectDir, ProjectModelFile),
-                    CurrentProject.ObjectModel
-                );
+                // Try to load the model
+                var importPath = Path.Combine(CurrentProjectDir, CurrentProject.ObjectFile);
+                var configPath = Path.Combine(CurrentProjectDir, ProjectModelFile);
+                CurrentProject.ObjectModel = ModelManager.Load(importPath, configPath, firstTime);
+
+                // Check if it was the first time loading the model
+                if (firstTime) return SaveProject();
 
                 // Save the new open project in the config
                 _configManager.Config.lastProject = CurrentProjectDir;
             }
             catch (Exception)
             {
-                return (false, "The project couldn't \n be loaded!");
+                return (false, "Model could not \n be imported!");
             }
 
             return (true, "");
         }
 
         /// <summary>
-        ///     Imports the GameObject instances from the provided OBJ file
+        ///     Create an artificial group ID for newly created items
         /// </summary>
-        /// <param name="importPath">The import path</param>
-        /// <returns>The game object, a success flag and a message in case of an error</returns>
-        private (bool, string, GameObject) LoadGameObjectsFromObj(string importPath)
-        {
-            try
-            {
-                var importObject = ObjectLoader.LoadObject(importPath);
-                return (true, "", importObject);
-            }
-            catch (Exception)
-            {
-                return (false, "Object could not \n be imported!", null);
-            }
-        }
-
-        /// <summary>
-        ///     Moves all loaded OBJ GameObjects into the default assembly station
-        /// </summary>
-        private void InitDefaultStation()
-        {
-            // Add the default assembly station
-            var defaultStation = new GameObject {name = DefaultStationName};
-            var info = new ItemInfo {displayName = DefaultStationName, isGroup = true};
-
-            defaultStation.AddComponent<ItemInfoController>();
-            defaultStation.GetComponent<ItemInfoController>().ItemInfo = info;
-            defaultStation.transform.parent = CurrentProject.ObjectModel.transform;
-
-            var children = Utility.GetAllGameObjects(CurrentProject.ObjectModel);
-
-            // Move all children to the default assembly station
-            foreach (var child in children)
-                if (child.name != DefaultStationName)
-                    child.transform.parent = defaultStation.transform;
-        }
-
-        /// <summary>
-        ///     Returns a unique ID for newly created component groups
-        /// </summary>
-        /// <returns></returns>
+        /// <returns>The id</returns>
         public string GetNextGroupID()
         {
-            return "AssembusCompGroup_" + CurrentProject.CurrentGroupIdx++;
+            return "assembus_group_" + CurrentProject.CurrentIndex++;
+        }
+
+        /// <summary>
+        ///     Create an ID with a given index
+        /// </summary>
+        /// <param name="index">The index</param>
+        /// <returns>The id</returns>
+        public string CreateID(int index)
+        {
+            return "assembus_item_" + index;
         }
     }
 }

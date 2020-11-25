@@ -10,10 +10,10 @@ namespace Models.Project
     {
         /// <summary>
         ///     Stores the current numerical index which
-        ///     acts as a postfix for newly created component groups
+        ///     acts as a postfix for newly created component items
         ///     and gets incremented each time a new group gets created
         /// </summary>
-        public int CurrentGroupIdx;
+        public int CurrentIndex;
 
         /// <summary>
         ///     The project's name
@@ -42,7 +42,7 @@ namespace Models.Project
         {
             Name = name;
             ObjectFile = objectFile;
-            CurrentGroupIdx = 0;
+            CurrentIndex = 0;
         }
 
         /// <summary>

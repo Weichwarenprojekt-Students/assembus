@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 
-namespace Services.Serialization
+namespace Services.Serialization.Shared
 {
     public class XmlDeSerializer<T>
     {

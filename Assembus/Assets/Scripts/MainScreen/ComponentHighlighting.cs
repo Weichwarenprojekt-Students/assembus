@@ -2,7 +2,7 @@
 using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
-using Services;
+using Shared;
 using UnityEngine;
 
 namespace MainScreen
@@ -264,10 +264,10 @@ namespace MainScreen
 
             // Get all grouping objects in the list (if there are any) and their children
             var groupedObjects = new List<GameObject>();
-            foreach (var g in gameObjects.Where(
-                g => g.GetComponent<ItemInfoController>().ItemInfo.isGroup
-            ))
-                groupedObjects.AddRange(Utility.GetAllGameObjects(g).ToList());
+            var groups =
+                gameObjects.Where(g => g.GetComponent<ItemInfoController>().ItemInfo.isGroup);
+            foreach (var group in groups)
+                groupedObjects.AddRange(Utility.GetAllChildren(group).ToList());
 
             // Add the grouped objects to the list of objects to be highlighted
             gameObjects.AddRange(groupedObjects);
@@ -277,14 +277,14 @@ namespace MainScreen
 
             // Highlight every game object
             gameObjects.ForEach(
-                g =>
+                group =>
                 {
-                    var itemRenderer = g.GetComponent<Renderer>();
+                    var itemRenderer = group.GetComponent<Renderer>();
                     if (itemRenderer == null) return;
 
                     // Add to selection list and save original color
-                    if (!_selectedGameObjects.ContainsKey(g))
-                        _selectedGameObjects.Add(g, itemRenderer.material.color);
+                    if (!_selectedGameObjects.ContainsKey(group))
+                        _selectedGameObjects.Add(group, itemRenderer.material.color);
 
                     // Highlight selection
                     itemRenderer.material.color = color;

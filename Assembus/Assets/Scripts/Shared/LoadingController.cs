@@ -3,7 +3,7 @@ using System.Collections;
 using System.Threading;
 using UnityEngine;
 
-namespace Shared.LoadingScreen
+namespace Shared
 {
     public class LoadingController : MonoBehaviour
     {

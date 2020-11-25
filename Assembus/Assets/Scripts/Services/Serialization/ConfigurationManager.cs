@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
 using Models.AppConfiguration;
+using Services.Serialization.Shared;
 using UnityEngine;
 
-namespace Services
+namespace Services.Serialization
 {
     public class ConfigurationManager
     {
@@ -21,7 +22,6 @@ namespace Services
         ///     ConfigFileStruct instance which stores the content of the XML file
         /// </summary>
         public Configuration Config = new Configuration();
-
 
         /// <summary>
         ///     Private constructor to comply with the singleton pattern

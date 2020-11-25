@@ -1,10 +1,8 @@
 ﻿using System.Linq;
 using Models.AppConfiguration;
-using Models.Project;
-using Services;
+using Services.Serialization;
 using SFB;
 using Shared;
-using Shared.LoadingScreen;
 using Shared.Toast;
 using TMPro;
 using UnityEngine;
@@ -139,7 +137,7 @@ namespace StartScreen
                             }
 
                             // Load the OBJ model
-                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+                            var (loadSuccess, loadMessage) = _projectManager.LoadModel(false);
                             if (!loadSuccess)
                             {
                                 toast.Error(Toast.Short, loadMessage);
@@ -187,7 +185,7 @@ namespace StartScreen
                                 return;
                             }
 
-                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(true);
+                            var (loadSuccess, loadMessage) = _projectManager.LoadModel(true);
                             if (!loadSuccess)
                             {
                                 // Show the error
@@ -288,7 +286,7 @@ namespace StartScreen
                             }
 
                             // Load the OBJ model
-                            var (loadSuccess, loadMessage) = _projectManager.LoadGameObject(false);
+                            var (loadSuccess, loadMessage) = _projectManager.LoadModel(false);
                             if (!loadSuccess)
                             {
                                 toast.Error(Toast.Short, loadMessage);
@@ -378,7 +376,7 @@ namespace StartScreen
             if (!success) return;
 
             // Load the OBJ model
-            var (loadSuccess, _) = _projectManager.LoadGameObject(false);
+            var (loadSuccess, _) = _projectManager.LoadModel(false);
             if (!loadSuccess) return;
 
             // Show the main screen

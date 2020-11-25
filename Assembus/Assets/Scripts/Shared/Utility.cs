@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using UnityEngine;
 
-namespace Services
+namespace Shared
 {
     public static class Utility
     {
@@ -11,7 +12,7 @@ namespace Services
         /// </summary>
         /// <param name="parent">The parent transform (where the search begins) </param>
         /// <param name="name">The name of the searched child</param>
-        /// <returns></returns>
+        /// <returns>The searched child</returns>
         public static Transform FindChild(Transform parent, string name)
         {
             for (var i = 0; i < parent.childCount; i++)
@@ -25,6 +26,17 @@ namespace Services
             }
 
             return null;
+        }
+
+        /// <summary>
+        ///     Perform a linear search on a given list
+        /// </summary>
+        /// <param name="children">The children</param>
+        /// <param name="name">The name of the searched child</param>
+        /// <returns>The searched child</returns>
+        public static GameObject FindChildLinear(List<GameObject> children, string name)
+        {
+            return (from child in children where child.name == name select child).FirstOrDefault();
         }
 
         /// <summary>
@@ -48,13 +60,13 @@ namespace Services
         /// </summary>
         /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
         /// <param name="outputData">Contains all child GameObjects of provided input GameObject</param>
-        private static void GetAllGameObjects(GameObject inputObject, ICollection<GameObject> outputData)
+        private static void GetAllChildren(GameObject inputObject, ICollection<GameObject> outputData)
         {
             // Add new child to the GameObject list
             outputData.Add(inputObject);
 
             // Recursively traverse to children
-            foreach (Transform child in inputObject.transform) GetAllGameObjects(child.gameObject, outputData);
+            foreach (Transform child in inputObject.transform) GetAllChildren(child.gameObject, outputData);
         }
 
         /// <summary>
@@ -62,11 +74,10 @@ namespace Services
         /// </summary>
         /// <param name="inputObject">The input GameObject instance where the children should be extracted from</param>
         /// <returns>Returns list of all child GameObjects of provided input GameObject</returns>
-        public static List<GameObject> GetAllGameObjects(GameObject inputObject)
+        public static List<GameObject> GetAllChildren(GameObject inputObject)
         {
             var list = new List<GameObject>();
-            GetAllGameObjects(inputObject, list);
-
+            foreach (Transform child in inputObject.transform) GetAllChildren(child.gameObject, list);
             return list;
         }
     }

@@ -1,8 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Shared.SwitchableButton
+namespace Shared
 {
     public class SwitchableButton : MonoBehaviour
     {

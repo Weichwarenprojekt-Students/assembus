@@ -73,7 +73,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     The expand button
         /// </summary>
-        public GameObject expandButton, expandDown, expandRight;
+        public GameObject expandButton, expandDown, expandRight, fusion;
 
         /// <summary>
         ///     The container of the item which contains all children
@@ -119,6 +119,11 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     The item of the actual model
         /// </summary>
         [HideInInspector] public GameObject item;
+
+        /// <summary>
+        ///     The item of the actual model
+        /// </summary>
+        [HideInInspector] public ItemInfoController itemInfo;
 
         /// <summary>
         ///     The camera controller
@@ -168,25 +173,46 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     True if the item has children
         /// </summary>
-        private bool HasChildren => childrenContainer.transform.childCount > 0;
+        private bool HasChildren => item.transform.childCount > 0;
 
         /// <summary>
-        ///     Update the expand button to display the correct icon
+        ///     Initialize the hierarchy item
         /// </summary>
-        private void Start()
+        /// <param name="modelItem">The item of the actual model</param>
+        /// <param name="indentionDepth">Depth of indentation inside the listview</param>
+        /// <param name="mainHierarchyView">Reference to the root of the hierarchy view</param>
+        public void Initialize(GameObject modelItem, float indentionDepth, GameObject mainHierarchyView)
         {
-            UpdateExpandButton();
+            // Save the actual item
+            item = modelItem;
+            itemInfo = item.GetComponent<ItemInfoController>();
 
+            // set the name of the item
+            nameText.text = itemInfo.ItemInfo.displayName;
+
+            // indent the item
+            IndentItem(indentionDepth);
+
+            // set the root hierarchy view
+            _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
+
+            // Show the item
+            ShowItem(true);
+            
+            // Add the double click detector
             clickDetector.DoubleClickOccured += () =>
             {
                 // Focus on component group only when there are children in group
                 if (item.transform.childCount > 0)
                     cameraController.ZoomOnObject(item);
 
-                //Focus on single component and make sure we have no empty group!
-                else if (item.GetComponent<ItemInfoController>().ItemInfo.isGroup == false)
+                // Focus on single component and make sure we have no empty group!
+                else if (itemInfo.ItemInfo.isGroup == false)
                     cameraController.UpdateCameraFocus(item);
             };
+            
+            // Update the button
+            UpdateExpandButton();
         }
 
         /// <summary>
@@ -199,30 +225,6 @@ namespace MainScreen.Sidebar.HierarchyView
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_hierarchyView);
 
             clickDetector.CheckForSecondClick();
-        }
-
-        /// <summary>
-        ///     Initialize the hierarchy item
-        /// </summary>
-        /// <param name="modelItem">The item of the actual model</param>
-        /// <param name="indentionDepth">Depth of indentation inside the listview</param>
-        /// <param name="mainHierarchyView">Reference to the root of the hierarchy view</param>
-        public void Initialize(GameObject modelItem, float indentionDepth, GameObject mainHierarchyView)
-        {
-            // Save the actual item
-            item = modelItem;
-
-            // set the name of the item
-            nameText.text = item.GetComponent<ItemInfoController>().ItemInfo.displayName;
-
-            // indent the item
-            IndentItem(indentionDepth);
-
-            // set the root hierarchy view
-            _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
-
-            // Show the item
-            ShowItem(true);
         }
 
         /// <summary>
@@ -300,13 +302,16 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void UpdateExpandButton()
         {
+            // Check if the item is fused
+            var fused = itemInfo.ItemInfo.isFused;
+            
             // Enable/Disable the button
-            expandButton.SetActive(HasChildren);
-            if (!HasChildren) return;
+            expandButton.SetActive(HasChildren || fused);
 
             // Update the logos if necessary
-            expandDown.SetActive(_isExpanded);
-            expandRight.SetActive(!_isExpanded);
+            expandDown.SetActive(_isExpanded && !fused);
+            expandRight.SetActive(!_isExpanded && !fused);
+            fusion.SetActive(fused);
         }
 
         /// <summary>
@@ -370,7 +375,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 }
             );
 
-            var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
+            var isGroup = itemInfo.ItemInfo.isGroup;
             if (isGroup)
                 entries.Add(
                     new ContextMenuController.Item
@@ -396,6 +401,15 @@ namespace MainScreen.Sidebar.HierarchyView
                 entries.Add(
                     new ContextMenuController.Item
                     {
+                        Icon = itemInfo.ItemInfo.isFused ? contextMenu.defuse : contextMenu.fuse,
+                        Name = itemInfo.ItemInfo.isFused ? "Split Group" : "Fuse Group",
+                        Action = FuseGroup
+                    }
+                );
+                
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
                         Icon = contextMenu.add,
                         Name = "Add Group",
                         Action = AddGroup
@@ -407,7 +421,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     {
                         Icon = contextMenu.delete,
                         Name = "Delete",
-                        Action = DeleteItem
+                        Action = DeleteGroup
                     }
                 );
             }
@@ -427,9 +441,18 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Item deletion
+        ///     Fuse a group
         /// </summary>
-        private void DeleteItem()
+        private void FuseGroup()
+        {
+            itemInfo.ItemInfo.isFused = !itemInfo.ItemInfo.isFused;
+            UpdateExpandButton();
+        }
+
+        /// <summary>
+        ///     Delete a group
+        /// </summary>
+        private void DeleteGroup()
         {
             //Check if the group isn't empty
             if (item.transform.childCount > 0)
@@ -531,7 +554,7 @@ namespace MainScreen.Sidebar.HierarchyView
             if (_selectedItems.Count == 0 || !_selectedItems.Contains(this)) return;
 
             // Show which items are dragged
-            var firstName = item.GetComponent<ItemInfoController>().ItemInfo.displayName;
+            var firstName = itemInfo.ItemInfo.displayName;
             dragPreviewText.text = _selectedItems.Count > 1 ? "Multiple Items" : firstName;
             dragPreview.transform.position = ((PointerEventData) data).position;
             dragPreview.SetActive(true);
@@ -630,7 +653,7 @@ namespace MainScreen.Sidebar.HierarchyView
         public void InsertItem(BaseEventData data)
         {
             // Change the color
-            var isGroup = item.GetComponent<ItemInfoController>().ItemInfo.isGroup;
+            var isGroup = itemInfo.ItemInfo.isGroup;
             var selected = hierarchyViewController.IsSelected(this);
             background.color = _dragging && !isGroup && !selected ? normalColor : highlightedColor;
 

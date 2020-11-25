@@ -78,7 +78,8 @@ namespace Services.Serialization
                 child.GetComponent<ItemInfoController>().ItemInfo = new ItemInfo
                 {
                     displayName = child.name,
-                    isGroup = false
+                    isGroup = false,
+                    isFused = false
                 };
                 child.name = ProjectManager.CreateID(i);
             }
@@ -138,7 +139,7 @@ namespace Services.Serialization
         {
             // Add the default assembly station
             var defaultStation = new GameObject {name = ProjectManager.GetNextGroupID()};
-            var info = new ItemInfo {displayName = DefaultStationName, isGroup = true};
+            var info = new ItemInfo {displayName = DefaultStationName, isGroup = true, isFused = false};
             defaultStation.AddComponent<ItemInfoController>();
             defaultStation.GetComponent<ItemInfoController>().ItemInfo = info;
 

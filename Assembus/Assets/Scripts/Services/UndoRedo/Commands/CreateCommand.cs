@@ -57,7 +57,7 @@ namespace Services.UndoRedo.Commands
             var newObject = new GameObject(state.ID);
             newObject.AddComponent<ItemInfoController>();
             newObject.GetComponent<ItemInfoController>().ItemInfo
-                = new ItemInfo {displayName = state.Name, isGroup = true};
+                = new ItemInfo {displayName = state.Name, isGroup = true, isFused = false};
             newObject.transform.parent = Model.transform;
 
             // Create the list view item

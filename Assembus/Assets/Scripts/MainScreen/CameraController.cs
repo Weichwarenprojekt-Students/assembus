@@ -1,5 +1,7 @@
-﻿using MainScreen.Sidebar.HierarchyView;
+﻿using System.Linq;
+using MainScreen.Sidebar.HierarchyView;
 using Services;
+using Shared;
 using UnityEngine;
 
 namespace MainScreen
@@ -129,13 +131,13 @@ namespace MainScreen
         ///     Set focus on passed GameObject component group
         /// </summary>
         /// <param name="parent">The object that shall be shown</param>
-        public void ZoomOnObject(GameObject parent)
+        /// <param name="setScrollSpeed">True if the scroll speed should be adjusted to the new camera distance</param>
+        public void ZoomOnObject(GameObject parent, bool setScrollSpeed = true)
         {
-            // Calculate the bounds of the game object
-            var bounds = new Bounds(parent.transform.position, Vector3.zero);
+            // Get the bounds of the game object
+            var bounds = GetBounds(parent);
 
-            // Get the bound of one GameObject with multiple children
-            foreach (var r in parent.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
+            // Get the sizes of the object and its children
             var objectSizes = bounds.max - bounds.min;
 
             // Calculate the camera distance
@@ -146,8 +148,9 @@ namespace MainScreen
             // Set the focus to the middle
             SetFocus(bounds.center);
 
-            // Recalculate the scroll speed
-            _scrollSpeed = ScrollFactor * _cameraDistance;
+            if (setScrollSpeed)
+                // Recalculate the scroll speed
+                _scrollSpeed = ScrollFactor * _cameraDistance;
         }
 
         /// <summary>
@@ -157,18 +160,17 @@ namespace MainScreen
         {
             if (_cam is null) return;
 
+            if (!MouseOverViewport) return;
+
             var ray = _cam.ScreenPointToRay(Input.mousePosition);
 
             if (!Physics.Raycast(ray, out var hit, 10000)) return;
 
-            GameObject o;
-            var transformGameObject = (o = hit.transform.gameObject).GetComponent<Renderer>().bounds.center;
+            var go = hit.transform.gameObject;
 
-            if (!MouseOverViewport) return;
-
-            componentHighlighting.HighlightGameObject(o);
-            hierarchyViewController.SetItemStatusFromList(new[] {o.name});
-            SetFocus(transformGameObject);
+            componentHighlighting.HighlightGameObject(go);
+            hierarchyViewController.SetItemStatusFromList(new[] {go.name});
+            SetFocus(GetBounds(go).center);
             StoreLastMousePosition();
             CalculateNewCameraTransform();
         }
@@ -181,11 +183,38 @@ namespace MainScreen
         {
             if (_cam is null) return;
 
-            var transformGameObject = go.transform.gameObject.GetComponent<Renderer>().bounds.center;
-
-            SetFocus(transformGameObject);
+            SetFocus(GetBounds(go).center);
             StoreLastMousePosition();
             CalculateNewCameraTransform();
+        }
+
+        /// <summary>
+        ///     Calculate the rendering bounds of a GameObjects and all children
+        /// </summary>
+        /// <param name="gameObj">The GameObject from which to get the bounds</param>
+        /// <returns>Bounds that include a GameObject and its children</returns>
+        private static Bounds GetBounds(GameObject gameObj)
+        {
+            // initialize with wrong value, because null initialization is not possible
+            var bounds = new Bounds();
+
+            // Set basic bounds to the ones of the GameObject, if the GameObject has one
+            var renderer = gameObj.GetComponent<Renderer>();
+            if (renderer != null) bounds = renderer.bounds;
+
+            // Get all Renderer components of the children of the GameObject
+            var childRenderers = Utility.GetAllChildren(gameObj)
+                .Select(child => child.GetComponent<Renderer>())
+                .Where(childRenderer => childRenderer != null).ToList();
+
+            // Set the basic bounds to the first bounds from the child objects, if a child exists
+            // Usually the GameObject does not have bounds, if it has children
+            bounds = childRenderers.FirstOrDefault()?.bounds ?? bounds;
+
+            // Add all bounds from all child objects to the bounds
+            foreach (var childRenderer in childRenderers) bounds.Encapsulate(childRenderer.bounds);
+
+            return bounds;
         }
 
         /// <summary>

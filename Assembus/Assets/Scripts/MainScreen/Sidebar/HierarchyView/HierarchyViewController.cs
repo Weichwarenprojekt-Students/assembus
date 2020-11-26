@@ -220,7 +220,7 @@ namespace MainScreen.Sidebar.HierarchyView
             var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
 
             // initialize the item
-            itemController.Initialize(item, depth, hierarchyView);
+            itemController.Initialize(item, depth);
 
             return itemController;
         }

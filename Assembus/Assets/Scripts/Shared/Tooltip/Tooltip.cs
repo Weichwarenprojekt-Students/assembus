@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Shared.Tooltip
@@ -44,6 +45,14 @@ namespace Shared.Tooltip
         ///     Hide the tooltip
         /// </summary>
         public void OnPointerExit(PointerEventData eventData)
+        {
+            tooltip.HideTooltip();
+        }
+
+        /// <summary>
+        ///     Hide the tooltip on disable
+        /// </summary>
+        public void OnDisable()
         {
             tooltip.HideTooltip();
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MainScreen.StationView;
 using Models.Project;
 using Services;
 using Services.Serialization;
@@ -71,9 +72,19 @@ namespace MainScreen.Sidebar.HierarchyView
         public RectTransform itemContent;
 
         /// <summary>
-        ///     The expand button
+        ///     The expand button with its logos
         /// </summary>
         public GameObject expandButton, expandDown, expandRight, fusion;
+
+        /// <summary>
+        ///     The button for showing a station
+        /// </summary>
+        public GameObject showStation;
+
+        /// <summary>
+        ///     The controller of the station view
+        /// </summary>
+        public StationController stationController;
 
         /// <summary>
         ///     The container of the item which contains all children
@@ -141,6 +152,11 @@ namespace MainScreen.Sidebar.HierarchyView
         public Color visibleColor, invisibleColor;
 
         /// <summary>
+        ///     The root element of the hierarchy view
+        /// </summary>
+        public RectTransform hierarchyView;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -154,11 +170,6 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     True if the item was actually clicked
         /// </summary>
         private bool _clicked;
-
-        /// <summary>
-        ///     The root element of the hierarchy view
-        /// </summary>
-        private RectTransform _hierarchyView;
 
         /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
@@ -176,12 +187,28 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool HasChildren => item.transform.childCount > 0;
 
         /// <summary>
+        ///     True if the item is a station
+        /// </summary>
+        public bool IsStation => itemInfo.ItemInfo.isGroup && transform.parent == hierarchyView;
+
+        /// <summary>
+        ///     Late update of the UI
+        /// </summary>
+        private void LateUpdate()
+        {
+            // force update of the hierarchy view if the item expansion changed
+            if (_updateHierarchy)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView);
+
+            clickDetector.CheckForSecondClick();
+        }
+
+        /// <summary>
         ///     Initialize the hierarchy item
         /// </summary>
         /// <param name="modelItem">The item of the actual model</param>
         /// <param name="indentionDepth">Depth of indentation inside the listview</param>
-        /// <param name="mainHierarchyView">Reference to the root of the hierarchy view</param>
-        public void Initialize(GameObject modelItem, float indentionDepth, GameObject mainHierarchyView)
+        public void Initialize(GameObject modelItem, float indentionDepth)
         {
             // Save the actual item
             item = modelItem;
@@ -193,12 +220,9 @@ namespace MainScreen.Sidebar.HierarchyView
             // indent the item
             IndentItem(indentionDepth);
 
-            // set the root hierarchy view
-            _hierarchyView = mainHierarchyView.GetComponent<RectTransform>();
-
             // Show the item
             ShowItem(true);
-            
+
             // Add the double click detector
             clickDetector.DoubleClickOccured += () =>
             {
@@ -210,21 +234,9 @@ namespace MainScreen.Sidebar.HierarchyView
                 else if (itemInfo.ItemInfo.isGroup == false)
                     cameraController.UpdateCameraFocus(item);
             };
-            
+
             // Update the button
-            UpdateExpandButton();
-        }
-
-        /// <summary>
-        ///     Late update of the UI
-        /// </summary>
-        private void LateUpdate()
-        {
-            // force update of the hierarchy view if the item expansion changed
-            if (_updateHierarchy)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(_hierarchyView);
-
-            clickDetector.CheckForSecondClick();
+            UpdateVisuals();
         }
 
         /// <summary>
@@ -276,7 +288,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 _updateHierarchy = true;
             }
 
-            UpdateExpandButton();
+            UpdateVisuals();
         }
 
         /// <summary>
@@ -298,13 +310,13 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Update the expand button to display the correct icons
+        ///     Update the visuals of the item
         /// </summary>
-        private void UpdateExpandButton()
+        public void UpdateVisuals()
         {
             // Check if the item is fused
             var fused = itemInfo.ItemInfo.isFused;
-            
+
             // Enable/Disable the button
             expandButton.SetActive(HasChildren || fused);
 
@@ -312,6 +324,17 @@ namespace MainScreen.Sidebar.HierarchyView
             expandDown.SetActive(_isExpanded && !fused);
             expandRight.SetActive(!_isExpanded && !fused);
             fusion.SetActive(fused);
+
+            // Show/Hide the station button
+            showStation.SetActive(IsStation);
+        }
+
+        /// <summary>
+        ///     Show a station in the station view
+        /// </summary>
+        public void ShowStation()
+        {
+            stationController.ShowStation(this);
         }
 
         /// <summary>
@@ -406,7 +429,7 @@ namespace MainScreen.Sidebar.HierarchyView
                         Action = FuseGroup
                     }
                 );
-                
+
                 entries.Add(
                     new ContextMenuController.Item
                     {
@@ -435,6 +458,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void RenameItem()
         {
             nameInput.text = nameText.text;
+            showStation.SetActive(false);
             nameInputObject.SetActive(true);
             nameInput.Select();
             nameTextObject.SetActive(false);
@@ -446,7 +470,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void FuseGroup()
         {
             itemInfo.ItemInfo.isFused = !itemInfo.ItemInfo.isFused;
-            UpdateExpandButton();
+            UpdateVisuals();
         }
 
         /// <summary>
@@ -504,7 +528,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Move the items
             _dragItem =
-                Utility.FindChild(_hierarchyView.transform, state.ID).GetComponent<HierarchyItemController>();
+                Utility.FindChild(hierarchyView.transform, state.ID).GetComponent<HierarchyItemController>();
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
@@ -535,6 +559,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Hide the input field an show the name field
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
+            showStation.SetActive(IsStation);
 
             // Add the new action to the undo redo service
             _undoService.AddCommand(new RenameCommand(item.name, nameText.text, newName));
@@ -613,6 +638,9 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Add the new action to the undo redo service
             _undoService.AddCommand(new MoveCommand(oldStates, newStates));
+
+            // Update the station view
+            stationController.UpdateStation();
         }
 
         /// <summary>

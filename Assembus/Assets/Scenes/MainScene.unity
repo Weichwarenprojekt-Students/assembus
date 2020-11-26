@@ -1901,6 +1901,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb97f70c368149dfb5c9c062d7aab4a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doubleClickOccured: 0
 --- !u!222 &168202936
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1983,7 +1984,7 @@ MonoBehaviour:
   item: {fileID: 0}
   itemInfo: {fileID: 0}
   cameraController: {fileID: 963194229}
-  clickDetector: {fileID: 168202935}
+  doubleClickDetector: {fileID: 168202935}
   visibleColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
   invisibleColor: {r: 0.6509804, g: 0.6509804, b: 0.6509804, a: 1}
 --- !u!1 &187689806
@@ -6391,6 +6392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb97f70c368149dfb5c9c062d7aab4a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doubleClickOccured: 0
 --- !u!224 &973023894 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2065074576797381153, guid: 0760d4c278b4b2149b12c08fcda2ce00,
@@ -7377,7 +7379,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1883572204}
   m_HandleRect: {fileID: 1883572203}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7788,8 +7790,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 0.9747634
+  m_Value: -0.000005722024
+  m_Size: 0.97476333
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

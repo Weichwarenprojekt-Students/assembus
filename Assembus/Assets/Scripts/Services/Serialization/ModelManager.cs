@@ -183,7 +183,7 @@ namespace Services.Serialization
                 var childItem = new SerializableItem(child);
 
                 if (topLevel && !childItem.itemInfo.isGroup)
-                    throw new ToplevelComponentException {Component = childItem.itemInfo.displayName};
+                    throw new ToplevelComponentException {ComponentName = childItem.itemInfo.displayName};
 
                 ExtractItemData(childItem, child, false);
                 parentItem.children.Add(childItem);
@@ -198,7 +198,7 @@ namespace Services.Serialization
             /// <summary>
             ///     The name of the component
             /// </summary>
-            public string Component;
+            public string ComponentName;
         }
     }
 }

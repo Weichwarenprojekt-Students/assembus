@@ -164,6 +164,10 @@ namespace Services.Serialization
 
                 return (true, "");
             }
+            catch (ModelManager.ToplevelComponentException e)
+            {
+                return (false, e.ComponentName + " can't be on top level!");
+            }
             catch (Exception)
             {
                 return (false, "The project couldn't \n be saved!");

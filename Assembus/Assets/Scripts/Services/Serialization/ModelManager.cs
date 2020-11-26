@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Dummiesman;
 using Models.Project;
 using Services.Serialization.Models;
@@ -162,7 +163,7 @@ namespace Services.Serialization
             var rootItem = new SerializableItem(rootObject.name);
 
             // Extract the serializable data from the root model
-            ExtractItemData(rootItem, rootObject);
+            ExtractItemData(rootItem, rootObject, true);
 
             // Write ModelComponent-List to XML file
             XMLDeSerializer.SerializeData(filePath, rootItem);
@@ -173,15 +174,31 @@ namespace Services.Serialization
         /// </summary>
         /// <param name="parentItem">The serializable parent item</param>
         /// <param name="parent">The actual parent object</param>
-        private static void ExtractItemData(SerializableItem parentItem, Transform parent)
+        /// <param name="topLevel">True if the method is called for the top level of the model</param>
+        private static void ExtractItemData(SerializableItem parentItem, Transform parent, bool topLevel)
         {
             for (var i = 0; i < parent.childCount; i++)
             {
                 var child = parent.GetChild(i);
                 var childItem = new SerializableItem(child);
+
+                if (topLevel && !childItem.itemInfo.isGroup)
+                    throw new ToplevelComponentException {ComponentName = childItem.itemInfo.displayName};
+
+                ExtractItemData(childItem, child, false);
                 parentItem.children.Add(childItem);
-                ExtractItemData(childItem, child);
             }
+        }
+
+        /// <summary>
+        ///     Exception for when a single, non-group component is on the top level of the model
+        /// </summary>
+        public class ToplevelComponentException : Exception
+        {
+            /// <summary>
+            ///     The name of the component
+            /// </summary>
+            public string ComponentName;
         }
     }
 }

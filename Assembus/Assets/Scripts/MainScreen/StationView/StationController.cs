@@ -21,7 +21,7 @@ namespace MainScreen.StationView
         /// <summary>
         ///     The buttons for hiding/showing previous stations
         /// </summary>
-        //public GameObject showPreviousButton, hidePreviousButton;
+        public GameObject showPreviousButton, hidePreviousButton;
 
         /// <summary>
         ///     The root of the hierarchy view
@@ -32,6 +32,10 @@ namespace MainScreen.StationView
         ///     The toast controller
         /// </summary>
         public ToastController toast;
+
+        /// <summary>
+        /// </summary>
+        public GameObject insertionArea;
 
         /// <summary>
         ///     The sequence controller
@@ -136,8 +140,8 @@ namespace MainScreen.StationView
                 nextStation.ShowItem(visible);
             }
 
-            //hidePreviousButton.SetActive(visible);
-            //showPreviousButton.SetActive(!visible);
+            hidePreviousButton.SetActive(visible);
+            showPreviousButton.SetActive(!visible);
         }
 
         /// <summary>

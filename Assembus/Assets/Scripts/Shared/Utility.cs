@@ -79,7 +79,10 @@ namespace Shared
         public static List<GameObject> GetAllChildren(GameObject inputObject)
         {
             var list = new List<GameObject>();
-            foreach (Transform child in inputObject.transform) GetAllChildren(child.gameObject, list);
+            
+            // Recursively get all children
+            GetAllChildren(inputObject, list);
+            
             return list;
         }
 
@@ -94,7 +97,7 @@ namespace Shared
         {
             var list = new List<GameObject>();
             
-            // Recursive get children/leaves
+            // Recursively get children/leaves
             GetAllComponents(inputObject.gameObject, list);   
             
             return list;

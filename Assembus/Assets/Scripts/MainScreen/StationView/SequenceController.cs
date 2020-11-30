@@ -9,16 +9,6 @@ namespace MainScreen.StationView
     public class SequenceController : MonoBehaviour
     {
         /// <summary>
-        ///     The root of the hierarchy view
-        /// </summary>
-        public Transform stationView;
-
-        /// <summary>
-        ///     The navigation buttons
-        /// </summary>
-        public SwitchableButton previousButton, nextButton, skipToStartButton, skipToEndButton;
-
-        /// <summary>
         ///     Text to show current item and number of items
         /// </summary>
         public TextMeshProUGUI itemIndexText;

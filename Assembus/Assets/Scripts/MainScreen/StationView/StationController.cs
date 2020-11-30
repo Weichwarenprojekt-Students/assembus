@@ -21,7 +21,7 @@ namespace MainScreen.StationView
         /// <summary>
         ///     The buttons for hiding/showing previous stations
         /// </summary>
-        public GameObject showPreviousButton, hidePreviousButton;
+        //public GameObject showPreviousButton, hidePreviousButton;
 
         /// <summary>
         ///     The root of the hierarchy view
@@ -98,8 +98,8 @@ namespace MainScreen.StationView
             sequenceController.OnStationUpdate(_station);
             
             // Update the other toolbar buttons
-            hidePreviousButton.SetActive(false);
-            showPreviousButton.SetActive(true);
+            //hidePreviousButton.SetActive(false);
+            //showPreviousButton.SetActive(true);
         }
 
         /// <summary>
@@ -130,8 +130,8 @@ namespace MainScreen.StationView
                 Utility.ToggleVisibility(nextStation.childrenContainer.transform, visible);
                 nextStation.ShowItem(visible);
             }
-            hidePreviousButton.SetActive(visible);
-            showPreviousButton.SetActive(!visible);
+            //hidePreviousButton.SetActive(visible);
+            //showPreviousButton.SetActive(!visible);
         }
 
         /// <summary>

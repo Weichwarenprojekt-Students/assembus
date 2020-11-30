@@ -135,12 +135,16 @@ namespace MainScreen.StationView
             // Hide dot icon on current item
             SetActiveHierarchyItem(_currentIndex, false);
 
+            // Set all items to visible
+            for (int i = _currentIndex; i < _numberOfItems; i++) 
+                SetItemVisibility(i, true);
+            
             // Set current index to last item
             _currentIndex = _numberOfItems - 1;
 
             // Show dot icon on next item
             SetActiveHierarchyItem(_currentIndex, true);
-
+            
             // Update the shown current item index of the controls
             UpdateItemIndexText();
         }
@@ -153,6 +157,10 @@ namespace MainScreen.StationView
             // Hide dot icon on current item
             SetActiveHierarchyItem(_currentIndex, false);
 
+            // Set all items to not visible
+            for (int i = _currentIndex; i > 0; i--)
+                SetItemVisibility(i, false);
+            
             // Set current index to last item
             _currentIndex = 0;
 

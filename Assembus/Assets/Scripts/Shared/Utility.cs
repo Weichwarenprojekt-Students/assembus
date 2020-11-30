@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using MainScreen.Sidebar.HierarchyView;
+using Models.Project;
 using UnityEngine;
 
 namespace Shared
@@ -81,6 +83,48 @@ namespace Shared
             return list;
         }
 
+        /// <summary>
+        ///     Returns all components of the given hierarchy structure
+        ///
+        ///     Components are all leaves of the tree excluding the children of fused groups as they behave like an leave
+        /// </summary>
+        /// <param name="inputObject"></param>
+        /// <returns></returns>
+        public static List<GameObject> GetAllComponents(GameObject inputObject)
+        {
+            var list = new List<GameObject>();
+            
+            // Recursive get children/leaves
+            GetAllComponents(inputObject.gameObject, list);   
+            
+            return list;
+        }
+        
+        /// <summary>
+        ///     Traverse through the entire GameObject hierarchy recursively and return all component GameObjects
+        /// </summary>
+        /// <param name="inputObject">The input GameObject instance where the components/leaves should be extracted from</param>
+        /// <param name="outputData">Contains all child GameObjects of provided input GameObject</param>
+        private static void GetAllComponents(GameObject inputObject, ICollection<GameObject> outputData)
+        {
+            // Recursively traverse to children
+            foreach (Transform child in inputObject.transform)
+            {
+                // Get item info containing further information of the hierarchy element
+                ItemInfo itemInfo = child.GetComponent<ItemInfoController>().ItemInfo;
+                if (itemInfo.isFused || !itemInfo.isGroup)
+                {
+                    // Add element to return list if is a leaf or fused group
+                    outputData.Add(inputObject);
+                }
+                else
+                {
+                    // Recursive get children/leaves
+                    GetAllComponents(child.gameObject, outputData);   
+                }
+            }
+        }
+        
         /// <summary>
         ///     Get the id of the lower neighbour of a given item
         /// </summary>

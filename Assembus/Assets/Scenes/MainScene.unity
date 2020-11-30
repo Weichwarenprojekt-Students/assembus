@@ -549,30 +549,6 @@ MonoBehaviour:
   redo: {fileID: 377598270}
   settings: {fileID: 1379669017}
   componentHighlighting: {fileID: 963194230}
---- !u!114 &44077922 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3437351685783896570, guid: 3a4f781a0fc3af14fac873fc35054b6c,
-    type: 3}
-  m_PrefabInstance: {fileID: 546561741}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b979723d0c6414b843970955c2358a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &44534023 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3437351685783896570, guid: 3a4f781a0fc3af14fac873fc35054b6c,
-    type: 3}
-  m_PrefabInstance: {fileID: 2114990739}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b979723d0c6414b843970955c2358a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &45048247
 GameObject:
   m_ObjectHideFlags: 0
@@ -4916,18 +4892,6 @@ MonoBehaviour:
   offsetY: 18
   center: 0
   tooltip: {fileID: 666079718}
---- !u!114 &656628678 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3437351685783896570, guid: 3a4f781a0fc3af14fac873fc35054b6c,
-    type: 3}
-  m_PrefabInstance: {fileID: 1005833256}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b979723d0c6414b843970955c2358a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &665188722
 GameObject:
   m_ObjectHideFlags: 0
@@ -5515,18 +5479,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!114 &722749680 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3437351685783896570, guid: 3a4f781a0fc3af14fac873fc35054b6c,
-    type: 3}
-  m_PrefabInstance: {fileID: 1912768878}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b979723d0c6414b843970955c2358a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &749964213
 GameObject:
   m_ObjectHideFlags: 0
@@ -7455,11 +7407,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee68cc9f70964ca3a1975478a3582c91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stationView: {fileID: 541487800}
-  previousButton: {fileID: 44077922}
-  nextButton: {fileID: 44534023}
-  skipToStartButton: {fileID: 656628678}
-  skipToEndButton: {fileID: 722749680}
   itemIndexText: {fileID: 109564379}
 --- !u!1 &947728691
 GameObject:
@@ -9277,8 +9224,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.0000038146973
-  m_Size: 0.9747634
+  m_Value: 0.000003814712
+  m_Size: 0.9747635
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11332,6 +11279,7 @@ MonoBehaviour:
   folder: {fileID: 2800000, guid: 058a3afd608c109459ca0cd86d80c310, type: 3}
   fuse: {fileID: 2800000, guid: db7169f1eedee38439706518f8a6c0af, type: 3}
   defuse: {fileID: 2800000, guid: 1472826fc5ae4384e9b887cc81916712, type: 3}
+  skipTo: {fileID: 2800000, guid: 7bb010b4276ed934ba64570a7c7f5c26, type: 3}
   defaultItem: {fileID: 523837211}
   listView: {fileID: 1699413149}
   mainCanvas: {fileID: 1135199803}

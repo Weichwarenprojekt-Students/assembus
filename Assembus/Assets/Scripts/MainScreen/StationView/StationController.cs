@@ -54,6 +54,11 @@ namespace MainScreen.StationView
         private bool HasNext => _station.hierarchyView.childCount > _station.transform.GetSiblingIndex() + 1;
 
         /// <summary>
+        ///     True if station view is open
+        /// </summary>
+        public bool IsOpen => _station != null;
+        
+        /// <summary>
         ///     Open the station view
         /// </summary>
         /// <param name="shownStation">The station to be shown</param>

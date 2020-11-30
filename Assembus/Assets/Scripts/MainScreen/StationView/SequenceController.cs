@@ -47,7 +47,7 @@ namespace MainScreen.StationView
 
             // Get number of items assigned to current station
             _numberOfItems = _itemList.Count;
-            
+
             _currentIndex = 0;
 
             // Set first element in hierarchy as active
@@ -114,7 +114,7 @@ namespace MainScreen.StationView
 
             // Hide dot icon on current item
             SetActiveHierarchyItem(_currentIndex, false);
-            
+
             _currentIndex++;
 
             // Show dot icon on next item
@@ -136,15 +136,15 @@ namespace MainScreen.StationView
             SetActiveHierarchyItem(_currentIndex, false);
 
             // Set all items to visible
-            for (int i = _currentIndex; i < _numberOfItems; i++) 
+            for (int i = _currentIndex; i < _numberOfItems; i++)
                 SetItemVisibility(i, true);
-            
+
             // Set current index to last item
             _currentIndex = _numberOfItems - 1;
 
             // Show dot icon on next item
             SetActiveHierarchyItem(_currentIndex, true);
-            
+
             // Update the shown current item index of the controls
             UpdateItemIndexText();
         }
@@ -160,7 +160,7 @@ namespace MainScreen.StationView
             // Set all items to not visible
             for (int i = _currentIndex; i > 0; i--)
                 SetItemVisibility(i, false);
-            
+
             // Set current index to last item
             _currentIndex = 0;
 

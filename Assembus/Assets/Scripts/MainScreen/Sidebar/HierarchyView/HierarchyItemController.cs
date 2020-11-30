@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MainScreen.StationView;
 using Models.Project;
@@ -16,6 +17,11 @@ using UnityEngine.UI;
 
 namespace MainScreen.Sidebar.HierarchyView
 {
+    /// <summary>
+    ///     Delegate to notify sequence view about skip to clicked
+    /// </summary>
+    public delegate void Notify();
+    
     /// <summary>
     ///     Manage the behaviour of a hierarchy view item
     /// </summary>
@@ -187,6 +193,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchy;
 
         /// <summary>
+        ///     Event to notify sequence view skip to was clicked
+        /// </summary>
+        public event Notify SkipToClicked; 
+        
+        /// <summary>
         ///     True if the item has children
         /// </summary>
         private bool HasChildren => item.transform.childCount > 0;
@@ -342,7 +353,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Skip if item is a station
             if (IsStation) return;
-            
+
             // Show/hide dot icon
             itemActive.SetActive(isActive);
         }
@@ -468,7 +479,33 @@ namespace MainScreen.Sidebar.HierarchyView
                 );
             }
 
+            if (stationController.IsOpen)
+            {
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
+                        Icon = contextMenu.skipTo,
+                        Name = "Skip To",
+                        Action = SequenceViewSkipToItem
+                    }
+                );
+            }
+
             contextMenu.Show(entries);
+        }
+
+        /// <summary>
+        ///     Skips to the selected item in the sequence view
+        /// </summary>
+        private void SequenceViewSkipToItem()
+        {
+            // Skip if station view not open
+            if (!stationController.IsOpen) return;
+         
+            // Invoke event
+            //SkipToClicked?.Invoke();
+            
+            throw new NotImplementedException();
         }
 
         /// <summary>

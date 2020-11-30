@@ -6,11 +6,6 @@ using UnityEngine;
 
 namespace MainScreen.StationView
 {
-    /// <summary>
-    ///     Delegate station update
-    /// </summary>
-    public delegate void Notify(); 
-    
     public class StationController : MonoBehaviour
     {
         /// <summary>
@@ -39,25 +34,25 @@ namespace MainScreen.StationView
         public ToastController toast;
 
         /// <summary>
+        ///     The sequence controller
+        /// </summary>
+        public SequenceController sequenceController;
+
+        /// <summary>
         ///     The current station
         /// </summary>
-        public HierarchyItemController station;
+        private HierarchyItemController _station;
 
         /// <summary>
         ///     True if there's a previous station
         /// </summary>
-        private bool HasPrevious => station.transform.GetSiblingIndex() > 1;
+        private bool HasPrevious => _station.transform.GetSiblingIndex() > 1;
 
         /// <summary>
         ///     True if there's a next station
         /// </summary>
-        private bool HasNext => station.hierarchyView.childCount > station.transform.GetSiblingIndex() + 1;
+        private bool HasNext => _station.hierarchyView.childCount > _station.transform.GetSiblingIndex() + 1;
 
-        /// <summary>
-        ///     Delegate which gets called on station update
-        /// </summary>
-        public event Notify StationUpdateOccured; 
-        
         /// <summary>
         ///     Open the station view
         /// </summary>
@@ -65,7 +60,7 @@ namespace MainScreen.StationView
         public void ShowStation(HierarchyItemController shownStation)
         {
             // Show the station view
-            station = shownStation;
+            _station = shownStation;
             gameObject.SetActive(true);
 
             // Set the name of the station
@@ -80,13 +75,11 @@ namespace MainScreen.StationView
         /// </summary>
         public void UpdateStation()
         {
-            Debug.Log("update station");
-            
             // Check if the station is null
-            if (station == null) return;
+            if (_station == null) return;
 
             // Check if the station still is a station
-            if (!station.IsStation)
+            if (!_station.IsStation)
             {
                 CloseStation();
                 return;
@@ -94,19 +87,19 @@ namespace MainScreen.StationView
 
             // Only show the items that belong to the station
             Utility.ToggleVisibility(hierarchyView, false);
-            station.ShowItem(true);
-            Utility.ToggleVisibility(station.childrenContainer.transform, true);
+            _station.ShowItem(true);
+            Utility.ToggleVisibility(_station.childrenContainer.transform, true);
 
             // Update the navigation buttons
             previousButton.Enable(HasPrevious);
             nextButton.Enable(HasNext);
+
+            // Update the sequence view controller
+            sequenceController.OnStationUpdate(_station);
             
             // Update the other toolbar buttons
             hidePreviousButton.SetActive(false);
             showPreviousButton.SetActive(true);
-            
-            // Trigger station change event
-            StationUpdateOccured?.Invoke();
         }
 
         /// <summary>
@@ -131,9 +124,9 @@ namespace MainScreen.StationView
         /// <param name="visible">True if the stations shall be visible</param>
         private void ChangePreviousStations(bool visible)
         {
-            for (var i = 0; i < station.transform.GetSiblingIndex(); i++)
+            for (var i = 0; i < _station.transform.GetSiblingIndex(); i++)
             {
-                var nextStation = station.hierarchyView.GetChild(i).GetComponent<HierarchyItemController>();
+                var nextStation = _station.hierarchyView.GetChild(i).GetComponent<HierarchyItemController>();
                 Utility.ToggleVisibility(nextStation.childrenContainer.transform, visible);
                 nextStation.ShowItem(visible);
             }
@@ -165,7 +158,7 @@ namespace MainScreen.StationView
         {
             try
             {
-                var newStation = station.hierarchyView.GetChild(station.transform.GetSiblingIndex() + offset);
+                var newStation = _station.hierarchyView.GetChild(_station.transform.GetSiblingIndex() + offset);
                 ShowStation(newStation.GetComponent<HierarchyItemController>());
             }
             catch
@@ -180,7 +173,7 @@ namespace MainScreen.StationView
         public void CloseStation()
         {
             gameObject.SetActive(false);
-            station = null;
+            _station = null;
             Utility.ToggleVisibility(hierarchyView, true);
         }
     }

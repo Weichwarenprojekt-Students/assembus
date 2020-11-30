@@ -1,4 +1,5 @@
-﻿using MainScreen.Sidebar.HierarchyView;
+﻿using System.Collections.Generic;
+using MainScreen.Sidebar.HierarchyView;
 using Shared;
 using TMPro;
 using UnityEngine;
@@ -28,44 +29,44 @@ namespace MainScreen.StationView
         private int _currentIndex;
 
         /// <summary>
+        ///     Leaves of the component group
+        /// </summary>
+        private List<HierarchyItemController> _itemList;
+
+        /// <summary>
         ///     Amount of items assigned to current station
         /// </summary>
         private int _numberOfItems;
 
         /// <summary>
-        ///     Station controller script handles station view
+        ///     The hierarchy item controller
         /// </summary>
-        private StationController _stationController;
+        private HierarchyItemController _station;
 
-        /// <summary>
-        ///     Override start method to get the station controller on initialization
-        /// </summary>
-        public void Start()
-        {
-            // Get the StationController component assigned to the game object station view
-            _stationController = stationView.GetComponent<StationController>();
-
-            // Register event on station update
-            _stationController.StationUpdateOccured += OnStationUpdate;
-
-            // Trigger station update on open as event not registered before
-            OnStationUpdate();
-        }
 
         /// <summary>
         ///     Method to react on changing stations
         /// </summary>
-        public void OnStationUpdate()
+        public void OnStationUpdate(HierarchyItemController station)
         {
+            // Get the hierarchy item controller reference
+            _station = station;
+
+            // Extract all leaves from the children container
+            _itemList = Utility.GetAllComponents(station.childrenContainer);
+
             // Get number of items assigned to current station
-            _numberOfItems = _stationController.station.childrenContainer.transform.childCount;
+            _numberOfItems = _itemList.Count;
             
-            // Reset current item index to 0
             _currentIndex = 0;
-            
+
             // Set first element in hierarchy as active
-            setActiveHierarchyItem(_currentIndex, true);
-            
+            SetActiveHierarchyItem(_currentIndex, true);
+
+            // Hide all items of the component group
+            for (var i = 1; i < _itemList.Count; i++)
+                SetItemVisibility(i, false);
+
             // Update the shown current item index of the controls
             UpdateItemIndexText();
         }
@@ -73,12 +74,21 @@ namespace MainScreen.StationView
         /// <summary>
         ///     Shows or hides the hierarchy item indicator dot at given index
         /// </summary>
-        /// <param name="idx">Position of the item in the hierarchy</param>
+        /// <param name="index">Position of the item in the hierarchy</param>
         /// <param name="visible">Visibility of the dot icon</param>
-        private void setActiveHierarchyItem(int idx, bool visible)
+        private void SetActiveHierarchyItem(int index, bool visible)
         {
-            _stationController.station.childrenContainer.transform.GetChild(idx).GetComponent<HierarchyItemController>()
-                .SetItemActive(visible);
+            _itemList[index].SetItemActive(visible);
+        }
+
+        /// <summary>
+        ///     Change visibility of a item in the 3D editor
+        /// </summary>
+        /// <param name="index">Index of item</param>
+        /// <param name="visible">Visibility of item</param>
+        private void SetItemVisibility(int index, bool visible)
+        {
+            _itemList[index].ShowItem(visible);
         }
 
         /// <summary>
@@ -90,13 +100,15 @@ namespace MainScreen.StationView
             if (_currentIndex <= 0) return;
 
             // Hide dot icon on current item
-            setActiveHierarchyItem(_currentIndex, false);
-            
-            // Decrement current index
+            SetActiveHierarchyItem(_currentIndex, false);
+
+            // Show the current item in the 3D editor
+            SetItemVisibility(_currentIndex, false);
+
             _currentIndex--;
 
             // Show dot icon on previous item
-            setActiveHierarchyItem(_currentIndex, true);
+            SetActiveHierarchyItem(_currentIndex, true);
 
             // Update the shown current item index of the controls
             UpdateItemIndexText();
@@ -111,14 +123,16 @@ namespace MainScreen.StationView
             if (_currentIndex >= _numberOfItems - 1) return;
 
             // Hide dot icon on current item
-            setActiveHierarchyItem(_currentIndex, false);
-
-            // Increment current index
+            SetActiveHierarchyItem(_currentIndex, false);
+            
             _currentIndex++;
 
             // Show dot icon on next item
-            setActiveHierarchyItem(_currentIndex, true);
-            
+            SetActiveHierarchyItem(_currentIndex, true);
+
+            // Show the current item in the 3D editor
+            SetItemVisibility(_currentIndex, true);
+
             // Update the shown current item index of the controls
             UpdateItemIndexText();
         }
@@ -129,14 +143,14 @@ namespace MainScreen.StationView
         public void SkipToLastItem()
         {
             // Hide dot icon on current item
-            setActiveHierarchyItem(_currentIndex, false);
-            
+            SetActiveHierarchyItem(_currentIndex, false);
+
             // Set current index to last item
             _currentIndex = _numberOfItems - 1;
-            
+
             // Show dot icon on next item
-            setActiveHierarchyItem(_currentIndex, true);
-            
+            SetActiveHierarchyItem(_currentIndex, true);
+
             // Update the shown current item index of the controls
             UpdateItemIndexText();
         }
@@ -147,14 +161,14 @@ namespace MainScreen.StationView
         public void SkipToFirstItem()
         {
             // Hide dot icon on current item
-            setActiveHierarchyItem(_currentIndex, false);
-            
+            SetActiveHierarchyItem(_currentIndex, false);
+
             // Set current index to last item
             _currentIndex = 0;
-            
+
             // Show dot icon on next item
-            setActiveHierarchyItem(_currentIndex, true);
-            
+            SetActiveHierarchyItem(_currentIndex, true);
+
             // Update the shown current item index of the controls
             UpdateItemIndexText();
         }
@@ -162,7 +176,7 @@ namespace MainScreen.StationView
         /// <summary>
         ///     Shows the current item number in the controls
         /// </summary>
-        public void UpdateItemIndexText()
+        private void UpdateItemIndexText()
         {
             itemIndexText.SetText(_currentIndex + 1 + " / " + _numberOfItems);
         }

@@ -94,10 +94,10 @@ namespace Shared
         ///     Components are all leaves of the tree excluding the children of fused groups as they behave like an leave
         /// </summary>
         /// <param name="inputObject"></param>
-        /// <returns></returns>
-        public static List<GameObject> GetAllComponents(GameObject inputObject)
+        /// <returns>Returns components of hierarchy</returns>
+        public static List<HierarchyItemController> GetAllComponents(GameObject inputObject)
         {
-            var list = new List<GameObject>();
+            var list = new List<HierarchyItemController>();
             
             // Recursively get children/leaves
             GetAllComponents(inputObject.gameObject, list);   
@@ -110,22 +110,24 @@ namespace Shared
         /// </summary>
         /// <param name="inputObject">The input GameObject instance where the components/leaves should be extracted from</param>
         /// <param name="outputData">Contains all child GameObjects of provided input GameObject</param>
-        private static void GetAllComponents(GameObject inputObject, ICollection<GameObject> outputData)
+        private static void GetAllComponents(GameObject inputObject, ICollection<HierarchyItemController> outputData)
         {
             // Recursively traverse to children
             foreach (Transform child in inputObject.transform)
             {
+                var itemController = child.GetComponent<HierarchyItemController>();
+                
                 // Get item info containing further information of the hierarchy element
-                ItemInfo itemInfo = child.GetComponent<ItemInfoController>().ItemInfo;
+                var itemInfo = itemController.item.GetComponent<ItemInfoController>().ItemInfo;
                 if (itemInfo.isFused || !itemInfo.isGroup)
                 {
                     // Add element to return list if is a leaf or fused group
-                    outputData.Add(inputObject);
+                    outputData.Add(itemController);
                 }
                 else
                 {
                     // Recursive get children/leaves
-                    GetAllComponents(child.gameObject, outputData);   
+                    GetAllComponents(itemController.childrenContainer, outputData);   
                 }
             }
         }

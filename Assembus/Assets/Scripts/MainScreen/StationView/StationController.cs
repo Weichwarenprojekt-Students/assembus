@@ -24,6 +24,11 @@ namespace MainScreen.StationView
         public SwitchableButton previousButton, nextButton;
 
         /// <summary>
+        ///     The buttons for hiding/showing previous stations
+        /// </summary>
+        public GameObject showPreviousButton, hidePreviousButton;
+
+        /// <summary>
         ///     The root of the hierarchy view
         /// </summary>
         public Transform hierarchyView;
@@ -96,8 +101,44 @@ namespace MainScreen.StationView
             previousButton.Enable(HasPrevious);
             nextButton.Enable(HasNext);
             
+            // Update the other toolbar buttons
+            hidePreviousButton.SetActive(false);
+            showPreviousButton.SetActive(true);
+            
             // Trigger station change event
             StationUpdateOccured?.Invoke();
+        }
+
+        /// <summary>
+        ///     Show the items of the previous stations
+        /// </summary>
+        public void ShowPreviousStations()
+        {
+            ChangePreviousStations(true);
+        }
+
+        /// <summary>
+        ///     Hide the items of the previous stations
+        /// </summary>
+        public void HidePreviousStations()
+        {
+           ChangePreviousStations(false);
+        }
+
+        /// <summary>
+        ///     Change the visibility of the previous stations
+        /// </summary>
+        /// <param name="visible">True if the stations shall be visible</param>
+        private void ChangePreviousStations(bool visible)
+        {
+            for (var i = 0; i < station.transform.GetSiblingIndex(); i++)
+            {
+                var nextStation = station.hierarchyView.GetChild(i).GetComponent<HierarchyItemController>();
+                Utility.ToggleVisibility(nextStation.childrenContainer.transform, visible);
+                nextStation.ShowItem(visible);
+            }
+            hidePreviousButton.SetActive(visible);
+            showPreviousButton.SetActive(!visible);
         }
 
         /// <summary>

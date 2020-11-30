@@ -43,6 +43,8 @@ namespace Shared
 
         /// <summary>
         ///     Toggle the visibility of an object group
+        ///     (The parent should be the item's children container
+        ///     if you call this function)
         /// </summary>
         /// <param name="parent">The parent of the object group</param>
         /// <param name="visible">True if the group should be shown</param>

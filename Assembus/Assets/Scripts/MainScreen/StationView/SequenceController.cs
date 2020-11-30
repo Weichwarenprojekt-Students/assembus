@@ -39,6 +39,9 @@ namespace MainScreen.StationView
         /// </summary>
         public void OnStationUpdate(HierarchyItemController station)
         {
+            // Reset SequenceView
+            OnStationLeave();
+
             // Get the hierarchy item controller reference
             _station = station;
 
@@ -50,7 +53,7 @@ namespace MainScreen.StationView
 
             _currentIndex = 0;
 
-            // Set first element in hierarchy as active
+            // Show the item dot on first element
             SetActiveHierarchyItem(_currentIndex, true);
 
             // Hide all items of the component group
@@ -59,6 +62,16 @@ namespace MainScreen.StationView
 
             // Update the shown current item index of the controls
             UpdateItemIndexText();
+        }
+
+        /// <summary>
+        ///     Method to react to closing the station
+        /// </summary>
+        public void OnStationLeave()
+        {
+            if (_station != null)
+                // Hide the item dot when leaving SequenceView
+                SetActiveHierarchyItem(_currentIndex, false);
         }
 
         /// <summary>
@@ -136,7 +149,7 @@ namespace MainScreen.StationView
             SetActiveHierarchyItem(_currentIndex, false);
 
             // Set all items to visible
-            for (int i = _currentIndex; i < _numberOfItems; i++)
+            for (var i = _currentIndex; i < _numberOfItems; i++)
                 SetItemVisibility(i, true);
 
             // Set current index to last item
@@ -158,7 +171,7 @@ namespace MainScreen.StationView
             SetActiveHierarchyItem(_currentIndex, false);
 
             // Set all items to not visible
-            for (int i = _currentIndex; i > 0; i--)
+            for (var i = _currentIndex; i > 0; i--)
                 SetItemVisibility(i, false);
 
             // Set current index to last item

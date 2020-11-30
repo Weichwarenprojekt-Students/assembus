@@ -57,7 +57,7 @@ namespace MainScreen.StationView
         ///     True if station view is open
         /// </summary>
         public bool IsOpen => _station != null;
-        
+
         /// <summary>
         ///     Open the station view
         /// </summary>
@@ -101,7 +101,7 @@ namespace MainScreen.StationView
 
             // Update the sequence view controller
             sequenceController.OnStationUpdate(_station);
-            
+
             // Update the other toolbar buttons
             //hidePreviousButton.SetActive(false);
             //showPreviousButton.SetActive(true);
@@ -120,7 +120,7 @@ namespace MainScreen.StationView
         /// </summary>
         public void HidePreviousStations()
         {
-           ChangePreviousStations(false);
+            ChangePreviousStations(false);
         }
 
         /// <summary>
@@ -135,6 +135,7 @@ namespace MainScreen.StationView
                 Utility.ToggleVisibility(nextStation.childrenContainer.transform, visible);
                 nextStation.ShowItem(visible);
             }
+
             //hidePreviousButton.SetActive(visible);
             //showPreviousButton.SetActive(!visible);
         }
@@ -180,6 +181,9 @@ namespace MainScreen.StationView
             gameObject.SetActive(false);
             _station = null;
             Utility.ToggleVisibility(hierarchyView, true);
+
+            // Close the SequenceView
+            sequenceController.OnStationLeave();
         }
     }
 }

@@ -82,6 +82,11 @@ namespace MainScreen.Sidebar.HierarchyView
         public GameObject showStation;
 
         /// <summary>
+        ///     Visualizes current item in the sequence view
+        /// </summary>
+        public GameObject itemActive;
+
+        /// <summary>
         ///     The controller of the station view
         /// </summary>
         public StationController stationController;
@@ -328,6 +333,20 @@ namespace MainScreen.Sidebar.HierarchyView
             // Show/Hide the station button
             showStation.SetActive(IsStation);
         }
+
+        /// <summary>
+        ///     Shows/hide the visualisation of an currently active item in the sequence view
+        /// </summary>
+        /// <param name="isActive"></param>
+        public void SetItemActive(bool isActive)
+        {
+            // Skip if item is a station
+            if (IsStation) return;
+            
+            // Show/hide dot icon
+            itemActive.SetActive(isActive);
+        }
+
 
         /// <summary>
         ///     Show a station in the station view

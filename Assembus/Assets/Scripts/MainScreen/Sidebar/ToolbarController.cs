@@ -1,5 +1,4 @@
-﻿using Services;
-using Services.Serialization;
+﻿using Services.Serialization;
 using Services.UndoRedo;
 using Shared;
 using Shared.Toast;
@@ -154,6 +153,12 @@ namespace MainScreen.Sidebar
         /// </summary>
         public void StartCinemaMode()
         {
+            // Deselect all items
+            componentHighlighting.ResetPreviousSelections();
+
+            // Center camera focus
+            mainController.cameraController.ZoomOnObject(ProjectManager.Instance.CurrentProject.ObjectModel);
+
             // Reset camera viewport
             mainController.ResetCamera();
 

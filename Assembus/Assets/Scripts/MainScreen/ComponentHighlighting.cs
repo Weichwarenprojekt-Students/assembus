@@ -25,6 +25,11 @@ namespace MainScreen
         public Color colorHover, colorSelectedGroup, colorSelectedSingle;
 
         /// <summary>
+        ///     Flag if component highlighting is active
+        /// </summary>
+        public bool isActive = true;
+
+        /// <summary>
         ///     List of selected game objects and their initial color value
         /// </summary>
         private readonly Dictionary<GameObject, Color> _selectedGameObjects = new Dictionary<GameObject, Color>();
@@ -71,7 +76,7 @@ namespace MainScreen
         private void LateUpdate()
         {
             // Prevent highlighting updates when mouse is not over the 3d editor
-            if (!MouseOverViewport || _cam is null) return;
+            if (!MouseOverViewport || _cam is null || !isActive) return;
 
             // Create ray from mouse position
             var ray = _cam.ScreenPointToRay(Input.mousePosition);
@@ -217,7 +222,7 @@ namespace MainScreen
         /// <summary>
         ///     Reset state of all selected game objects
         /// </summary>
-        private void ResetPreviousSelections()
+        public void ResetPreviousSelections()
         {
             // Reset hover-highlighting on non-selected objects
             if (!(_hoveredObject is null || _selectedGameObjects.ContainsKey(_hoveredObject)))

@@ -6623,6 +6623,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainScreen: {fileID: 1135199799}
   cinemaScreen: {fileID: 856812546}
+  componentHighlighting: {fileID: 963194230}
 --- !u!224 &885003734 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 717380490150660244, guid: aea309f7b5e3afe4fbba4e3f68cb3bae,
@@ -7361,6 +7362,7 @@ MonoBehaviour:
   colorHover: {r: 0.85490197, g: 0.56078434, b: 0.37254903, a: 1}
   colorSelectedGroup: {r: 0.50980395, g: 0.25490198, b: 0.09019608, a: 1}
   colorSelectedSingle: {r: 0.50980395, g: 0.25490198, b: 0.09019608, a: 1}
+  isActive: 1
 --- !u!114 &963194231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14229,7 +14231,7 @@ PrefabInstance:
     - target: {fileID: 3473847349459424496, guid: 87f58289b86ba5f4c99c4aaf8769c21c,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -31.999878
+      value: -32
       objectReference: {fileID: 0}
     - target: {fileID: 3473847349459424496, guid: 87f58289b86ba5f4c99c4aaf8769c21c,
         type: 3}

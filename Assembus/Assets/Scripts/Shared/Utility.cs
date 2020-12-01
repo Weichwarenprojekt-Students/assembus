@@ -81,10 +81,7 @@ namespace Shared
         public static List<GameObject> GetAllChildren(GameObject inputObject)
         {
             var list = new List<GameObject>();
-
-            // Recursively get all children
-            GetAllChildren(inputObject, list);
-
+            foreach (Transform child in inputObject.transform) GetAllChildren(child.gameObject, list);
             return list;
         }
 

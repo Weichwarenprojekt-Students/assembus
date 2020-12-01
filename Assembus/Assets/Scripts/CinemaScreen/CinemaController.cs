@@ -69,6 +69,10 @@ namespace CinemaScreen
             FillList(currentProjectObjectModel);
         }
 
+        /// <summary>
+        ///  Fill list with components and fused groups
+        /// </summary>
+        /// <param name="parent">GameObject parent</param>
         private void FillList(GameObject parent)
         {
             for (var i = 0; i < parent.transform.childCount; i++)
@@ -84,16 +88,25 @@ namespace CinemaScreen
             }
         }
 
+        /// <summary>
+        ///     Action for the next button
+        /// </summary>
         public void NextButton()
         {
-            if (!_animationRunning) StartCoroutine(DisplayNextComponent(true));
+            if (!_animationRunning) StartCoroutine(FadeInComponent(true));
         }
 
+        /// <summary>
+        ///     Action for the previous button
+        /// </summary>
         public void PreviousButton()
         {
             if (!_animationRunning) StartCoroutine(PreviousComponent(true));
         }
 
+        /// <summary>
+        ///     Action for the play button
+        /// </summary>
         public void PlayButton()
         {
             _animationRunning = true;
@@ -101,10 +114,13 @@ namespace CinemaScreen
             playButton.SetActive(false);
             pauseButton.SetActive(true);
 
-            if (speedSlider.value >= 0) StartCoroutine(DisplayNextComponent(false));
+            if (speedSlider.value >= 0) StartCoroutine(FadeInComponent(false));
             else StartCoroutine(PreviousComponent(false));
         }
 
+        /// <summary>
+        ///     Action for the pause button
+        /// </summary>
         public void PauseButton()
         {
             pauseButton.SetActive(false);
@@ -113,6 +129,9 @@ namespace CinemaScreen
             _animationRunning = false;
         }
 
+        /// <summary>
+        ///     Action for the skip to front button
+        /// </summary>
         public void SkipToStart()
         {
             if (_animationRunning) return;
@@ -126,6 +145,9 @@ namespace CinemaScreen
             );
         }
 
+        /// <summary>
+        ///     Action for the skip to end button
+        /// </summary>
         public void SkipToEnd()
         {
             if (_animationRunning) return;
@@ -139,7 +161,12 @@ namespace CinemaScreen
             );
         }
 
-        private IEnumerator DisplayNextComponent(bool skip)
+        /// <summary>
+        ///     Play animation to fade in the next component
+        /// </summary>
+        /// <param name="skip">True if the coroutine is started from the skip button</param>
+        /// <returns>IEnumerator for the coroutine</returns>
+        private IEnumerator FadeInComponent(bool skip)
         {
             if (_index >= _playbackList.Count - 1)
             {
@@ -177,11 +204,16 @@ namespace CinemaScreen
             }
             else if (_animationRunning)
             {
-                if (speedSlider.value >= 0) StartCoroutine(DisplayNextComponent(false));
+                if (speedSlider.value >= 0) StartCoroutine(FadeInComponent(false));
                 else StartCoroutine(PreviousComponent(false));
             }
         }
 
+        /// <summary>
+        ///     Fade out current component
+        /// </summary>
+        /// <param name="skip">True if the coroutine is started from the skip button</param>
+        /// <returns>IEnumerator for the coroutine</returns>
         private IEnumerator PreviousComponent(bool skip)
         {
             if (_index < 0)
@@ -219,15 +251,20 @@ namespace CinemaScreen
             }
             else if (_animationRunning)
             {
-                if (speedSlider.value >= 0) StartCoroutine(DisplayNextComponent(false));
+                if (speedSlider.value >= 0) StartCoroutine(FadeInComponent(false));
                 else StartCoroutine(PreviousComponent(false));
             }
         }
 
-        private static void SetOpacity(GameObject go, float opacity)
+        /// <summary>
+        ///     Set opacity recursively for component and its children
+        /// </summary>
+        /// <param name="parent">The parent game object</param>
+        /// <param name="opacity">The opacity</param>
+        private static void SetOpacity(GameObject parent, float opacity)
         {
             Utility.ApplyRecursively(
-                go,
+                parent,
                 obj =>
                 {
                     var objRenderer = obj.GetComponent<Renderer>();
@@ -239,6 +276,10 @@ namespace CinemaScreen
             );
         }
 
+        /// <summary>
+        ///     Set rendering mode to "Fade" for animation
+        /// </summary>
+        /// <param name="go"></param>
         private static void SetFade(GameObject go)
         {
             var renderer = go.GetComponent<Renderer>();
@@ -255,6 +296,10 @@ namespace CinemaScreen
             renderer.material = m;
         }
 
+        /// <summary>
+        ///     Set rendering mode to "Opaque" after animation
+        /// </summary>
+        /// <param name="go"></param>
         private static void SetOpaque(GameObject go)
         {
             var renderer = go.GetComponent<Renderer>();

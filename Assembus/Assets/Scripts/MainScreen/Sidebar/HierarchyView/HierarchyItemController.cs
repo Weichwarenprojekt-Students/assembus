@@ -8,6 +8,7 @@ using Services.UndoRedo;
 using Services.UndoRedo.Commands;
 using Services.UndoRedo.Models;
 using Shared;
+using Shared.Exceptions;
 using Shared.Toast;
 using TMPro;
 using UnityEngine;
@@ -16,11 +17,6 @@ using UnityEngine.UI;
 
 namespace MainScreen.Sidebar.HierarchyView
 {
-    /// <summary>
-    ///     Delegate to notify sequence view about skip to clicked
-    /// </summary>
-    public delegate void Notify();
-
     /// <summary>
     ///     Manage the behaviour of a hierarchy view item
     /// </summary>
@@ -492,17 +488,25 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Skips to the selected item in the sequence view
+        ///     Skips to the selected item in the sequence view.
+        ///     Only skip inside the same assembly station.
         /// </summary>
         private void SequenceViewSkipToItem()
         {
             // Skip if station view not open
             if (!stationController.IsOpen) return;
 
-            // Invoke event
-            //SkipToClicked?.Invoke();
-
-            throw new NotImplementedException();
+            try
+            {
+                // Get station index of the currently (this) selected GameObject component
+                var index = Utility.GetIndexForStation(stationController.station, item);
+               
+                stationController.sequenceController.SkipToItem(index);
+            }
+            catch (ComponentNotFoundException e)
+            {
+                toast.Error(Toast.Short, "Could not skip to component");
+            }
         }
 
         /// <summary>

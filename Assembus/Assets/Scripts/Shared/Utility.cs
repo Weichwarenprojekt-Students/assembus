@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
+using Shared.Exceptions;
 using UnityEngine;
 
 namespace Shared
@@ -81,16 +81,15 @@ namespace Shared
         public static List<GameObject> GetAllChildren(GameObject inputObject)
         {
             var list = new List<GameObject>();
-            
+
             // Recursively get all children
             GetAllChildren(inputObject, list);
-            
+
             return list;
         }
 
         /// <summary>
         ///     Returns all components of the given hierarchy structure
-        ///
         ///     Components are all leaves of the tree excluding the children of fused groups as they behave like an leave
         /// </summary>
         /// <param name="inputObject"></param>
@@ -98,13 +97,13 @@ namespace Shared
         public static List<HierarchyItemController> GetAllComponents(GameObject inputObject)
         {
             var list = new List<HierarchyItemController>();
-            
+
             // Recursively get children/leaves
-            GetAllComponents(inputObject.gameObject, list);   
-            
+            GetAllComponents(inputObject.gameObject, list);
+
             return list;
         }
-        
+
         /// <summary>
         ///     Traverse through the entire GameObject hierarchy recursively and return all component GameObjects
         /// </summary>
@@ -116,22 +115,38 @@ namespace Shared
             foreach (Transform child in inputObject.transform)
             {
                 var itemController = child.GetComponent<HierarchyItemController>();
-                
+
                 // Get item info containing further information of the hierarchy element
                 var itemInfo = itemController.item.GetComponent<ItemInfoController>().ItemInfo;
                 if (itemInfo.isFused || !itemInfo.isGroup)
-                {
                     // Add element to return list if is a leaf or fused group
                     outputData.Add(itemController);
-                }
                 else
-                {
                     // Recursive get children/leaves
-                    GetAllComponents(itemController.childrenContainer, outputData);   
-                }
+                    GetAllComponents(itemController.childrenContainer, outputData);
             }
         }
-        
+
+        /// <summary>
+        ///     Returns index of passed component inside the specified station
+        /// </summary>
+        /// <param name="station">Input station</param>
+        /// <param name="indexedObject">Component which should be searched in passed station</param>
+        /// <returns>Returns index of passed component in station</returns>
+        /// <exception cref="ComponentNotFoundException">Throws exception when component not existent</exception>
+        public static int GetIndexForStation(HierarchyItemController station, GameObject indexedObject)
+        {
+            // Get all components of the current station
+            var itemList = GetAllComponents(station.childrenContainer);
+
+            // Search for the indexed object in the station
+            for (var i = 0; i < itemList.Count; i++)
+                if (itemList[i].item.name == indexedObject.name)
+                    return i;
+
+            throw new ComponentNotFoundException();
+        }
+
         /// <summary>
         ///     Get the id of the lower neighbour of a given item
         /// </summary>

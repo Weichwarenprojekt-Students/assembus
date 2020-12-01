@@ -9,6 +9,11 @@ namespace MainScreen.StationView
     public class SequenceController : MonoBehaviour
     {
         /// <summary>
+        ///     The navigation buttons
+        /// </summary>
+        public SwitchableButton previousButton, nextButton, skipFirstButton, skipLastButton;
+
+        /// <summary>
         ///     Text to show current item and number of items
         /// </summary>
         public TextMeshProUGUI itemIndexText;
@@ -39,7 +44,7 @@ namespace MainScreen.StationView
         /// </summary>
         public void OnStationUpdate(HierarchyItemController station)
         {
-            // Reset SequenceView
+            // Reset item dot indicator
             OnStationLeave();
 
             // Get the hierarchy item controller reference
@@ -47,21 +52,16 @@ namespace MainScreen.StationView
 
             // Extract all leaves from the children container
             _itemList = Utility.GetAllComponents(station.childrenContainer);
-
-            // Get number of items assigned to current station
+            
             _numberOfItems = _itemList.Count;
-
-            _currentIndex = 0;
-
-            // Show the item dot on first element
-            SetActiveHierarchyItem(_currentIndex, true);
-
+            
             // Hide all items of the component group
             for (var i = 1; i < _itemList.Count; i++)
                 SetItemVisibility(i, false);
-
-            // Update the shown current item index of the controls
-            UpdateItemIndexText();
+            
+            _currentIndex = 0;
+            
+            SkipToItem(0);
         }
 
         /// <summary>
@@ -94,23 +94,49 @@ namespace MainScreen.StationView
             _itemList[index].ShowItem(visible);
         }
 
-        /// <summary>
-        ///     Show previous item
-        /// </summary>
-        public void PreviousItem()
+        public void SkipToItem(int index)
         {
-            // Skip if no previous item available
-            if (_currentIndex <= 0) return;
+            // Update the control visibility
+            if (index == 0) // Start of list
+            {
+                previousButton.Enable(false);
+                skipFirstButton.Enable(false);
+                
+                nextButton.Enable(true);
+                skipLastButton.Enable(true);
+            }
+            else if (index == _numberOfItems - 1) // End of list
+            {
+                nextButton.Enable(false);
+                skipLastButton.Enable(false);
+                
+                previousButton.Enable(true);
+                skipFirstButton.Enable(true);
+            }
+            else // In-between start and end
+            {
+                previousButton.Enable(true);
+                nextButton.Enable(true);
+                skipFirstButton.Enable(true);
+                skipLastButton.Enable(true);
+            }
+
+            if (index < 0 || index >= _numberOfItems) return;
 
             // Hide dot icon on current item
             SetActiveHierarchyItem(_currentIndex, false);
 
-            // Show the current item in the 3D editor
-            SetItemVisibility(_currentIndex, false);
+            // Set items from current index to new index to invisible
+            for (var i = _currentIndex; i > index; i--)
+                SetItemVisibility(i, false);
 
-            _currentIndex--;
+            // Set items visible from current index to index
+            for (var i = _currentIndex; i <= index; i++)
+                SetItemVisibility(i, true);
+            
+            _currentIndex = index;
 
-            // Show dot icon on previous item
+            // Show dot icon on current index
             SetActiveHierarchyItem(_currentIndex, true);
 
             // Update the shown current item index of the controls
@@ -122,22 +148,15 @@ namespace MainScreen.StationView
         /// </summary>
         public void NextItem()
         {
-            // Skip if no further item available
-            if (_currentIndex >= _numberOfItems - 1) return;
+            SkipToItem(_currentIndex + 1);
+        }
 
-            // Hide dot icon on current item
-            SetActiveHierarchyItem(_currentIndex, false);
-
-            _currentIndex++;
-
-            // Show dot icon on next item
-            SetActiveHierarchyItem(_currentIndex, true);
-
-            // Show the current item in the 3D editor
-            SetItemVisibility(_currentIndex, true);
-
-            // Update the shown current item index of the controls
-            UpdateItemIndexText();
+        /// <summary>
+        ///     Show previous item
+        /// </summary>
+        public void PreviousItem()
+        {
+            SkipToItem(_currentIndex - 1);
         }
 
         /// <summary>
@@ -145,21 +164,7 @@ namespace MainScreen.StationView
         /// </summary>
         public void SkipToLastItem()
         {
-            // Hide dot icon on current item
-            SetActiveHierarchyItem(_currentIndex, false);
-
-            // Set all items to visible
-            for (var i = _currentIndex; i < _numberOfItems; i++)
-                SetItemVisibility(i, true);
-
-            // Set current index to last item
-            _currentIndex = _numberOfItems - 1;
-
-            // Show dot icon on next item
-            SetActiveHierarchyItem(_currentIndex, true);
-
-            // Update the shown current item index of the controls
-            UpdateItemIndexText();
+            SkipToItem(_numberOfItems - 1);
         }
 
         /// <summary>
@@ -167,21 +172,7 @@ namespace MainScreen.StationView
         /// </summary>
         public void SkipToFirstItem()
         {
-            // Hide dot icon on current item
-            SetActiveHierarchyItem(_currentIndex, false);
-
-            // Set all items to not visible
-            for (var i = _currentIndex; i > 0; i--)
-                SetItemVisibility(i, false);
-
-            // Set current index to last item
-            _currentIndex = 0;
-
-            // Show dot icon on next item
-            SetActiveHierarchyItem(_currentIndex, true);
-
-            // Update the shown current item index of the controls
-            UpdateItemIndexText();
+            SkipToItem(0);
         }
 
         /// <summary>

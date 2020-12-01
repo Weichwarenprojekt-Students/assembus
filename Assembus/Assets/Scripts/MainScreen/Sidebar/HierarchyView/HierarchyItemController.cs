@@ -30,7 +30,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     True if the user is currently dragging an item
         /// </summary>
-        private static bool _dragging;
+        public static bool Dragging;
 
         /// <summary>
         ///     True if the user wants to insert an item (otherwise it will be put above)
@@ -639,7 +639,7 @@ namespace MainScreen.Sidebar.HierarchyView
             dragPreviewText.text = _selectedItems.Count > 1 ? "Multiple Items" : firstName;
             dragPreview.transform.position = ((PointerEventData) data).position;
             dragPreview.SetActive(true);
-            _dragging = true;
+            Dragging = true;
         }
 
         /// <summary>
@@ -661,7 +661,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Reset the drag event
             dragPreview.SetActive(false);
-            _dragging = false;
+            Dragging = false;
 
             // Insert the items (Only if the dragged item was selected)
             if (_selectedItems.Count != 0 && hierarchyViewController.IsSelected(this)) InsertItems();
@@ -707,11 +707,11 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Change the color
             var selected = hierarchyViewController.IsSelected(this);
-            background.color = _dragging && !selected ? normalColor : highlightedColor;
+            background.color = Dragging && !selected ? normalColor : highlightedColor;
 
 
             // Show the moving indicator
-            movingIndicator.SetActive(_dragging && !selected);
+            movingIndicator.SetActive(Dragging && !selected);
 
             // Save the item and the action
             _insertion = false;
@@ -739,7 +739,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Change the color
             var isGroup = itemInfo.ItemInfo.isGroup;
             var selected = hierarchyViewController.IsSelected(this);
-            background.color = _dragging && !isGroup && !selected ? normalColor : highlightedColor;
+            background.color = Dragging && !isGroup && !selected ? normalColor : highlightedColor;
 
             // Save the item and the action if item is compatible
             _insertion = true;

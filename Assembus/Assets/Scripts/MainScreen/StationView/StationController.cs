@@ -3,10 +3,11 @@ using Shared;
 using Shared.Toast;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace MainScreen.StationView
 {
-    public class StationController : MonoBehaviour
+    public class StationController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary>
         ///     The title of the station
@@ -109,6 +110,25 @@ namespace MainScreen.StationView
             // Update the other toolbar buttons
             //hidePreviousButton.SetActive(false);
             //showPreviousButton.SetActive(true);
+        }
+
+        /// <summary>
+        ///     Add selected items to this station
+        /// </summary>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (!HierarchyItemController.Dragging) return;
+            insertionArea.SetActive(true);
+            _station.InsertItem(null);
+        }
+
+        /// <summary>
+        ///     Stop adding selected items to this station
+        /// </summary>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            insertionArea.SetActive(false);
+            _station.StopInsertingItem(null);
         }
 
         /// <summary>

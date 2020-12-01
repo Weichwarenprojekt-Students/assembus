@@ -170,7 +170,6 @@ namespace Shared
         {
             while (model != null)
             {
-                Debug.Log(model.name + " " + name);
                 if (model.name == name) return true;
                 model = model.parent;
             }

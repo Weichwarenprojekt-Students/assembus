@@ -52,15 +52,14 @@ namespace MainScreen.StationView
 
             // Extract all leaves from the children container
             _itemList = Utility.GetAllComponents(station.childrenContainer);
-            
+
             _numberOfItems = _itemList.Count;
-            
+
             // Hide all items of the component group
-            for (var i = 1; i < _itemList.Count; i++)
-                SetItemVisibility(i, false);
-            
+            for (var i = 1; i < _itemList.Count; i++) SetItemVisibility(i, false);
+
             _currentIndex = 0;
-            
+
             SkipToItem(0);
         }
 
@@ -94,6 +93,10 @@ namespace MainScreen.StationView
             _itemList[index].ShowItem(visible);
         }
 
+        /// <summary>
+        ///     Jump to an item of the station
+        /// </summary>
+        /// <param name="index">The index of the item</param>
         public void SkipToItem(int index)
         {
             // Update the control visibility
@@ -101,7 +104,7 @@ namespace MainScreen.StationView
             {
                 previousButton.Enable(false);
                 skipFirstButton.Enable(false);
-                
+
                 nextButton.Enable(true);
                 skipLastButton.Enable(true);
             }
@@ -109,7 +112,7 @@ namespace MainScreen.StationView
             {
                 nextButton.Enable(false);
                 skipLastButton.Enable(false);
-                
+
                 previousButton.Enable(true);
                 skipFirstButton.Enable(true);
             }
@@ -133,7 +136,7 @@ namespace MainScreen.StationView
             // Set items visible from current index to index
             for (var i = _currentIndex; i <= index; i++)
                 SetItemVisibility(i, true);
-            
+
             _currentIndex = index;
 
             // Show dot icon on current index

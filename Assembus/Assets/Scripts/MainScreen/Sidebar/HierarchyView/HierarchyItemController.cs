@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MainScreen.StationView;
 using Models.Project;
 using Services;
@@ -210,11 +209,6 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Event to notify sequence view skip to was clicked
-        /// </summary>
-        public event Notify SkipToClicked;
-
-        /// <summary>
         ///     Initialize the hierarchy item
         /// </summary>
         /// <param name="modelItem">The item of the actual model</param>
@@ -257,7 +251,9 @@ namespace MainScreen.Sidebar.HierarchyView
         public void ShowItem(bool show)
         {
             nameText.color = show ? visibleColor : invisibleColor;
-            if (item != null) item.SetActive(show);
+            if (item == null) return;
+            item.SetActive(show);
+            if (itemInfo.ItemInfo.isFused) Utility.ToggleVisibility(childrenContainer.transform, show);
         }
 
         /// <summary>
@@ -331,13 +327,17 @@ namespace MainScreen.Sidebar.HierarchyView
             // Enable/Disable the button
             expandButton.SetActive(HasChildren || fused);
 
-            // Update the logos if necessary
+            // Update the logos if necessary (hide fusion if group is station)
+            fused = !IsStation;
             expandDown.SetActive(_isExpanded && !fused);
             expandRight.SetActive(!_isExpanded && !fused);
             fusion.SetActive(fused);
 
             // Show/Hide the station button
             showStation.SetActive(IsStation);
+
+            // Hide dot icon
+            itemActive.SetActive(false);
         }
 
         /// <summary>
@@ -500,12 +500,12 @@ namespace MainScreen.Sidebar.HierarchyView
             {
                 // Get station index of the currently (this) selected GameObject component
                 var index = Utility.GetIndexForStation(stationController.station, item);
-               
+
                 stationController.sequenceController.SkipToItem(index);
             }
-            catch (ComponentNotFoundException e)
+            catch (ComponentNotFoundException)
             {
-                toast.Error(Toast.Short, "Could not skip to component");
+                toast.Error(Toast.Short, "Could not skip to component!");
             }
         }
 
@@ -528,6 +528,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             itemInfo.ItemInfo.isFused = !itemInfo.ItemInfo.isFused;
             UpdateVisuals();
+            stationController.UpdateStation();
         }
 
         /// <summary>
@@ -690,7 +691,6 @@ namespace MainScreen.Sidebar.HierarchyView
                 // Check whether a group is dragged into itself
                 if (Utility.IsParent(_dragItem.item.transform, _selectedItems[i].item.name))
                 {
-                    Debug.Log("Test");
                     toast.Error(Toast.Short, "Cannot make a group a child of its own!");
                     return;
                 }
@@ -707,9 +707,6 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Add the new action to the undo redo service
             _undoService.AddCommand(new MoveCommand(oldStates, newStates));
-
-            // Update the station view
-            stationController.UpdateStation();
         }
 
         /// <summary>

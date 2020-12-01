@@ -548,6 +548,7 @@ MonoBehaviour:
   undo: {fileID: 1011190931}
   redo: {fileID: 377598270}
   settings: {fileID: 1379669017}
+  stationController: {fileID: 541487803}
   componentHighlighting: {fileID: 963194230}
 --- !u!1 &45048247
 GameObject:
@@ -9590,8 +9591,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.0000038146827
-  m_Size: 0.97476333
+  m_Value: -0.0000038146973
+  m_Size: 0.9747634
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

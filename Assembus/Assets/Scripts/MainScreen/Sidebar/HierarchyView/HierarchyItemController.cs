@@ -328,7 +328,7 @@ namespace MainScreen.Sidebar.HierarchyView
             expandButton.SetActive(HasChildren || fused);
 
             // Update the logos if necessary (hide fusion if group is station)
-            fused = !IsStation;
+            fused &= !IsStation;
             expandDown.SetActive(_isExpanded && !fused);
             expandRight.SetActive(!_isExpanded && !fused);
             fusion.SetActive(fused);

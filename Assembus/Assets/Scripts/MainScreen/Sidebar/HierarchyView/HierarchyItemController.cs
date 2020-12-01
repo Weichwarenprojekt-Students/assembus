@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using MainScreen.StationView;
 using Models.Project;
 using Services;
@@ -21,7 +20,7 @@ namespace MainScreen.Sidebar.HierarchyView
     ///     Delegate to notify sequence view about skip to clicked
     /// </summary>
     public delegate void Notify();
-    
+
     /// <summary>
     ///     Manage the behaviour of a hierarchy view item
     /// </summary>
@@ -193,11 +192,6 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchy;
 
         /// <summary>
-        ///     Event to notify sequence view skip to was clicked
-        /// </summary>
-        public event Notify SkipToClicked; 
-        
-        /// <summary>
         ///     True if the item has children
         /// </summary>
         private bool HasChildren => item.transform.childCount > 0;
@@ -218,6 +212,11 @@ namespace MainScreen.Sidebar.HierarchyView
 
             clickDetector.CheckForSecondClick();
         }
+
+        /// <summary>
+        ///     Event to notify sequence view skip to was clicked
+        /// </summary>
+        public event Notify SkipToClicked;
 
         /// <summary>
         ///     Initialize the hierarchy item
@@ -480,7 +479,6 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             if (stationController.IsOpen)
-            {
                 entries.Add(
                     new ContextMenuController.Item
                     {
@@ -489,7 +487,6 @@ namespace MainScreen.Sidebar.HierarchyView
                         Action = SequenceViewSkipToItem
                     }
                 );
-            }
 
             contextMenu.Show(entries);
         }
@@ -501,10 +498,10 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             // Skip if station view not open
             if (!stationController.IsOpen) return;
-         
+
             // Invoke event
             //SkipToClicked?.Invoke();
-            
+
             throw new NotImplementedException();
         }
 
@@ -672,6 +669,9 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void InsertItems()
         {
+            // Hide the insertion area of the station view
+            stationController.HideInsertionArea();
+
             // Check if the drag leads to a change
             if (_dragItem == null) return;
 
@@ -679,13 +679,22 @@ namespace MainScreen.Sidebar.HierarchyView
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
             var neighbourID = _insertion ? ItemState.Last : Utility.GetNeighbourID(_dragItem.transform);
 
-            // Save the old item states
-            var oldStates = _selectedItems.Select(selected => new ItemState(selected)).ToList();
-
-            // Create the new item states
-            var newStates = new List<ItemState>();
+            // Create the item states
+            List<ItemState> oldStates = new List<ItemState>(), newStates = new List<ItemState>();
             for (var i = 0; i < _selectedItems.Count; i++)
             {
+                // Check whether a group is dragged into itself
+                if (Utility.IsParent(_dragItem.item.transform, _selectedItems[i].item.name))
+                {
+                    Debug.Log("Test");
+                    toast.Error(Toast.Short, "Cannot make a group a child of its own!");
+                    return;
+                }
+
+                // Create the old state
+                oldStates.Add(new ItemState(_selectedItems[i]));
+
+                // Create the new state
                 newStates.Add(
                     new ItemState(oldStates[i]) {ParentID = parent, NeighbourID = neighbourID}
                 );
@@ -743,7 +752,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Save the item and the action if item is compatible
             _insertion = true;
-            _dragItem = isGroup && !selected ? this : null;
+            _dragItem = isGroup ? this : null;
         }
 
         /// <summary>

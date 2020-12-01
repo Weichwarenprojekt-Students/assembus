@@ -143,5 +143,24 @@ namespace Shared
             if (item.GetSiblingIndex() - 1 >= 0) neighbourID = item.parent.GetChild(item.GetSiblingIndex() - 1).name;
             return neighbourID;
         }
+
+        /// <summary>
+        ///     Check whether an item is a parent of a given model
+        ///     (The parameter model should be an actual model game object)
+        /// </summary>
+        /// <param name="model">The model that should be checked</param>
+        /// <param name="name">The name of the possible parent</param>
+        /// <returns>True if the item is a parent</returns>
+        public static bool IsParent(Transform model, string name)
+        {
+            while (model != null)
+            {
+                Debug.Log(model.name + " " + name);
+                if (model.name == name) return true;
+                model = model.parent;
+            }
+
+            return false;
+        }
     }
 }

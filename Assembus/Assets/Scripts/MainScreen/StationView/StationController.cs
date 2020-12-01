@@ -113,6 +113,14 @@ namespace MainScreen.StationView
         }
 
         /// <summary>
+        ///     Hide the insertion area
+        /// </summary>
+        public void HideInsertionArea()
+        {
+            insertionArea.SetActive(false);
+        }
+
+        /// <summary>
         ///     Add selected items to this station
         /// </summary>
         public void OnPointerEnter(PointerEventData eventData)

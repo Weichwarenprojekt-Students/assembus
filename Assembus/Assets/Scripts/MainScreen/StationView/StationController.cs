@@ -108,8 +108,8 @@ namespace MainScreen.StationView
             sequenceController.OnStationUpdate(station);
 
             // Update the other toolbar buttons
-            //hidePreviousButton.SetActive(false);
-            //showPreviousButton.SetActive(true);
+            hidePreviousButton.SetActive(false);
+            showPreviousButton.SetActive(true);
         }
 
         /// <summary>

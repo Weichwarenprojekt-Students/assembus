@@ -16,6 +16,11 @@ namespace Services
         private const float TimeBetweenClicks = 0.25f;
 
         /// <summary>
+        ///     Flag if a double click was detected. This should only be used if ClickRelease() is also used.
+        /// </summary>
+        [HideInInspector] public bool doubleClickOccured;
+
+        /// <summary>
         ///     Allow coroutine for double click detection
         /// </summary>
         private bool _coroutineAllowed = true;
@@ -35,13 +40,20 @@ namespace Services
         /// </summary>
         public event Notify DoubleClickOccured;
 
-
         /// <summary>
         ///     Perform a click and increment the click counter by 1
         /// </summary>
         public void Click()
         {
             _leftClickCounter++;
+        }
+
+        /// <summary>
+        ///     Reset the double click flag when the click is released
+        /// </summary>
+        public void ClickRelease()
+        {
+            doubleClickOccured = false;
         }
 
         /// <summary>
@@ -68,6 +80,7 @@ namespace Services
                 {
                     // Call the delegate
                     DoubleClickOccured?.Invoke();
+                    doubleClickOccured = true;
                     break;
                 }
 

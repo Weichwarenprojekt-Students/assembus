@@ -149,7 +149,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     The click detector instance
         /// </summary>
-        public DoubleClickDetector clickDetector;
+        public DoubleClickDetector doubleClickDetector;
 
         /// <summary>
         ///     The text colors for visible and invisible items
@@ -205,7 +205,7 @@ namespace MainScreen.Sidebar.HierarchyView
             if (_updateHierarchy)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView);
 
-            clickDetector.CheckForSecondClick();
+            doubleClickDetector.CheckForSecondClick();
         }
 
         /// <summary>
@@ -229,11 +229,11 @@ namespace MainScreen.Sidebar.HierarchyView
             ShowItem(true);
 
             // Add the double click detector
-            clickDetector.DoubleClickOccured += () =>
+            doubleClickDetector.DoubleClickOccured += () =>
             {
                 // Focus on component group only when there are children in group
                 if (item.transform.childCount > 0)
-                    cameraController.ZoomOnObject(item);
+                    cameraController.ZoomOnObject(item, false);
 
                 // Focus on single component and make sure we have no empty group!
                 else if (itemInfo.ItemInfo.isGroup == false)
@@ -380,7 +380,7 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             // Check what type of click happened
-            if (pointerData.button == PointerEventData.InputButton.Left) clickDetector.Click();
+            if (pointerData.button == PointerEventData.InputButton.Left) doubleClickDetector.Click();
         }
 
         /// <summary>
@@ -393,12 +393,16 @@ namespace MainScreen.Sidebar.HierarchyView
             switch (pointerData.button)
             {
                 case PointerEventData.InputButton.Left when _clicked:
+                    // Only perform selection if no double click occured before
+                    if (doubleClickDetector.doubleClickOccured && hierarchyViewController.IsSelected(this)) break;
                     SelectItem();
                     break;
                 case PointerEventData.InputButton.Right:
                     ShowContextMenu();
                     break;
             }
+
+            doubleClickDetector.ClickRelease();
 
             _clicked = false;
         }

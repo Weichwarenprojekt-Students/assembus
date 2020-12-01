@@ -173,9 +173,8 @@ namespace Services.Serialization
         /// <summary>
         ///     Load all project data into the local ProjectSpace instance
         /// </summary>
-        /// <returns>
-        ///     A success flag and a message in case of an error.
-        /// </returns>
+        /// <param name="projectPath">Path to the project directory</param>
+        /// <returns>A success flag and a message in case of an error.</returns>
         public (bool, string) LoadProject(string projectPath)
         {
             // Check if the directory path is valid

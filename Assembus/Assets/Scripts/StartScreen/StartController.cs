@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using MainScreen;
 using Models.AppConfiguration;
 using Services.Serialization;
 using SFB;
@@ -33,9 +34,9 @@ namespace StartScreen
         public GameObject listView;
 
         /// <summary>
-        ///     The two screens
+        ///     The main controller
         /// </summary>
-        public GameObject startScreen, mainScreen;
+        public MainController mainController;
 
         /// <summary>
         ///     The dialog controller
@@ -145,8 +146,8 @@ namespace StartScreen
                             }
 
                             // Show the new project
-                            startScreen.SetActive(false);
-                            mainScreen.SetActive(true);
+                            gameObject.SetActive(false);
+                            mainController.ShowEditor();
                             SaveWindowConfig();
                         },
                         2000
@@ -194,8 +195,8 @@ namespace StartScreen
                             }
 
                             // Show the main screen
-                            startScreen.SetActive(false);
-                            mainScreen.SetActive(true);
+                            gameObject.SetActive(false);
+                            mainController.ShowEditor();
 
                             // Write window config to XML file before leaving this window
                             SaveWindowConfig();
@@ -294,8 +295,8 @@ namespace StartScreen
                             }
 
                             // Show the new project
-                            startScreen.SetActive(false);
-                            mainScreen.SetActive(true);
+                            gameObject.SetActive(false);
+                            mainController.ShowEditor();
                             SaveWindowConfig();
                         },
                         2000
@@ -380,8 +381,8 @@ namespace StartScreen
             if (!loadSuccess) return;
 
             // Show the main screen
-            startScreen.SetActive(false);
-            mainScreen.SetActive(true);
+            gameObject.SetActive(false);
+            mainController.ShowEditor();
         }
     }
 }

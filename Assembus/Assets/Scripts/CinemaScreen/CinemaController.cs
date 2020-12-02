@@ -13,6 +13,20 @@ namespace CinemaScreen
     public class CinemaController : MonoBehaviour
     {
         /// <summary>
+        ///     The material keywords
+        /// </summary>
+        private const string AlphaTest = "_ALPHATEST_ON",
+            AlphaBlend = "_ALPHABLEND_ON",
+            AlphaPremultiply = "_ALPHAPREMULTIPLY_ON";
+
+        /// <summary>
+        ///     The material properties
+        /// </summary>
+        private static readonly int SrcBlend = Shader.PropertyToID("_SrcBlend"),
+            DstBlend = Shader.PropertyToID("_DstBlend"),
+            ZWrite = Shader.PropertyToID("_ZWrite");
+
+        /// <summary>
         ///     References to main and cinema screen
         /// </summary>
         public GameObject mainScreen, cinemaScreen;
@@ -70,7 +84,7 @@ namespace CinemaScreen
         }
 
         /// <summary>
-        ///  Fill list with components and fused groups
+        ///     Fill list with components and fused groups
         /// </summary>
         /// <param name="parent">GameObject parent</param>
         private void FillList(GameObject parent)
@@ -137,7 +151,7 @@ namespace CinemaScreen
             if (_animationRunning) return;
 
             _index = -1;
-            
+
             Utility.ApplyRecursively(
                 ProjectManager.Instance.CurrentProject.ObjectModel,
                 o => o.SetActive(false),
@@ -153,7 +167,7 @@ namespace CinemaScreen
             if (_animationRunning) return;
 
             _index = _playbackList.Count - 1;
-            
+
             Utility.ApplyRecursively(
                 ProjectManager.Instance.CurrentProject.ObjectModel,
                 o => o.SetActive(true),
@@ -268,9 +282,10 @@ namespace CinemaScreen
                 obj =>
                 {
                     var objRenderer = obj.GetComponent<Renderer>();
-                    var c = objRenderer.material.color;
+                    var material = objRenderer.material;
+                    var c = material.color;
                     c.a = opacity;
-                    objRenderer.material.color = c;
+                    material.color = c;
                 },
                 false
             );
@@ -285,12 +300,12 @@ namespace CinemaScreen
             var renderer = go.GetComponent<Renderer>();
             var m = renderer.material;
 
-            m.SetInt("_SrcBlend", (int) BlendMode.SrcAlpha);
-            m.SetInt("_DstBlend", (int) BlendMode.OneMinusSrcAlpha);
-            m.SetInt("_ZWrite", 0);
-            m.DisableKeyword("_ALPHATEST_ON");
-            m.EnableKeyword("_ALPHABLEND_ON");
-            m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            m.SetInt(SrcBlend, (int) BlendMode.SrcAlpha);
+            m.SetInt(DstBlend, (int) BlendMode.OneMinusSrcAlpha);
+            m.SetInt(ZWrite, 0);
+            m.DisableKeyword(AlphaTest);
+            m.EnableKeyword(AlphaBlend);
+            m.DisableKeyword(AlphaPremultiply);
             m.renderQueue = 3000;
 
             renderer.material = m;
@@ -305,12 +320,12 @@ namespace CinemaScreen
             var renderer = go.GetComponent<Renderer>();
             var m = renderer.material;
 
-            m.SetInt("_SrcBlend", (int) BlendMode.One);
-            m.SetInt("_DstBlend", (int) BlendMode.Zero);
-            m.SetInt("_ZWrite", 1);
-            m.DisableKeyword("_ALPHATEST_ON");
-            m.DisableKeyword("_ALPHABLEND_ON");
-            m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            m.SetInt(SrcBlend, (int) BlendMode.One);
+            m.SetInt(DstBlend, (int) BlendMode.Zero);
+            m.SetInt(ZWrite, 1);
+            m.DisableKeyword(AlphaTest);
+            m.EnableKeyword(AlphaBlend);
+            m.DisableKeyword(AlphaPremultiply);
             m.renderQueue = -1;
         }
 
@@ -325,6 +340,9 @@ namespace CinemaScreen
             // Switch screens
             cinemaScreen.SetActive(false);
             mainScreen.SetActive(true);
+
+            // Show the model
+            foreach (var child in _playbackList) child.SetActive(true);
         }
     }
 }

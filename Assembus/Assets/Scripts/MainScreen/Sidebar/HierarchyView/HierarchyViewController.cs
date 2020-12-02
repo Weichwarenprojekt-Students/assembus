@@ -84,9 +84,9 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Clear the selections
+        ///     Setup the hierarchy view
         /// </summary>
-        private void OnEnable()
+        public void SetupHierarchy()
         {
             SelectedItems.Clear();
 

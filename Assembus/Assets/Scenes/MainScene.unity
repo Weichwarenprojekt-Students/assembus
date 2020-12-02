@@ -10022,6 +10022,7 @@ MonoBehaviour:
   sidebar: {fileID: 431994765}
   mainCanvas: {fileID: 1135199803}
   dialog: {fileID: 1258558055}
+  hierarchyController: {fileID: 2006810628}
 --- !u!114 &1135199801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11323,8 +11324,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.0000038146973
-  m_Size: 0.9747634
+  m_Value: 0.0000019073414
+  m_Size: 0.97476333
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14482,8 +14483,7 @@ MonoBehaviour:
   overwriteToggle: {fileID: 973023895}
   defaultListViewItem: {fileID: 1109152468}
   listView: {fileID: 1282756213}
-  startScreen: {fileID: 1754779550}
-  mainScreen: {fileID: 1135199799}
+  mainController: {fileID: 1135199800}
   dialog: {fileID: 1258558055}
   toast: {fileID: 1305548565}
   loadingScreen: {fileID: 25505039}

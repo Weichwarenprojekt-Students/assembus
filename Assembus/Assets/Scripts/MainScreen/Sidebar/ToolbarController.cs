@@ -1,4 +1,5 @@
 ﻿using Services.Serialization;
+using MainScreen.StationView;
 using Services.UndoRedo;
 using Shared;
 using Shared.Toast;
@@ -43,6 +44,11 @@ namespace MainScreen.Sidebar
         ///     The settings controller
         /// </summary>
         public SettingsController settings;
+
+        /// <summary>
+        ///     The controller of the station view
+        /// </summary>
+        public StationController stationController;
 
         /// <summary>
         ///     The component highlighting script
@@ -110,6 +116,9 @@ namespace MainScreen.Sidebar
             // Enable the buttons
             undo.Enable(_undoService.HasUndo());
             redo.Enable(_undoService.HasRedo());
+
+            // Update the station view
+            stationController.UpdateStation();
         }
 
         /// <summary>

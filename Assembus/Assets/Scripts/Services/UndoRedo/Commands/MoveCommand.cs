@@ -59,8 +59,7 @@ namespace Services.UndoRedo.Commands
             // Move the item
             var oldParent = listItem.parent.parent;
             listItem.SetParent(container);
-            var offset = listParent == null ? 1 : 0;
-            listItem.SetSiblingIndex(siblingIndex + offset);
+            listItem.SetSiblingIndex(siblingIndex);
 
             // Move the item in the actual object
             var modelItem = Utility.FindChild(Model.transform, state.ID);
@@ -80,10 +79,11 @@ namespace Services.UndoRedo.Commands
                 var parentItem = listParent.GetComponent<HierarchyItemController>();
                 indentionDepth = parentItem.GetIndention() + 16f;
                 parentItem.ExpandItem(true);
-                parentItem.childrenContainer.SetActive(true);
             }
-
             IndentItems(listItem, indentionDepth);
+            
+            // Update the button visuals
+            listItem.GetComponent<HierarchyItemController>().UpdateVisuals();
         }
 
         /// <summary>

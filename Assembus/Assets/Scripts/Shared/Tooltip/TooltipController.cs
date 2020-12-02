@@ -26,7 +26,9 @@ namespace Shared.Tooltip
         /// <param name="x">Position of the tooltip</param>
         /// <param name="y">Position of the tooltip</param>
         /// <param name="text">Text of the tooltip</param>
-        public void ShowTooltip(float x, float y, string text)
+        /// <param name="center">True if the tooltip shall be centered</param>
+        /// <param name="scaleX">The scale of the canvas</param>
+        public void ShowTooltip(float x, float y, string text, bool center, float scaleX)
         {
             // Set the text
             textLabel.SetText(text);
@@ -36,7 +38,8 @@ namespace Shared.Tooltip
 
             // Set the bounds of the rect transform
             var rectTransform = gameObject.GetComponent<RectTransform>();
-            rectTransform.position = new Vector2(x, y);
+            var offset = center ? -scaleX * width / 2 : 0;
+            rectTransform.position = new Vector2(x + offset, y);
             rectTransform.sizeDelta = new Vector2(width, rectTransform.sizeDelta.y);
 
             // Show the tooltip

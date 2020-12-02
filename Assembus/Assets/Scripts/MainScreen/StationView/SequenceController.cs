@@ -80,7 +80,8 @@ namespace MainScreen.StationView
         /// <param name="visible">Visibility of the dot icon</param>
         private void SetActiveHierarchyItem(int index, bool visible)
         {
-            _itemList[index].SetItemActive(visible);
+            if (_itemList.Count > 0)
+                _itemList[index].SetItemActive(visible);
         }
 
         /// <summary>
@@ -90,7 +91,8 @@ namespace MainScreen.StationView
         /// <param name="visible">Visibility of item</param>
         private void SetItemVisibility(int index, bool visible)
         {
-            _itemList[index].ShowItem(visible);
+            if (_itemList.Count > 0)
+                _itemList[index].ShowItem(visible);
         }
 
         /// <summary>
@@ -99,51 +101,65 @@ namespace MainScreen.StationView
         /// <param name="index">The index of the item</param>
         public void SkipToItem(int index)
         {
-            // Update the control visibility
-            if (index == 0) // Start of list
+            // Empty station
+            if (_itemList.Count < 1)
             {
                 previousButton.Enable(false);
                 skipFirstButton.Enable(false);
-
-                nextButton.Enable(true);
-                skipLastButton.Enable(true);
-            }
-            else if (index == _numberOfItems - 1) // End of list
-            {
                 nextButton.Enable(false);
                 skipLastButton.Enable(false);
 
-                previousButton.Enable(true);
-                skipFirstButton.Enable(true);
+                // Update the shown current item index of the controls
+                UpdateItemIndexText();
             }
-            else // In-between start and end
+            else
             {
-                previousButton.Enable(true);
-                nextButton.Enable(true);
-                skipFirstButton.Enable(true);
-                skipLastButton.Enable(true);
+                // Update the control visibility
+                if (index == 0) // Start of list
+                {
+                    previousButton.Enable(false);
+                    skipFirstButton.Enable(false);
+
+                    nextButton.Enable(true);
+                    skipLastButton.Enable(true);
+                }
+                else if (index == _numberOfItems - 1) // End of list
+                {
+                    nextButton.Enable(false);
+                    skipLastButton.Enable(false);
+
+                    previousButton.Enable(true);
+                    skipFirstButton.Enable(true);
+                }
+                else // In-between start and end
+                {
+                    previousButton.Enable(true);
+                    nextButton.Enable(true);
+                    skipFirstButton.Enable(true);
+                    skipLastButton.Enable(true);
+                }
+
+                if (index < 0 || index >= _numberOfItems) return;
+
+                // Hide dot icon on current item
+                SetActiveHierarchyItem(_currentIndex, false);
+
+                // Set items from current index to new index to invisible
+                for (var i = _currentIndex; i > index; i--)
+                    SetItemVisibility(i, false);
+
+                // Set items visible from current index to index
+                for (var i = _currentIndex; i <= index; i++)
+                    SetItemVisibility(i, true);
+
+                _currentIndex = index;
+
+                // Show dot icon on current index
+                SetActiveHierarchyItem(_currentIndex, true);
+
+                // Update the shown current item index of the controls
+                UpdateItemIndexText();
             }
-
-            if (index < 0 || index >= _numberOfItems) return;
-
-            // Hide dot icon on current item
-            SetActiveHierarchyItem(_currentIndex, false);
-
-            // Set items from current index to new index to invisible
-            for (var i = _currentIndex; i > index; i--)
-                SetItemVisibility(i, false);
-
-            // Set items visible from current index to index
-            for (var i = _currentIndex; i <= index; i++)
-                SetItemVisibility(i, true);
-
-            _currentIndex = index;
-
-            // Show dot icon on current index
-            SetActiveHierarchyItem(_currentIndex, true);
-
-            // Update the shown current item index of the controls
-            UpdateItemIndexText();
         }
 
         /// <summary>

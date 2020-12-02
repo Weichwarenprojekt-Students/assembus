@@ -35,6 +35,7 @@ namespace MainScreen.StationView
         public ToastController toast;
 
         /// <summary>
+        ///     Field to pull items into stations
         /// </summary>
         public GameObject insertionArea;
 

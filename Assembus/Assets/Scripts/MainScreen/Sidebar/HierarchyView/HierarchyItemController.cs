@@ -42,6 +42,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private static List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
 
         /// <summary>
+        ///     Reference to ComponentHighlighting script
+        /// </summary>
+        public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
         ///     The colors for the item
         /// </summary>
         public Color highlightedColor, normalColor;
@@ -754,6 +759,11 @@ namespace MainScreen.Sidebar.HierarchyView
             var isGroup = itemInfo.ItemInfo.isGroup;
             var selected = hierarchyViewController.IsSelected(this);
             background.color = Dragging && !isGroup && !selected ? normalColor : highlightedColor;
+
+            // Highlight hovered object
+            var parent = _projectManager.CurrentProject.ObjectModel.transform;
+            var hoveredObject = Utility.FindChild(parent, name).gameObject;
+            componentHighlighting.HighlightHoverFromList(hoveredObject);
 
             // Save the item and the action if item is compatible
             _insertion = true;

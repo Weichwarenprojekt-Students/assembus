@@ -224,7 +224,16 @@ namespace MainScreen.Sidebar.HierarchyView
             if (_updateHierarchy)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_hierarchyView);
 
+            // Detect double click on list item
             doubleClickDetector.CheckForSecondClick();
+            
+            // Apply rename of component on press enter key
+            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf)
+                ApplyRenaming();
+
+            // Cancel renaming a component on press escape key
+            if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
+                CancelRenaming();
         }
 
         /// <summary>
@@ -366,7 +375,12 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             var entries = new List<ContextMenuController.Item>
             {
-                new ContextMenuController.Item {Icon = contextMenu.edit, Name = "Rename", Action = RenameItem}
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.edit, 
+                    Name = "Rename", 
+                    Action = RenameItem
+                }
             };
 
             var visible = item.activeSelf;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
-using Models.Project;
 using Shared.Exceptions;
 using UnityEngine;
 
@@ -167,7 +166,7 @@ namespace Shared
         public static void ApplyRecursively(GameObject gameObject, Action<GameObject> action, bool applyToGroups)
         {
             var itemInfoController = gameObject.GetComponent<ItemInfoController>();
-            
+
             if (itemInfoController == null || itemInfoController.ItemInfo.isGroup)
             {
                 for (var i = 0; i < gameObject.transform.childCount; i++)

@@ -72,6 +72,11 @@ namespace Services.Serialization
             {
                 var child = parent.transform.GetChild(i).gameObject;
 
+                // Use custom shader for transparency
+                var renderer = child.GetComponent<Renderer>();
+                var shader = Shader.Find("Transparent/Diffuse ZWrite");
+                renderer.material.shader = shader;
+
                 // Add a mesh collider
                 child.AddComponent<MeshCollider>();
 

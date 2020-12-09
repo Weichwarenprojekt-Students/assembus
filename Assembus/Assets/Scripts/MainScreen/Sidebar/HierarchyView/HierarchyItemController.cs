@@ -42,6 +42,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private static List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
 
         /// <summary>
+        ///     Reference to ComponentHighlighting script
+        /// </summary>
+        public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
         ///     The colors for the item
         /// </summary>
         public Color highlightedColor, normalColor;
@@ -723,10 +728,12 @@ namespace MainScreen.Sidebar.HierarchyView
             var selected = hierarchyViewController.IsSelected(this);
             background.color = Dragging && !selected ? normalColor : highlightedColor;
 
-
             // Show the moving indicator
             movingIndicator.SetActive(Dragging && !selected);
 
+            // Highlight hovered object
+            HighlightHover();
+            
             // Save the item and the action
             _insertion = false;
             _dragItem = selected ? null : this;
@@ -755,6 +762,9 @@ namespace MainScreen.Sidebar.HierarchyView
             var selected = hierarchyViewController.IsSelected(this);
             background.color = Dragging && !isGroup && !selected ? normalColor : highlightedColor;
 
+            // Highlight hovered object
+            HighlightHover();
+
             // Save the item and the action if item is compatible
             _insertion = true;
             _dragItem = isGroup ? this : null;
@@ -768,6 +778,16 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             _dragItem = null;
             if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;
+        }
+
+        /// <summary>
+        ///     Highlights currently hovered items in the editor
+        /// </summary>
+        private void HighlightHover()
+        {
+            var parent = _projectManager.CurrentProject.ObjectModel.transform;
+            var hoveredObject = Utility.FindChild(parent, name).gameObject;
+            componentHighlighting.HighlightHoverFromList(hoveredObject);
         }
 
         /// <summary>

@@ -293,6 +293,27 @@ namespace MainScreen
         }
 
         /// <summary>
+        ///     Highlights a given game object with the hovering color, used
+        ///     to indicate which object is hovered over in the item list-view
+        /// </summary>
+        /// <param name="gO">Game object to be highlighted</param>
+        public void HighlightHoverFromList(GameObject gO)
+        {
+            // Check if component has a Renderer
+            if (gO.GetComponent<Renderer>() != null)
+            {
+                HighlightHover(gO);
+            }
+            else
+            {
+                if (_hoveredObject == null) return;
+
+                _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
+                _hoveredObject = null;
+            }
+        }
+
+        /// <summary>
         ///     Reset highlighting, when application is closed
         /// </summary>
         public void ResetHighlighting()

@@ -234,6 +234,23 @@ namespace MainScreen.Sidebar.HierarchyView
             // Cancel renaming a component on press escape key
             if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
                 CancelRenaming();
+            
+            // Check if the object is active and if the mouse is clicked
+            if (Input.GetMouseButtonDown(0) && nameInputObject.activeSelf)
+            {
+                // rect = width, height, x, y
+                var rectTransform = nameInputObject.GetComponent<RectTransform>().gameObject
+                    .GetComponent<RectTransform>().rect;
+                
+                // Check if the mouse is outside the textinput, if so, apply the renaming
+                if (!(Input.mousePosition.x < (nameInputObject.transform.position.x + rectTransform.width/2) && 
+                    Input.mousePosition.x > (nameInputObject.transform.position.x - rectTransform.width/2) && 
+                    Input.mousePosition.y < (nameInputObject.transform.position.y + rectTransform.height/2) && 
+                    Input.mousePosition.y > (nameInputObject.transform.position.y - rectTransform.height/2)))
+                {
+                    ApplyRenaming();
+                }
+            }
         }
 
         /// <summary>

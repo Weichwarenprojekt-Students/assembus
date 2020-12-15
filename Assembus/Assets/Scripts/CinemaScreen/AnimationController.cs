@@ -378,8 +378,8 @@ namespace CinemaScreen
         /// <returns>IEnumerator for the coroutine</returns>
         private IEnumerator WaitAccordingToSpeedSlider()
         {
-            // Calculate delay until next fading, proportional to the speed slider value
-            var waitTime = 1 / Math.Abs(speedSlider.value);
+            // Calculate delay until next fading, between 2s and 200ms
+            var waitTime = -0.9 * Math.Abs(speedSlider.value) + 2;
 
             var passedTime = 0.0;
             while (passedTime <= waitTime)

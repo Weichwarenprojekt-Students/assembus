@@ -158,7 +158,7 @@ namespace CinemaScreen
                 var itemInfo = go.GetComponent<ItemInfoController>().ItemInfo;
 
                 // Components (leaves in the tree) or fused group get added to the list because fused groups should
-                //     be handled like components by the animation
+                // be handled like components by the animation
                 if (itemInfo.isGroup)
                     if (itemInfo.isFused) _playbackList.Add(go);
                     else FillList(go);

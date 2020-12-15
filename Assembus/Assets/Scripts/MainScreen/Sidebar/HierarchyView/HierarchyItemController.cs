@@ -224,18 +224,18 @@ namespace MainScreen.Sidebar.HierarchyView
         private void ScrollOnDrag()
         {
             // Scroll at bottom 5% of screen
-            if (Input.mousePosition.y < Screen.height / 20.0)
+            if (Input.mousePosition.y < Screen.height * 0.05f)
             {
                 // Stop at top of scroll rect
                 if (scrollRect.normalizedPosition.y > 0.00001)
                     // Scroll down
                     scrollRect.normalizedPosition -= new Vector2(
                         0.0f,
-                        GetScrollSpeedFromPosition(Math.Abs(Screen.height / 20.0f - Input.mousePosition.y))
+                        GetScrollSpeedFromPosition(Math.Abs(Screen.height * 0.05f - Input.mousePosition.y))
                     );
             }
             // Scroll at top 10% of screen
-            else if (Input.mousePosition.y > Screen.height - Screen.height / 10.0f)
+            else if (Input.mousePosition.y > Screen.height * 0.9f)
             {
                 // Stop at bottom of scroll rect
                 if (scrollRect.normalizedPosition.y < 0.99999)
@@ -243,7 +243,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     scrollRect.normalizedPosition += new Vector2(
                         0.0f,
                         GetScrollSpeedFromPosition(
-                            Math.Abs(Screen.height - Screen.height / 10.0f - Input.mousePosition.y)
+                            Math.Abs(Screen.height * 0.9f - Input.mousePosition.y)
                         )
                     );
             }
@@ -258,10 +258,10 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             if (val >= 70)
                 return 0.0005f;
-            
+
             if (val <= 0)
                 return 0.0001f;
-            
+
             return (float) (0.0005 * Math.Pow(Math.E, -0.0008 * Math.Pow(val - 80, 2)));
         }
 

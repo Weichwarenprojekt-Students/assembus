@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
@@ -38,7 +39,7 @@ namespace Shared
         /// <returns>The searched child</returns>
         public static GameObject FindChildLinear(List<GameObject> children, string name)
         {
-            return (from child in children where child.name == name select child).FirstOrDefault();
+            return children.FirstOrDefault(child => child.name == name);
         }
 
         /// <summary>
@@ -154,6 +155,30 @@ namespace Shared
             var neighbourID = "";
             if (item.GetSiblingIndex() - 1 >= 0) neighbourID = item.parent.GetChild(item.GetSiblingIndex() - 1).name;
             return neighbourID;
+        }
+
+        /// <summary>
+        ///     Apply an action recursively to a GameObject and its children
+        /// </summary>
+        /// <param name="gameObject">The GameObject the action is applied to</param>
+        /// <param name="action">The action that gets applied</param>
+        /// <param name="applyToGroups">True if action should also be applied to groups</param>
+        public static void ApplyRecursively(GameObject gameObject, Action<GameObject> action, bool applyToGroups)
+        {
+            var itemInfoController = gameObject.GetComponent<ItemInfoController>();
+
+            if (itemInfoController == null || itemInfoController.ItemInfo.isGroup)
+            {
+                for (var i = 0; i < gameObject.transform.childCount; i++)
+                    ApplyRecursively(gameObject.transform.GetChild(i).gameObject, action, applyToGroups);
+
+                if (itemInfoController != null && applyToGroups) action.Invoke(gameObject);
+            }
+            else
+            {
+                // If game object is no group, apply the action
+                action.Invoke(gameObject);
+            }
         }
 
         /// <summary>

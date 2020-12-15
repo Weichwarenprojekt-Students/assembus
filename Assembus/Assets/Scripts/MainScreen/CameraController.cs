@@ -158,9 +158,7 @@ namespace MainScreen
         /// </summary>
         private void UpdateCameraFocus()
         {
-            if (_cam is null) return;
-
-            if (!MouseOverViewport) return;
+            if (_cam is null || !MouseOverViewport || !componentHighlighting.isActive) return;
 
             var ray = _cam.ScreenPointToRay(Input.mousePosition);
 

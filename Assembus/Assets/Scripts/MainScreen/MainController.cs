@@ -1,4 +1,4 @@
-﻿using Services;
+﻿using MainScreen.Sidebar.HierarchyView;
 using Services.Serialization;
 using Shared;
 using UnityEngine;
@@ -31,6 +31,11 @@ namespace MainScreen
         ///     The dialog controller
         /// </summary>
         public DialogController dialog;
+
+        /// <summary>
+        ///     The hierarchy view controller
+        /// </summary>
+        public HierarchyViewController hierarchyController;
 
         /// <summary>
         ///     The project manager
@@ -66,6 +71,15 @@ namespace MainScreen
                 );
                 return false;
             };
+        }
+
+        /// <summary>
+        ///     Enter the editor view
+        /// </summary>
+        public void ShowEditor()
+        {
+            gameObject.SetActive(true);
+            hierarchyController.SetupHierarchy();
         }
 
         /// <summary>

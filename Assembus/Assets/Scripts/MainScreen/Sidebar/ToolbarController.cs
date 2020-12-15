@@ -1,5 +1,5 @@
-﻿using MainScreen.StationView;
-using Services.Serialization;
+﻿using Services.Serialization;
+using MainScreen.StationView;
 using Services.UndoRedo;
 using Shared;
 using Shared.Toast;
@@ -11,9 +11,9 @@ namespace MainScreen.Sidebar
     public class ToolbarController : MonoBehaviour
     {
         /// <summary>
-        ///     The two screens
+        ///     The three screens
         /// </summary>
-        public GameObject startScreen, mainScreen;
+        public GameObject startScreen, mainScreen, cinemaScreen;
 
         /// <summary>
         ///     The toast controller
@@ -155,6 +155,25 @@ namespace MainScreen.Sidebar
             _projectManager.Saved = true;
             title.text = _projectManager.CurrentProject.Name;
             toast.Success(Toast.Short, "Project was saved successfully!");
+        }
+
+        /// <summary>
+        ///     Enter the cinema mode
+        /// </summary>
+        public void StartCinemaMode()
+        {
+            // Deselect all items
+            componentHighlighting.ResetPreviousSelections();
+
+            // Center camera focus
+            mainController.cameraController.ZoomOnObject(ProjectManager.Instance.CurrentProject.ObjectModel);
+
+            // Reset camera viewport
+            mainController.ResetCamera();
+
+            // Switch screens
+            mainScreen.SetActive(false);
+            cinemaScreen.SetActive(true);
         }
 
         /// <summary>

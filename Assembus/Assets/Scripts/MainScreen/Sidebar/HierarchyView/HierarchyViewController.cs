@@ -50,6 +50,21 @@ namespace MainScreen.Sidebar.HierarchyView
         public ContextMenuController contextMenu;
 
         /// <summary>
+        ///     RectTransform from Content
+        /// </summary>
+        public RectTransform contentPanel;
+
+        /// <summary>
+        ///     RectTransform from Scroll View
+        /// </summary>
+        public RectTransform scrollRect;
+
+        /// <summary>
+        ///     ScrollRect from Scroll View
+        /// </summary>
+        public ScrollRect scroll;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -73,16 +88,6 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     True if hierarchy view needs to be updated
         /// </summary>
         private bool _updateHierarchyView;
-
-        /// <summary>
-        ///     RectTransform from Content
-        /// </summary>
-        public RectTransform contentPanel;
-
-        /// <summary>
-        ///     RectTransform from Scroll View
-        /// </summary>
-        public RectTransform scrollRect;
 
         /// <summary>
         ///     Late update of the UI
@@ -269,7 +274,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 ItemState.Last
             );
             _undoService.AddCommand(new CreateCommand(true, state));
-            
+
             // Scroll to the created station
             var stationItem = hierarchyView.transform.GetChild(hierarchyView.transform.childCount - 1);
             ScrollToItem(stationItem.GetComponent<RectTransform>());
@@ -484,20 +489,22 @@ namespace MainScreen.Sidebar.HierarchyView
             if (SelectedItems.Contains(parent)) DeselectItem(parent);
             else DeselectParent(parent.transform);
         }
-        
+
         /// <summary>
         ///     Scrolls to the targetItem
         /// </summary>
         /// <param name="targetItem"></param>
         public void ScrollToItem(RectTransform targetItem)
         {
-            // 5 Items are above the target item
-            var offset = new Vector2(0, 200);
             Canvas.ForceUpdateCanvases();
+
             contentPanel.anchoredPosition =
-                (Vector2)scrollRect.InverseTransformPoint(contentPanel.position) - 
-                (Vector2)scrollRect.transform.InverseTransformPoint(targetItem.position) - offset;
+                (Vector2) scrollRect.InverseTransformPoint(contentPanel.position) -
+                (Vector2) scrollRect.transform.InverseTransformPoint(targetItem.position) - new Vector2(0, 200);
+
+            Debug.Log(scroll.normalizedPosition.y);
+            if (scroll.normalizedPosition.y < 0) scroll.normalizedPosition = new Vector2(0, 0);
+            else if (scroll.normalizedPosition.y > 1) scroll.normalizedPosition = new Vector2(0, 1);
         }
-        
     }
 }

@@ -455,7 +455,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Start a renaming action
         /// </summary>
-        private void RenameItem()
+        public void RenameItem()
         {
             nameInput.text = nameText.text;
             nameInputObject.SetActive(true);
@@ -499,17 +499,15 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void AddGroup()
         {
-            // Save the item state
             var state = new ItemState(
                 _projectManager.GetNextGroupID(),
                 "Group",
                 item.name,
                 ItemState.Last
             );
-
             // Add the new action to the undo redo service
             _undoService.AddCommand(new CreateCommand(true, state));
-            
+
             // Scroll to the created group in the group
             var groupItem = childrenContainer.transform.GetChild(childrenContainer.transform.childCount - 1);
             hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());

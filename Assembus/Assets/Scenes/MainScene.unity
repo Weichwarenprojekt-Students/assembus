@@ -5402,7 +5402,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1142076522}
   m_HandleRect: {fileID: 1142076521}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7587,8 +7587,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0.0000019073414
-  m_Size: 0.97476333
+  m_Value: 0.0000019073486
+  m_Size: 0.9747634
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10679,6 +10679,7 @@ MonoBehaviour:
   contextMenu: {fileID: 1647295334}
   contentPanel: {fileID: 441038524}
   scrollRect: {fileID: 22417656}
+  scroll: {fileID: 22417657}
 --- !u!224 &2006810629
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11853,7 +11854,7 @@ PrefabInstance:
     - target: {fileID: 3473847349459424496, guid: 87f58289b86ba5f4c99c4aaf8769c21c,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -31.999878
+      value: -32
       objectReference: {fileID: 0}
     - target: {fileID: 3473847349459424496, guid: 87f58289b86ba5f4c99c4aaf8769c21c,
         type: 3}

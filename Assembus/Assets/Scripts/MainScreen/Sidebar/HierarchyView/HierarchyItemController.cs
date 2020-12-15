@@ -256,7 +256,12 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <returns>Scroll speed value</returns>
         private float GetScrollSpeedFromPosition(float val)
         {
-            // Values of [0.0001, 0.0005] for a range of [0, 70]
+            if (val >= 70)
+                return 0.0005f;
+            
+            if (val <= 0)
+                return 0.0001f;
+            
             return (float) (0.0005 * Math.Pow(Math.E, -0.0008 * Math.Pow(val - 80, 2)));
         }
 

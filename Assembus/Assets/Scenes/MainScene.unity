@@ -2424,6 +2424,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4903f57d35ecc45b83f992387e38dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  componentHighlighting: {fileID: 963194230}
   highlightedColor: {r: 0.30588236, g: 0.3882353, b: 0.50980395, a: 1}
   normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
   hierarchyViewController: {fileID: 2006810628}
@@ -11390,8 +11391,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: -0.0000019073486
-  m_Size: 0.9747634
+  m_Value: -0.000011444135
+  m_Size: 0.9747635
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

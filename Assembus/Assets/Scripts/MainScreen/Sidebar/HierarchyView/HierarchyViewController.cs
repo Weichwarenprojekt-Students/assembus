@@ -435,9 +435,9 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Return the selected GameObjects as a list in the right order
+        ///     Return the selected game objects as a list in the right order
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of selected game objects</returns>
         public List<HierarchyItemController> GetSelectedItems()
         {
             return SelectedItems.OrderByDescending(item => item.itemContent.position.y).ToList();

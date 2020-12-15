@@ -75,6 +75,28 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchyView;
 
         /// <summary>
+        ///     RectTransform from Content
+        /// </summary>
+        public RectTransform contentPanel;
+
+        /// <summary>
+        ///     RectTransform from Scroll View
+        /// </summary>
+        public RectTransform scrollRect;
+        
+        /// <summary>
+        ///     Scrolls to the targetItem
+        /// </summary>
+        /// <param name="targetItem"></param>
+        public void ScrollToItem(RectTransform targetItem)
+        {
+            Canvas.ForceUpdateCanvases();
+            contentPanel.anchoredPosition =
+                (Vector2)scrollRect.InverseTransformPoint(contentPanel.position)
+                - (Vector2)scrollRect.transform.InverseTransformPoint(targetItem.position);
+        }
+        
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()

@@ -176,6 +176,32 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool HasChildren => item.transform.childCount > 0;
 
         /// <summary>
+        ///     Late update of the UI
+        /// </summary>
+        private void LateUpdate()
+        {
+            // force update of the hierarchy view if the item expansion changed
+            if (_updateHierarchy)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_hierarchyView);
+
+            // Detect double click on list item
+            doubleClickDetector.CheckForSecondClick();
+
+            // Apply rename of component on press enter key
+            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf)
+                ApplyRenaming();
+
+            // Cancel renaming a component on press escape key
+            if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
+                CancelRenaming();
+
+            // Check if the object is active and if the mouse is clicked
+            if (!Input.GetMouseButtonDown(0) || !nameInputObject.activeSelf) return;
+            if (EventSystem.current.currentSelectedGameObject != nameInputObject)
+                ApplyRenaming();
+        }
+
+        /// <summary>
         ///     Initialize the hierarchy item
         /// </summary>
         /// <param name="modelItem">The item of the actual model</param>
@@ -213,44 +239,6 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Update the button
             UpdateExpandButton();
-        }
-
-        /// <summary>
-        ///     Late update of the UI
-        /// </summary>
-        private void LateUpdate()
-        {
-            // force update of the hierarchy view if the item expansion changed
-            if (_updateHierarchy)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(_hierarchyView);
-
-            // Detect double click on list item
-            doubleClickDetector.CheckForSecondClick();
-            
-            // Apply rename of component on press enter key
-            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf)
-                ApplyRenaming();
-
-            // Cancel renaming a component on press escape key
-            if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
-                CancelRenaming();
-            
-            // Check if the object is active and if the mouse is clicked
-            if (Input.GetMouseButtonDown(0) && nameInputObject.activeSelf)
-            {
-                // rect = width, height, x, y
-                var rectTransform = nameInputObject.GetComponent<RectTransform>().gameObject
-                    .GetComponent<RectTransform>().rect;
-                
-                // Check if the mouse is outside the textinput, if so, apply the renaming
-                if (!(Input.mousePosition.x < (nameInputObject.transform.position.x + rectTransform.width/2) && 
-                    Input.mousePosition.x > (nameInputObject.transform.position.x - rectTransform.width/2) && 
-                    Input.mousePosition.y < (nameInputObject.transform.position.y + rectTransform.height/2) && 
-                    Input.mousePosition.y > (nameInputObject.transform.position.y - rectTransform.height/2)))
-                {
-                    ApplyRenaming();
-                }
-            }
         }
 
         /// <summary>
@@ -394,8 +382,8 @@ namespace MainScreen.Sidebar.HierarchyView
             {
                 new ContextMenuController.Item
                 {
-                    Icon = contextMenu.edit, 
-                    Name = "Rename", 
+                    Icon = contextMenu.edit,
+                    Name = "Rename",
                     Action = RenameItem
                 }
             };

@@ -281,6 +281,11 @@ namespace MainScreen.Sidebar.HierarchyView
                 ItemState.Last
             );
             _undoService.AddCommand(new CreateCommand(true, state));
+            
+            // Scroll to the created station
+            var stationItem = hierarchyView.transform.GetChild(hierarchyView.transform.childCount - 1);
+            ScrollToItem(stationItem.GetComponent<RectTransform>());
+            stationItem.GetComponent<HierarchyItemController>().RenameItem();
         }
 
         /// <summary>

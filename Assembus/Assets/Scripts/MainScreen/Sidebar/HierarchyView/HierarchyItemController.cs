@@ -509,6 +509,11 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Add the new action to the undo redo service
             _undoService.AddCommand(new CreateCommand(true, state));
+            
+            // Scroll to the created group
+            var groupItem = childrenContainer.transform.GetChild(childrenContainer.transform.childCount - 1);
+            hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
+            groupItem.GetComponent<HierarchyItemController>().RenameItem();
         }
 
         /// <summary>

@@ -23,6 +23,11 @@ namespace CinemaScreen
         private CinemaStateMachine _cinemaStateMachine;
 
         /// <summary>
+        ///     Currently running animation coroutine
+        /// </summary>
+        private Coroutine _currentCoroutine;
+
+        /// <summary>
         ///     Current index in the playback list (-1 is the beginning _playbackList.Count - 1 is the end)
         /// </summary>
         private int _index;
@@ -31,6 +36,11 @@ namespace CinemaScreen
         ///     List that contains all animation items
         /// </summary>
         private List<GameObject> _playbackList;
+
+        /// <summary>
+        ///     True if the current playback animation should be skipped
+        /// </summary>
+        private bool _shouldSkipFw, _shouldSkipBw;
 
         /// <summary>
         ///     The state machine which controls the cinema states
@@ -92,13 +102,43 @@ namespace CinemaScreen
         /// </summary>
         private void SubscribeToStateMachine()
         {
-            CinemaStateMachine.PlayingFw.Entry += () => { StartCoroutine(PlayAnimationForward()); };
+            // Subscribe to Playing Entry events
+            CinemaStateMachine.PlayingFw.Entry += () => { _currentCoroutine = StartCoroutine(PlayAnimationForward()); };
+            CinemaStateMachine.PlayingBw.Entry += () =>
+            {
+                _currentCoroutine = StartCoroutine(PlayAnimationBackward());
+            };
 
-            CinemaStateMachine.PlayingBw.Entry += () => { StartCoroutine(PlayAnimationBackward()); };
+            // Subscribe to Skipping Entry events
+            CinemaStateMachine.SkippingFw.Entry += () =>
+            {
+                _currentCoroutine = StartCoroutine(PlayAnimationForward());
+            };
+            CinemaStateMachine.SkippingBw.Entry += () =>
+            {
+                _currentCoroutine = StartCoroutine(PlayAnimationBackward());
+            };
 
-            CinemaStateMachine.SkippingFw.Entry += () => { StartCoroutine(PlayAnimationForward()); };
+            // Reset the current coroutine
+            CinemaStateMachine.Paused.Entry += () => { _currentCoroutine = null; };
+            CinemaStateMachine.StoppedEnd.Entry += () => { _currentCoroutine = null; };
+            CinemaStateMachine.StoppedStart.Entry += () => { _currentCoroutine = null; };
 
-            CinemaStateMachine.SkippingBw.Entry += () => { StartCoroutine(PlayAnimationBackward()); };
+            // Enable skipping while playing
+            CinemaStateMachine.SkippedFwWhilePlaying += () => { _shouldSkipFw = true; };
+            CinemaStateMachine.SkippedBwWhilePlaying += () => { _shouldSkipBw = true; };
+
+            // Enable skipping to start/end while playing
+            CinemaStateMachine.SkippedToEndWhilePlaying += () =>
+            {
+                StopCoroutine(_currentCoroutine);
+                SkipToEnd();
+            };
+            CinemaStateMachine.SkippedToStartWhilePlaying += () =>
+            {
+                StopCoroutine(_currentCoroutine);
+                SkipToStart();
+            };
 
             CinemaStateMachine.SkippedToEnd += SkipToEnd;
             CinemaStateMachine.SkippedToStart += SkipToStart;
@@ -197,7 +237,7 @@ namespace CinemaScreen
             // Fade in the current item
             yield return PlayFadeAnimation(true);
 
-            if (_index == _playbackList.Count - 1)
+            if (_index >= _playbackList.Count - 1)
             {
                 // The animation reached the end
                 CinemaStateMachine.ReachEnd();
@@ -212,6 +252,12 @@ namespace CinemaScreen
                 // Wait for delay after fading
                 yield return WaitAccordingToSpeedSlider();
 
+                // Skip in the opposite direction
+                if (_shouldSkipBw) SkipWhilePlaying();
+
+                // Reset skip flag
+                _shouldSkipFw = false;
+
                 if (ShouldPause)
                 {
                     ShouldPause = false;
@@ -222,7 +268,7 @@ namespace CinemaScreen
                 else if (speedSlider.value >= 0)
                 {
                     // Keep playing forward
-                    StartCoroutine(PlayAnimationForward());
+                    _currentCoroutine = StartCoroutine(PlayAnimationForward());
                 }
                 else
                 {
@@ -244,7 +290,7 @@ namespace CinemaScreen
             // Decrease the index to be on the previous item
             _index--;
 
-            if (_index == -1)
+            if (_index <= -1)
             {
                 // The animation reached the start
                 CinemaStateMachine.ReachStart();
@@ -258,6 +304,12 @@ namespace CinemaScreen
             {
                 // Wait for delay after fading
                 yield return WaitAccordingToSpeedSlider();
+
+                // Skip in the opposite direction
+                if (_shouldSkipFw) SkipWhilePlaying();
+
+                // Reset skip flag
+                _shouldSkipBw = false;
 
                 if (ShouldPause)
                 {
@@ -274,9 +326,50 @@ namespace CinemaScreen
                 else
                 {
                     // Keep playing backward
-                    StartCoroutine(PlayAnimationBackward());
+                    _currentCoroutine = StartCoroutine(PlayAnimationBackward());
                 }
             }
+        }
+
+        /// <summary>
+        ///     Skip in the opposite direction of playback
+        /// </summary>
+        private void SkipWhilePlaying()
+        {
+            if (_shouldSkipFw)
+                // repeat twice
+                for (var i = 0; i < 2; i++)
+                {
+                    // select next item
+                    _index++;
+                    var currentObject = _playbackList[_index];
+
+                    // Show item
+                    SetOpacity(currentObject, 1);
+                    Utility.ApplyRecursively(currentObject, obj => obj.SetActive(true), false);
+
+                    // Don't go over the edge of the list
+                    if (_index >= _playbackList.Count - 1) break;
+                }
+            else if (_shouldSkipBw)
+                // repeat twice
+                for (var i = 0; i < 2; i++)
+                {
+                    // Get previous item
+                    var currentObject = _playbackList[_index];
+                    _index--;
+
+                    // Hide item
+                    SetOpacity(currentObject, 0);
+                    Utility.ApplyRecursively(currentObject, obj => obj.SetActive(false), false);
+
+                    // Don't got over the edge of the list
+                    if (_index <= -1) break;
+                }
+
+            // Reset skip flags
+            _shouldSkipFw = false;
+            _shouldSkipBw = false;
         }
 
         /// <summary>
@@ -292,7 +385,7 @@ namespace CinemaScreen
             while (passedTime <= waitTime)
             {
                 // If the animation should pause just skip
-                if (ShouldPause) break;
+                if (ShouldPause || _shouldSkipFw || _shouldSkipBw) break;
 
                 passedTime += Time.deltaTime;
 
@@ -313,10 +406,11 @@ namespace CinemaScreen
 
             if (fadeIn)
             {
+                // Set item to be fully transparent
+                SetOpacity(currentObject, 0);
+
                 // Set the item or its child components to be visible
                 Utility.ApplyRecursively(currentObject, obj => obj.SetActive(true), false);
-
-                SetOpacity(currentObject, 0);
             }
 
             for (float opacity = 0; opacity <= 1; opacity += 3 * Time.deltaTime)
@@ -325,17 +419,23 @@ namespace CinemaScreen
                 SetOpacity(currentObject, fadeIn ? opacity : 1 - opacity);
 
                 // If the animation should pause, skip the fading
-                if (ShouldPause) break;
+                if (ShouldPause || _shouldSkipFw || _shouldSkipBw) break;
 
                 // Wait until the next frame
                 yield return null;
             }
 
-            // Set the item or its child components to be hidden
-            if (!fadeIn) Utility.ApplyRecursively(currentObject, obj => obj.SetActive(false), false);
-
-            // Reset opacity so its always opaque
-            SetOpacity(currentObject, 1);
+            if (!fadeIn)
+            {
+                // Set the item or its child components to be hidden
+                SetOpacity(currentObject, 0);
+                Utility.ApplyRecursively(currentObject, obj => obj.SetActive(false), false);
+            }
+            else
+            {
+                // Reset opacity so its always opaque
+                SetOpacity(currentObject, 1);
+            }
         }
 
         /// <summary>
@@ -343,7 +443,7 @@ namespace CinemaScreen
         /// </summary>
         /// <param name="parent">The parent game object</param>
         /// <param name="opacity">The opacity</param>
-        private static void SetOpacity(GameObject parent, float opacity)
+        public static void SetOpacity(GameObject parent, float opacity)
         {
             Utility.ApplyRecursively(
                 parent,

@@ -56,12 +56,15 @@ namespace CinemaScreen
             // Disable component highlighting
             componentHighlighting.isActive = false;
 
+            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
+
             // Hide all components
             Utility.ApplyRecursively(
-                ProjectManager.Instance.CurrentProject.ObjectModel,
+                objectModel,
                 o => o.SetActive(false),
                 false
             );
+            AnimationController.SetOpacity(objectModel, 0);
 
             // Initialize new state machine
             CinemaStateMachine = new CinemaStateMachine();
@@ -90,11 +93,6 @@ namespace CinemaScreen
             {
                 pauseButton.gameObject.SetActive(false);
                 playButton.gameObject.SetActive(true);
-
-                skipStart.Enable(true);
-                skipEnd.Enable(true);
-                nextButton.Enable(true);
-                previousButton.Enable(true);
             }
 
             // Local function for setting the buttons correctly
@@ -102,11 +100,6 @@ namespace CinemaScreen
             {
                 playButton.gameObject.SetActive(false);
                 pauseButton.gameObject.SetActive(true);
-
-                skipStart.Enable(false);
-                skipEnd.Enable(false);
-                nextButton.Enable(false);
-                previousButton.Enable(false);
             }
 
             CinemaStateMachine.PlayingFw.Entry += EnterPlayingState;
@@ -143,7 +136,10 @@ namespace CinemaScreen
         /// </summary>
         public void NextButton()
         {
-            CinemaStateMachine.SkipFw();
+            if (CinemaStateMachine.CurrentState.In(CinemaStateMachine.PlayingFw, CinemaStateMachine.PlayingBw))
+                CinemaStateMachine.SkipFwWhilePlaying();
+            else
+                CinemaStateMachine.SkipFw();
         }
 
         /// <summary>
@@ -151,7 +147,10 @@ namespace CinemaScreen
         /// </summary>
         public void PreviousButton()
         {
-            CinemaStateMachine.SkipBw();
+            if (CinemaStateMachine.CurrentState.In(CinemaStateMachine.PlayingFw, CinemaStateMachine.PlayingBw))
+                CinemaStateMachine.SkipBwWhilePlaying();
+            else
+                CinemaStateMachine.SkipBw();
         }
 
         /// <summary>
@@ -175,7 +174,10 @@ namespace CinemaScreen
         /// </summary>
         public void SkipToEndButton()
         {
-            CinemaStateMachine.SkipToEnd();
+            if (CinemaStateMachine.CurrentState.In(CinemaStateMachine.PlayingFw, CinemaStateMachine.PlayingBw))
+                CinemaStateMachine.SkipToEndWhilePlaying();
+            else
+                CinemaStateMachine.SkipToEnd();
         }
 
         /// <summary>
@@ -183,7 +185,10 @@ namespace CinemaScreen
         /// </summary>
         public void SkipToStartButton()
         {
-            CinemaStateMachine.SkipToStart();
+            if (CinemaStateMachine.CurrentState.In(CinemaStateMachine.PlayingFw, CinemaStateMachine.PlayingBw))
+                CinemaStateMachine.SkipToStartWhilePlaying();
+            else
+                CinemaStateMachine.SkipToStart();
         }
 
         /// <summary>
@@ -201,6 +206,7 @@ namespace CinemaScreen
             var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
 
             // Show the model
+            AnimationController.SetOpacity(objectModel, 1);
             Utility.ApplyRecursively(
                 objectModel,
                 o => o.SetActive(true),

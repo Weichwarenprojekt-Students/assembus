@@ -151,8 +151,8 @@
             // Don't change the state if not in an allowed state
             if (CurrentState.NotIn(Paused, StoppedEnd)) return;
 
-            CurrentState = StoppedStart;
             SkippedToStart?.Invoke();
+            CurrentState = StoppedStart;
         }
 
         /// <summary>
@@ -168,13 +168,75 @@
             // Don't change the state if not in an allowed state
             if (CurrentState.NotIn(Paused, StoppedStart)) return;
 
-            CurrentState = StoppedEnd;
             SkippedToEnd?.Invoke();
+            CurrentState = StoppedEnd;
         }
 
         /// <summary>
         ///     Event which gets invoked when skipping to end
         /// </summary>
         public event StateMachineAction SkippedToEnd;
+
+        /// <summary>
+        ///     Action to skip forward while playing
+        /// </summary>
+        public void SkipFwWhilePlaying()
+        {
+            if (CurrentState.NotIn(PlayingFw, PlayingBw)) return;
+
+            SkippedFwWhilePlaying?.Invoke();
+        }
+
+        /// <summary>
+        ///     Event which gets invoked when skipping forward while playing
+        /// </summary>
+        public event StateMachineAction SkippedFwWhilePlaying;
+
+        /// <summary>
+        ///     Action to skip backward while playing
+        /// </summary>
+        public void SkipBwWhilePlaying()
+        {
+            if (CurrentState.NotIn(PlayingFw, PlayingBw)) return;
+
+            SkippedBwWhilePlaying?.Invoke();
+        }
+
+        /// <summary>
+        ///     Event which gets invoked when skipping backward while playing
+        /// </summary>
+        public event StateMachineAction SkippedBwWhilePlaying;
+
+        /// <summary>
+        ///     Action to skip to end while playing
+        /// </summary>
+        public void SkipToEndWhilePlaying()
+        {
+            if (CurrentState.NotIn(PlayingFw, PlayingBw)) return;
+
+            SkippedToEndWhilePlaying?.Invoke();
+            CurrentState = StoppedEnd;
+        }
+
+        /// <summary>
+        ///     Event which gets invoked when skipping to end while playing
+        /// </summary>
+        public event StateMachineAction SkippedToEndWhilePlaying;
+
+        /// <summary>
+        ///     Action to skip to start while playing
+        /// </summary>
+        public void SkipToStartWhilePlaying()
+        {
+            if (CurrentState.NotIn(PlayingFw, PlayingBw)) return;
+
+            SkippedToStartWhilePlaying?.Invoke();
+            CurrentState = StoppedStart;
+        }
+
+        /// <summary>
+        ///     Event which gets invoked when skipping to start while playing
+        /// </summary>
+        public event StateMachineAction SkippedToStartWhilePlaying;
     }
 }

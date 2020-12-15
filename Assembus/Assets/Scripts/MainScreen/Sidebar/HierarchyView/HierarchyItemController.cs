@@ -193,11 +193,6 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchy;
 
         /// <summary>
-        ///     True if the item has children
-        /// </summary>
-        private bool HasChildren => item.transform.childCount > 0;
-
-        /// <summary>
         ///     True if the item is a station
         /// </summary>
         public bool IsStation => itemInfo.ItemInfo.isGroup && transform.parent == hierarchyView;
@@ -345,7 +340,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="expand">True if the item shall be expanded</param>
         public void ExpandItem(bool expand)
         {
-            if (HasChildren)
+            if (itemInfo.ItemInfo.isGroup)
             {
                 childrenContainer.SetActive(expand);
                 _isExpanded = expand;
@@ -382,7 +377,7 @@ namespace MainScreen.Sidebar.HierarchyView
             var fused = itemInfo.ItemInfo.isFused;
 
             // Enable/Disable the button
-            expandButton.SetActive(HasChildren || fused);
+            expandButton.SetActive(itemInfo.ItemInfo.isGroup || fused);
 
             // Update the logos if necessary (hide fusion if group is station)
             fused &= !IsStation;
@@ -409,8 +404,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Show/hide dot icon
             itemActive.SetActive(isActive);
         }
-
-
+        
         /// <summary>
         ///     Show a station in the station view
         /// </summary>

@@ -83,19 +83,7 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     RectTransform from Scroll View
         /// </summary>
         public RectTransform scrollRect;
-        
-        /// <summary>
-        ///     Scrolls to the targetItem
-        /// </summary>
-        /// <param name="targetItem"></param>
-        public void ScrollToItem(RectTransform targetItem)
-        {
-            Canvas.ForceUpdateCanvases();
-            contentPanel.anchoredPosition =
-                (Vector2)scrollRect.InverseTransformPoint(contentPanel.position)
-                - (Vector2)scrollRect.transform.InverseTransformPoint(targetItem.position);
-        }
-        
+
         /// <summary>
         ///     Late update of the UI
         /// </summary>
@@ -496,5 +484,20 @@ namespace MainScreen.Sidebar.HierarchyView
             if (SelectedItems.Contains(parent)) DeselectItem(parent);
             else DeselectParent(parent.transform);
         }
+        
+        /// <summary>
+        ///     Scrolls to the targetItem
+        /// </summary>
+        /// <param name="targetItem"></param>
+        public void ScrollToItem(RectTransform targetItem)
+        {
+            // 5 Items are above the target item
+            var offset = new Vector2(0, 200);
+            Canvas.ForceUpdateCanvases();
+            contentPanel.anchoredPosition =
+                (Vector2)scrollRect.InverseTransformPoint(contentPanel.position) - 
+                (Vector2)scrollRect.transform.InverseTransformPoint(targetItem.position) - offset;
+        }
+        
     }
 }

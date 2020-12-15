@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MainScreen.StationView;
 using Models.Project;
 using Services;
@@ -211,6 +212,52 @@ namespace MainScreen.Sidebar.HierarchyView
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView);
 
             doubleClickDetector.CheckForSecondClick();
+
+            // Scroll if dragging an item up/down
+            if (Dragging)
+                ScrollOnDrag();
+        }
+
+        /// <summary>
+        ///     Scroll list view if dragging items to bottom/top
+        /// </summary>
+        private void ScrollOnDrag()
+        {
+            // Scroll at bottom 5% of screen
+            if (Input.mousePosition.y < Screen.height / 20.0)
+            {
+                // Stop at top of scroll rect
+                if (scrollRect.normalizedPosition.y > 0.00001)
+                    // Scroll down
+                    scrollRect.normalizedPosition -= new Vector2(
+                        0.0f,
+                        GetScrollSpeedFromPosition(Math.Abs(Screen.height / 20.0f - Input.mousePosition.y))
+                    );
+            }
+            // Scroll at top 10% of screen
+            else if (Input.mousePosition.y > Screen.height - Screen.height / 10.0f)
+            {
+                // Stop at bottom of scroll rect
+                if (scrollRect.normalizedPosition.y < 0.99999)
+                    // Scroll down
+                    scrollRect.normalizedPosition += new Vector2(
+                        0.0f,
+                        GetScrollSpeedFromPosition(
+                            Math.Abs(Screen.height - Screen.height / 10.0f - Input.mousePosition.y)
+                        )
+                    );
+            }
+        }
+
+        /// <summary>
+        ///     Function to calculate dragging scroll speed
+        /// </summary>
+        /// <param name="val">Scroll intensity between [0, 70]</param>
+        /// <returns>Scroll speed value</returns>
+        private float GetScrollSpeedFromPosition(float val)
+        {
+            // Values of [0.0001, 0.0005] for a range of [0, 70]
+            return (float) (0.0005 * Math.Pow(Math.E, -0.0008 * Math.Pow(val - 80, 2)));
         }
 
         /// <summary>
@@ -733,7 +780,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Highlight hovered object
             HighlightHover();
-            
+
             // Save the item and the action
             _insertion = false;
             _dragItem = selected ? null : this;

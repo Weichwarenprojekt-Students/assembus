@@ -85,7 +85,7 @@ namespace MainScreen.StationView
         }
 
         /// <summary>
-        ///     Change visibility of a item in the 3D editor
+        ///     Change visibility of an item in the 3D editor
         /// </summary>
         /// <param name="index">Index of item</param>
         /// <param name="visible">Visibility of item</param>
@@ -101,7 +101,7 @@ namespace MainScreen.StationView
         /// <param name="index">The index of the item</param>
         public void SkipToItem(int index)
         {
-            // Empty station
+            // If there are no components, disable all buttons and set display text accordingly
             if (_itemList.Count < 1)
             {
                 previousButton.Enable(false);
@@ -112,7 +112,7 @@ namespace MainScreen.StationView
                 // Update the shown current item index of the controls
                 UpdateItemIndexText();
             }
-            else
+            else // At least one component available
             {
                 // Update the control visibility
                 if (index == 0) // Start of list

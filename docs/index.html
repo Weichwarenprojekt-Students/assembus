@@ -5,11 +5,60 @@
     <title>Assembus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="css/bootstrap-adjust.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-<div class="container" style="text-align: center">
-    <h1><img src="construction.svg" alt=""> Work in Progress</h1>
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+    <div class="container-md">
+        <a class="navbar-brand" href="#">
+            <img src="img/assembus-logo.png" alt="" width="30" height="30">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Docs</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-md">
+
+    <!-- Intro -->
+    <div class="row container-intro">
+        <div class="col-lg-5 col-md-12 jumbotron">
+            <h1 class="display-3">Manage your assembly process like a pro!</h1>
+            <p class="intro-subheading text-muted">
+                Optimize and plan your manufacturing line with Assembus
+            </p>
+            <div class="intro-buttons">
+                <button type="button" class="btn btn-lg btn-primary">Get started</button>
+                <button type="button" class="btn btn-lg btn-primary">Download</button>
+            </div>
+        </div>
+        <div class="col-lg-6 offset-lg-1 col-md-12 intro-image">
+            <img src="img/assembus-demo.png" alt="screenshot">
+        </div>
+    </div>
+
+
 </div>
+
+
 </body>
 </html>

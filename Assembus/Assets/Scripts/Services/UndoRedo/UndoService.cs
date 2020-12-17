@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Services.Serialization;
 using Services.UndoRedo.Commands;
 
 namespace Services.UndoRedo
@@ -8,9 +7,9 @@ namespace Services.UndoRedo
     public class UndoService
     {
         /// <summary>
-        ///     The configuration manager
+        ///     Maximum number of actions in the history
         /// </summary>
-        private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
+        private const int UndoHistoryLimit = 420;
 
         /// <summary>
         ///     LinkedList contains the undo redo history
@@ -64,7 +63,7 @@ namespace Services.UndoRedo
             while (_current?.Next != null) _linkedList.Remove(_current.Next);
 
             // Remove first entry if greater than configured length
-            if (_linkedList.Count > _configManager.Config.undoHistoryLimit) _linkedList.RemoveFirst();
+            if (_linkedList.Count > UndoHistoryLimit) _linkedList.RemoveFirst();
 
             // Execute the new action
             _current?.Value.Redo();

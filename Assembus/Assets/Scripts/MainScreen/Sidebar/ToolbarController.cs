@@ -41,11 +41,6 @@ namespace MainScreen.Sidebar
         public SwitchableButton undo, redo;
 
         /// <summary>
-        ///     The settings controller
-        /// </summary>
-        public SettingsController settings;
-
-        /// <summary>
         ///     The controller of the station view
         /// </summary>
         public StationController stationController;
@@ -207,14 +202,6 @@ namespace MainScreen.Sidebar
                     startScreen.SetActive(true);
                 }
             );
-        }
-
-        /// <summary>
-        ///     Show the settings
-        /// </summary>
-        public void Settings()
-        {
-            settings.Show();
         }
     }
 }

@@ -107,7 +107,7 @@ namespace StartScreen
         /// </summary>
         public void GetImportPath()
         {
-            var paths = StandaloneFileBrowser.OpenFilePanel("", "", "obj", false);
+            var paths = StandaloneFileBrowser.OpenFilePanel("Import 3D model", "", "obj", false);
             if (paths.Length != 0 && !paths[0].Equals("")) importInput.SetTextWithoutNotify(paths[0]);
         }
 

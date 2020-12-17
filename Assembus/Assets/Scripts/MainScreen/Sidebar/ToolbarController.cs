@@ -1,6 +1,8 @@
-﻿using Services.Serialization;
+﻿using System.IO;
 using MainScreen.StationView;
+using Services.Serialization;
 using Services.UndoRedo;
+using SFB;
 using Shared;
 using Shared.Toast;
 using TMPro;
@@ -169,6 +171,46 @@ namespace MainScreen.Sidebar
             // Switch screens
             mainScreen.SetActive(false);
             cinemaScreen.SetActive(true);
+        }
+
+        /// <summary>
+        ///     Export the assembly data to hard disk
+        /// </summary>
+        public void ExportData()
+        {
+            // Get the name of the previously exported file
+            var previousExportFileName = _projectManager.CurrentProject.ExportFileName;
+
+            // Open save dialog for the user
+            var exportPath = StandaloneFileBrowser.SaveFilePanel(
+                "Export Data",
+                "",
+                string.IsNullOrEmpty(previousExportFileName)
+                    ? _projectManager.CurrentProject.Name
+                    : previousExportFileName,
+                "xml"
+            );
+
+            // If save dialog was canceled, string is empty
+            if (string.IsNullOrEmpty(exportPath)) return;
+
+            // Save chosen file name
+            _projectManager.CurrentProject.ExportFileName = Path.GetFileName(exportPath);
+
+            try
+            {
+                // Serialize model to chosen path
+                ModelManager.SerializeModel(
+                    exportPath,
+                    _projectManager.CurrentProject.ObjectModel.transform
+                );
+
+                toast.Success(Toast.Short, "Data was exported successfully!");
+            }
+            catch (IOException)
+            {
+                toast.Error(Toast.Short, "Error while exporting data!");
+            }
         }
 
         /// <summary>

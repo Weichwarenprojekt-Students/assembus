@@ -65,6 +65,25 @@ namespace MainScreen.StationView
         public bool IsOpen => station != null;
 
         /// <summary>
+        ///     Add selected items to this station
+        /// </summary>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (!HierarchyItemController.Dragging) return;
+            insertionArea.SetActive(true);
+            station.StartHoveringOverInsertingArea(null);
+        }
+
+        /// <summary>
+        ///     Stop adding selected items to this station
+        /// </summary>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            insertionArea.SetActive(false);
+            station.StopHoveringOverInsertingArea(null);
+        }
+
+        /// <summary>
         ///     Open the station view
         /// </summary>
         /// <param name="shownStation">The station to be shown</param>
@@ -119,25 +138,6 @@ namespace MainScreen.StationView
         public void HideInsertionArea()
         {
             insertionArea.SetActive(false);
-        }
-
-        /// <summary>
-        ///     Add selected items to this station
-        /// </summary>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            if (!HierarchyItemController.Dragging) return;
-            insertionArea.SetActive(true);
-            station.InsertItem(null);
-        }
-
-        /// <summary>
-        ///     Stop adding selected items to this station
-        /// </summary>
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            insertionArea.SetActive(false);
-            station.StopInsertingItem(null);
         }
 
         /// <summary>

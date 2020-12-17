@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MainScreen.StationView;
 using Models.Project;
 using Services;
@@ -404,7 +405,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Show/hide dot icon
             itemActive.SetActive(isActive);
         }
-        
+
         /// <summary>
         ///     Show a station in the station view
         /// </summary>
@@ -725,7 +726,7 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Insert the currently selected items into a group
+        ///     Insert the currently selected items into a group or put them above another item
         /// </summary>
         private void InsertItems()
         {
@@ -738,6 +739,8 @@ namespace MainScreen.Sidebar.HierarchyView
             // Get the new parent and the new neighbour id
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
             var neighbourID = _insertion ? ItemState.Last : Utility.GetNeighbourID(_dragItem.transform);
+
+            if (_selectedItems.Count == 1 && neighbourID == _selectedItems.First().name) return;
 
             // Create the item states
             List<ItemState> oldStates = new List<ItemState>(), newStates = new List<ItemState>();
@@ -765,10 +768,10 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Put an item above this item
+        ///     Start hovering over the area to put an item above this item
         /// </summary>
         /// <param name="data">Event data</param>
-        public void PutAbove(BaseEventData data)
+        public void StartHoveringOverPutAboveArea(BaseEventData data)
         {
             // Change the color
             var selected = hierarchyViewController.IsSelected(this);
@@ -786,10 +789,10 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Stop putting an item above this item
+        ///     Stop hovering over the area to put an item above this item
         /// </summary>
         /// <param name="data">Event data</param>
-        public void StopPuttingAbove(BaseEventData data)
+        public void StopHoveringOverPutAboveArea(BaseEventData data)
         {
             movingIndicator.SetActive(false);
             if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;
@@ -797,11 +800,11 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Insert an item into this item
+        ///     Start hovering overing overing over the insertion area to insert another item into this item
         ///     (only works with if this item is a group)
         /// </summary>
         /// <param name="data">Event data</param>
-        public void InsertItem(BaseEventData data)
+        public void StartHoveringOverInsertingArea(BaseEventData data)
         {
             // Change the color
             var isGroup = itemInfo.ItemInfo.isGroup;
@@ -817,10 +820,10 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Stop inserting an item into this item
+        ///     Stop hovering over the insertion area of this item
         /// </summary>
         /// <param name="data">Event data</param>
-        public void StopInsertingItem(BaseEventData data)
+        public void StopHoveringOverInsertingArea(BaseEventData data)
         {
             _dragItem = null;
             if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;

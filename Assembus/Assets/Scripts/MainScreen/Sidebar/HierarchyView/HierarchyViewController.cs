@@ -143,13 +143,17 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void LoadModelIntoHierarchyView()
         {
-            defaultHierarchyViewItem.SetActive(true);
+            // Move default item out of hierarchy view
+            defaultHierarchyViewItem.transform.SetParent(null);
+
+            // Remove the old children
+            RemoveElementWithChildren(hierarchyView.transform);
+
+            // Move default item back into hierarchy view for instantiation
+            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
 
             // Get the root element of the object model
             var parent = _projectManager.CurrentProject.ObjectModel;
-
-            // Remove the old children
-            RemoveElementWithChildren(hierarchyView.transform, true);
 
             // Execute the recursive loading of game objects
             LoadElementWithChildren(hierarchyView, parent);
@@ -157,19 +161,19 @@ namespace MainScreen.Sidebar.HierarchyView
             // Force hierarchy view update
             _updateHierarchyView = true;
 
-            defaultHierarchyViewItem.SetActive(false);
+            // Move default item out of hierarchy view again
+            defaultHierarchyViewItem.transform.SetParent(null);
         }
 
         /// <summary>
         ///     Remove all previous list view items
         /// </summary>
         /// <param name="parent">The parent of the children that shall be removed</param>
-        /// <param name="first">True if it is the first (to make sure that the default item isn't deleted)</param>
-        private static void RemoveElementWithChildren(Transform parent, bool first)
+        private static void RemoveElementWithChildren(Transform parent)
         {
-            for (var i = first ? 1 : 0; i < parent.childCount; i++)
+            for (var i = 0; i < parent.childCount; i++)
             {
-                RemoveElementWithChildren(parent.GetChild(i).transform, false);
+                RemoveElementWithChildren(parent.GetChild(i).transform);
                 Destroy(parent.GetChild(i).gameObject);
             }
         }
@@ -233,9 +237,9 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="depth">The depth of indention</param>
         public void AddSingleListItem(GameObject parent, GameObject item, float depth)
         {
-            defaultHierarchyViewItem.SetActive(true);
+            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
             AddListItem(parent, item, depth);
-            defaultHierarchyViewItem.SetActive(false);
+            defaultHierarchyViewItem.transform.SetParent(null);
         }
 
         /// <summary>

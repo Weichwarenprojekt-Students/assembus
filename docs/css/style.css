@@ -25,6 +25,10 @@ section {
     padding: 80px 0;
 }
 
+section.dark {
+    background-color: var(--prime-1);
+}
+
 #intro {
     margin-top: 59px;
     padding: 32px 0 64px;

@@ -1,6 +1,7 @@
 body {
     color: #f5f5f5;
     overflow-x: hidden;
+    min-height: 100%;
 }
 
 .jumbotron p {
@@ -8,12 +9,35 @@ body {
 }
 
 .container-intro {
-    padding-top: 128px;
+    margin-top: 60px;
+    padding-top: 60px;
     height: calc(100vh - 128px);
 }
 
+@media screen and (max-width: 1199px) {
+    .container-intro {
+        padding-top: 48px;
+    }
+}
+
+@media screen and (max-width: 1199px) {
+    .container-intro {
+        padding-top: 24px;
+    }
+}
+
 .intro-image img {
-    height: 70vh;
+    width: 70vw;
+}
+
+@media screen and (max-width: 1199px) {
+    .intro-image {
+        margin-top: 40px;
+    }
+
+    .intro-image img {
+        width: 100%;
+    }
 }
 
 .intro-buttons, .intro-subheading {

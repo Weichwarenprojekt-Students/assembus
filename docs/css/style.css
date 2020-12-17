@@ -97,3 +97,17 @@ footer img {
     display: inline-block;
     margin-left: 16px;
 }
+
+.feature-row {
+    margin-top: 64px;
+    margin-bottom: 32px;
+}
+
+.feature-box {
+    text-align: center;
+}
+
+.feature-box i.zmdi {
+    font-size: 8rem;
+    margin-bottom: 32px;
+}

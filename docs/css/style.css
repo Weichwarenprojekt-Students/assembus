@@ -25,11 +25,10 @@ section {
 }
 
 #intro {
-    padding-top: 73px;
+    margin-top: 59px;
+    padding: 32px 0 64px;
     color: #f5f5f5;
     background-color: var(--prime-5);
-    min-height: 100vh;
-    height: 1px;
 }
 
 @media screen and (max-width: 1199px) {
@@ -39,23 +38,19 @@ section {
     }
 }
 
-#intro .container-md, #intro .row {
-    height: 100%;
-}
-
 .jumbotron, .intro-image {
     display: flex;
     align-items: center;
-}
-
-.intro-image {
-    margin-bottom: 48px;
 }
 
 @media screen and (max-width: 1199px) {
     .intro-image {
         margin-bottom: 0;
     }
+}
+
+#intro .jumbotron {
+    padding-bottom: 32px;
 }
 
 .intro-image img {

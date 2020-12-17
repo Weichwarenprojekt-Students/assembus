@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Xml.Linq;
-using MainScreen.StationView;
-using Models.Project;
+﻿using MainScreen.StationView;
 using Services.Serialization;
 using Services.UndoRedo;
 using SFB;
@@ -196,82 +193,17 @@ namespace MainScreen.Sidebar
             // If save dialog was canceled, string is empty
             if (string.IsNullOrEmpty(exportPath)) return;
 
-            // Save chosen file name
-            _projectManager.CurrentProject.ExportFileName = Path.GetFileName(exportPath);
+            // Export data to XML
+            var (success, message) = DataExport.ExportData(exportPath);
 
-            try
+            if (!success)
             {
-                // Export data structure to XML file
-                ConvertToExportXml().Save(exportPath);
-
-                toast.Success(Toast.Short, "Data was exported successfully!");
+                toast.Error(Toast.Short, message);
+                return;
             }
-            catch (ModelManager.ToplevelComponentException e)
-            {
-                toast.Error(Toast.Short, e.ComponentName + " can't be on top level!");
-            }
-            catch (IOException)
-            {
-                toast.Error(Toast.Short, "Error while exporting data!");
-            }
-        }
 
-        /// <summary>
-        ///     Convert the model data to the export XML format
-        /// </summary>
-        /// <returns></returns>
-        private XElement ConvertToExportXml()
-        {
-            // Get the current model
-            var currentObject = _projectManager.CurrentProject.ObjectModel.transform;
-
-            // Create a root element for the XML file
-            var rootElement = new XElement("AssemblyLine");
-
-            // For every station add the XML structure to the root element
-            for (var i = 0; i < currentObject.transform.childCount; i++)
-                rootElement.Add(ConvertToExportXml(currentObject.GetChild(i), true));
-
-            return rootElement;
-        }
-
-        /// <summary>
-        ///     Convert sub components into xml structure for data export
-        /// </summary>
-        /// <param name="parent">The element which needs to be converted to xml</param>
-        /// <param name="topLevel">True if parent is in the top level of the model</param>
-        /// <returns>XElement with all information of an item and its possible children</returns>
-        private static XElement ConvertToExportXml(Transform parent, bool topLevel = false)
-        {
-            // Get item info
-            var itemInfo = parent.GetComponent<ItemInfoController>().ItemInfo;
-
-            // Check that a top level item is also a group (station)
-            if (topLevel && !itemInfo.isGroup)
-                throw new ModelManager.ToplevelComponentException {ComponentName = itemInfo.displayName};
-
-            // Get the type for the xml element
-            string type;
-            if (topLevel) type = "Station";
-            else if (itemInfo.isGroup) type = "Group";
-            else type = "Component";
-
-            // Generate the xml element for the current item
-            var elem = new XElement(
-                type,
-                new XAttribute("name", itemInfo.displayName),
-                new XAttribute("id", parent.name)
-            );
-
-            // Add attribute for fused groups
-            if (!topLevel && itemInfo.isFused) elem.Add(new XAttribute("isFused", true));
-
-            // Add xml elements for all children recursively
-            if (itemInfo.isGroup)
-                for (var i = 0; i < parent.childCount; i++)
-                    elem.Add(ConvertToExportXml(parent.GetChild(i)));
-
-            return elem;
+            // Export successful
+            toast.Success(Toast.Short, "Data was exported successfully!");
         }
 
         /// <summary>

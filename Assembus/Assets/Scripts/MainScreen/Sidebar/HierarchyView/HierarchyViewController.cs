@@ -106,34 +106,27 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         public void ShowContextMenu()
         {
-            var entries = new List<ContextMenuController.Item>();
-
-            entries.Add(
+            var entries = new List<ContextMenuController.Item>
+            {
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.add,
                     Name = "Create Station",
                     Action = CreateAssemblyStation
-                }
-            );
-
-            entries.Add(
+                },
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.show,
                     Name = "Show All",
                     Action = () => SetObjectVisibility(true)
-                }
-            );
-
-            entries.Add(
+                },
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.hide,
                     Name = "Hide All",
                     Action = () => SetObjectVisibility(false)
                 }
-            );
+            };
 
             contextMenu.Show(entries);
         }
@@ -322,7 +315,7 @@ namespace MainScreen.Sidebar.HierarchyView
             var trans = _projectManager.CurrentProject.ObjectModel.transform;
             var list = SelectedItems.Select(item => Utility.FindChild(trans, item.name).gameObject).ToList();
 
-            componentHighlighting.HighlightGameObjects(list);
+            componentHighlighting.HighlightGameObjects(list, false);
         }
 
         /// <summary>

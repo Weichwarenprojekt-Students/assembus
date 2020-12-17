@@ -11,10 +11,6 @@
     background-color: var(--prime-5) !important;
 }
 
-body {
-    background-color: var(--prime-5);
-}
-
 .btn {
     border-radius: 0;
 }

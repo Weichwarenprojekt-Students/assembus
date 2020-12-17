@@ -1,33 +1,53 @@
+:root {
+    --prime-1: #7C8DA7;
+    --prime-2: #4E6382;
+    --prime-3: #354967;
+    --prime-4: #213451;
+    --prime-5: #102138;
+}
+
 body {
-    color: #f5f5f5;
+    color: #333;
     overflow-x: hidden;
     min-height: 100%;
+}
+
+.btn i.zmdi {
+    margin-right: 8px;
 }
 
 .jumbotron p {
     font-size: 1.5rem;
 }
 
-.container-intro {
-    margin-top: 60px;
-    padding-top: 60px;
-    height: calc(100vh - 128px);
+section {
+    padding: 60px 0;
+}
+
+#intro {
+    margin-top: 59px;
+    color: #f5f5f5;
+    background-color: var(--prime-5);
 }
 
 @media screen and (max-width: 1199px) {
-    .container-intro {
-        padding-top: 48px;
-    }
-}
-
-@media screen and (max-width: 1199px) {
-    .container-intro {
+    #intro {
         padding-top: 24px;
     }
 }
 
+.intro-image {
+    margin-bottom: 48px;
+}
+
+@media screen and (max-width: 1199px) {
+    .intro-image {
+        margin-bottom: 0;
+    }
+}
+
 .intro-image img {
-    width: 70vw;
+    height: 520px;
 }
 
 @media screen and (max-width: 1199px) {
@@ -36,6 +56,7 @@ body {
     }
 
     .intro-image img {
+        height: auto;
         width: 100%;
     }
 }

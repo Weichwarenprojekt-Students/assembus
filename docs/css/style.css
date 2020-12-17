@@ -22,7 +22,7 @@ body {
 }
 
 section {
-    padding: 60px 0;
+    padding: 80px 0;
 }
 
 #intro {
@@ -110,4 +110,8 @@ footer img {
 .feature-box i.zmdi {
     font-size: 8rem;
     margin-bottom: 32px;
+}
+
+.section-buttons {
+    margin-top: 48px;
 }

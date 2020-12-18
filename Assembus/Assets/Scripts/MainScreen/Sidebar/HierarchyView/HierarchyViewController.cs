@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Models;
 using Models.Project;
 using Services.Serialization;
 using Services.UndoRedo;
@@ -501,25 +504,47 @@ namespace MainScreen.Sidebar.HierarchyView
             var topBorder = contentPanel.localPosition.y;
 
             // Lower border of the actual viewport
-            var lowerBorder = contentPanel.localPosition.y + 1000;
+            var lowerBorder = topBorder + 1000;
 
-            // Target item position in the viewoort
+            // Target item position in the viewport
             var itemPosition = scrollRect.InverseTransformPoint(contentPanel.position).y -
                                scrollRect.transform.InverseTransformPoint(targetItem.position).y;
 
             // Check if item is outside the borders, if so, scroll to the item
             if (!(itemPosition < lowerBorder && topBorder < itemPosition))
             {
-                contentPanel.anchoredPosition =
-                    (Vector2) scrollRect.InverseTransformPoint(contentPanel.position) -
-                    (Vector2) scrollRect.transform.InverseTransformPoint(targetItem.position) - new Vector2(0, 200);
-
-                // Check, if the scroll view will scroll outside the viewport
-                if (scroll.normalizedPosition.y < 0) scroll.normalizedPosition = scroll.viewport.anchorMin;
-                else if (scroll.normalizedPosition.y > 1) scroll.normalizedPosition = scroll.viewport.anchorMax;
+                StartCoroutine(ScrollToTarget(itemPosition - 200));
             }
-            else
-            {
+        }
+        
+        /// <summary>
+        ///     Coroutine for smoth scrolling to an new item
+        /// </summary>
+        /// <param name="targetValue"></param>
+        /// <returns></returns>
+        IEnumerator ScrollToTarget(float targetValue) {
+            
+            var interpolatedFloat = new InterpolatedFloat(contentPanel.anchoredPosition.y);
+            
+            while (interpolatedFloat != targetValue) {
+                
+                interpolatedFloat.ToValue(targetValue);
+                
+                contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value());
+                
+                // Check, if the scroll view will scroll outside the viewport
+                if (scroll.normalizedPosition.y < 0)
+                {
+                    scroll.normalizedPosition = scroll.viewport.anchorMin;
+                    break;
+                }
+                if (scroll.normalizedPosition.y > 1)
+                {
+                    scroll.normalizedPosition = scroll.viewport.anchorMax;
+                    break;
+                }
+                
+                yield return new WaitForEndOfFrame();
             }
         }
     }

@@ -497,14 +497,30 @@ namespace MainScreen.Sidebar.HierarchyView
         public void ScrollToItem(RectTransform targetItem)
         {
             Canvas.ForceUpdateCanvases();
+            // Top border of the actual viewport
+            var topBorder = contentPanel.localPosition.y;
 
-            contentPanel.anchoredPosition =
-                (Vector2) scrollRect.InverseTransformPoint(contentPanel.position) -
-                (Vector2) scrollRect.transform.InverseTransformPoint(targetItem.position) - new Vector2(0, 200);
+            // Lower border of the actual viewport
+            var lowerBorder = contentPanel.localPosition.y + 1000;
 
-            Debug.Log(scroll.normalizedPosition.y);
-            if (scroll.normalizedPosition.y < 0) scroll.normalizedPosition = new Vector2(0, 0);
-            else if (scroll.normalizedPosition.y > 1) scroll.normalizedPosition = new Vector2(0, 1);
+            // Target item position in the viewoort
+            var itemPosition = scrollRect.InverseTransformPoint(contentPanel.position).y -
+                               scrollRect.transform.InverseTransformPoint(targetItem.position).y;
+
+            // Check if item is outside the borders, if so, scroll to the item
+            if (!(itemPosition < lowerBorder && topBorder < itemPosition))
+            {
+                contentPanel.anchoredPosition =
+                    (Vector2) scrollRect.InverseTransformPoint(contentPanel.position) -
+                    (Vector2) scrollRect.transform.InverseTransformPoint(targetItem.position) - new Vector2(0, 200);
+
+                // Check, if the scroll view will scroll outside the viewport
+                if (scroll.normalizedPosition.y < 0) scroll.normalizedPosition = scroll.viewport.anchorMin;
+                else if (scroll.normalizedPosition.y > 1) scroll.normalizedPosition = scroll.viewport.anchorMax;
+            }
+            else
+            {
+            }
         }
     }
 }

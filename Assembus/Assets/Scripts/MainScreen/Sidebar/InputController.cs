@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MainScreen.Sidebar.HierarchyView;
 using Shared;
 using TMPro;
@@ -45,11 +46,6 @@ namespace MainScreen.Sidebar
         private readonly List<GameObject> _foundObjects = new List<GameObject>();
 
         /// <summary>
-        ///     Amount of items found after completing a search
-        /// </summary>
-        private int _amountResults;
-
-        /// <summary>
         ///     Current index when skipping through items
         /// </summary>
         private int _currentIndex;
@@ -88,7 +84,6 @@ namespace MainScreen.Sidebar
         private void SearchForResults(string input)
         {
             // Reset search results and index position
-            _amountResults = 0;
             _currentIndex = 0;
 
             // Collect all game objects with the given input name
@@ -100,11 +95,8 @@ namespace MainScreen.Sidebar
                 _foundObjects
             );
 
-            // Update number of results according to the list
-            _amountResults = _foundObjects.Count;
-
             // No results, disable text indication and reset index
-            if (_amountResults == 0)
+            if (_foundObjects.Count == 0)
             {
                 _currentIndex = 0;
                 textAmountResults.gameObject.SetActive(false);
@@ -119,7 +111,7 @@ namespace MainScreen.Sidebar
                 // Enable text indication
                 textAmountResults.gameObject.SetActive(true);
 
-                // TODO :: Jump to first item using hierarchyViewController's skipTo method from better-rename-control
+                JumpToItemInListView();
             }
         }
 
@@ -138,14 +130,22 @@ namespace MainScreen.Sidebar
         private void SkipToNextResult()
         {
             // Check if there is more than 1 result
-            if (_amountResults <= 1) return;
+            if (_foundObjects.Count <= 1) return;
 
             // Increase index or go back to first object
-            _currentIndex = _currentIndex == _amountResults ? 1 : _currentIndex + 1;
+            _currentIndex = _currentIndex == _foundObjects.Count ? 1 : _currentIndex + 1;
             UpdateResultsText();
 
             // Skip to the next result
+            JumpToItemInListView();
+        }
+
+        private void JumpToItemInListView()
+        {
             // TODO :: use hierarchyViewController's skipTo method from better-rename-control
+            // hierarchyViewController.ScrollToItem(
+            //     _foundObjects[_currentIndex - 1].GetComponent<RectTransform>()
+            // );
         }
 
         /// <summary>
@@ -154,23 +154,32 @@ namespace MainScreen.Sidebar
         private void SkipToPreviousResult()
         {
             // Check if there is more than 1 result
-            if (_amountResults <= 1) return;
+            if (_foundObjects.Count <= 1) return;
 
             // Decrease index or go to last object
-            _currentIndex = _currentIndex == 1 ? _amountResults : _currentIndex - 1;
+            _currentIndex = _currentIndex == 1 ? _foundObjects.Count : _currentIndex - 1;
             UpdateResultsText();
 
             // Go back to previous result
-            // TODO :: use hierarchyViewController's skipTo method from better-rename-control
+            JumpToItemInListView();
         }
 
         /// <summary>
         ///     Update string that indicates which item the user is currently
-        ///     inspecting
+        ///     inspecting and adjust the font size if necessary
         /// </summary>
         private void UpdateResultsText()
         {
-            textAmountResults.SetText(_currentIndex + " / " + _amountResults);
+            if (_foundObjects.Count > 0)
+            {
+                var digitCount = Math.Floor(Math.Log10(_foundObjects.Count) + 1);
+
+                textAmountResults.fontSize = (digitCount > 3)
+                    ? textAmountResults.fontSize = (float) (15.0 - (digitCount - 3.0))
+                    : textAmountResults.fontSize = 18.0f;
+            }
+
+            textAmountResults.SetText(_currentIndex + " / " + _foundObjects.Count);
         }
     }
 }

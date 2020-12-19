@@ -201,31 +201,38 @@ namespace Shared
         }
 
         /// <summary>
-        ///     Finds every child that has a given name in a list view and fills a list
-        ///     that is forwarded to the function with the results
+        ///     Finds every child that has a given name in a list view recursively
+        ///     and fills a list that has to be forwarded to the function with the results
         /// </summary>
         /// <param name="parent">Game object to start recursive search from</param>
         /// <param name="childName">Name of the list item to look for</param>
         /// <param name="foundObjects">List that is filled with the results</param>
         public static void FillListWithChildrenByName(Transform parent, string childName, List<GameObject> foundObjects)
         {
+            // Go through all the child objects of the parent
             foreach (Transform child in parent)
             {
+                // Look for a child called "Content"
                 var itemContent = child.Find("Content");
-
-                if (itemContent.childCount > 0)
-                {
-                    FillListWithChildrenByName(itemContent, childName, foundObjects);
-                    continue;
-                }
-
+                
+                // Find children with a name sub-child
                 var itemContentName = child.Find("Item/ItemContent/Name");
 
+                // Check if the item contains any children
+                if (itemContent.childCount > 0)
+                {
+                    // Go through the children or current parent
+                    FillListWithChildrenByName(itemContent, childName, foundObjects);
+                    
+                    if(itemContentName == null)
+                        continue;
+                }
+
+                // Ignore if none exists
                 if (itemContentName == null) continue;
 
-                var childVisibleName = itemContentName.GetComponent<TMP_Text>().text;
-
-                if (childVisibleName.Contains(childName))
+                // Get displayed name of the game object and check for matches
+                if (itemContentName.GetComponent<TMP_Text>().text.Contains(childName))
                     foundObjects.Add(child.gameObject);
             }
         }

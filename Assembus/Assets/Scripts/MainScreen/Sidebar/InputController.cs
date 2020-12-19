@@ -140,6 +140,9 @@ namespace MainScreen.Sidebar
             JumpToItemInListView();
         }
 
+        /// <summary>
+        ///     Jump to the current item in the list view
+        /// </summary>
         private void JumpToItemInListView()
         {
             // TODO :: use hierarchyViewController's skipTo method from better-rename-control
@@ -174,7 +177,7 @@ namespace MainScreen.Sidebar
             {
                 var digitCount = Math.Floor(Math.Log10(_foundObjects.Count) + 1);
 
-                textAmountResults.fontSize = (digitCount > 3)
+                textAmountResults.fontSize = digitCount > 3
                     ? textAmountResults.fontSize = (float) (15.0 - (digitCount - 3.0))
                     : textAmountResults.fontSize = 18.0f;
             }

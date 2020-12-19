@@ -229,8 +229,8 @@ namespace MainScreen.Sidebar.HierarchyView
                         GetScrollSpeedFromPosition(Math.Abs(Screen.height * 0.05f - Input.mousePosition.y))
                     );
             }
-            // Scroll at top 10% of screen
-            else if (Input.mousePosition.y > Screen.height * 0.9f)
+            // Scroll at top 20% of screen
+            else if (Input.mousePosition.y > Screen.height * 0.8f)
             {
                 // Stop at bottom of scroll rect
                 if (scrollRect.normalizedPosition.y < 0.99999)
@@ -238,7 +238,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     scrollRect.normalizedPosition += new Vector2(
                         0.0f,
                         GetScrollSpeedFromPosition(
-                            Math.Abs(Screen.height * 0.9f - Input.mousePosition.y)
+                            Math.Abs(Screen.height * 0.8f - Input.mousePosition.y)
                         )
                     );
             }

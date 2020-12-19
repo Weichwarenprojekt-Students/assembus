@@ -1,4 +1,6 @@
-﻿using MainScreen.Sidebar.HierarchyView;
+﻿using System.Collections.Generic;
+using MainScreen.Sidebar.HierarchyView;
+using Shared;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +13,7 @@ namespace MainScreen.Sidebar
         ///     Reference to HierarchyViewController to skip to items in the list
         /// </summary>
         public HierarchyViewController hierarchyViewController;
-        
+
         /// <summary>
         ///     Input in the search bar
         /// </summary>
@@ -38,6 +40,11 @@ namespace MainScreen.Sidebar
         public Button searchButton;
 
         /// <summary>
+        ///     List items that have been found in the search process
+        /// </summary>
+        private readonly List<GameObject> _foundObjects = new List<GameObject>();
+
+        /// <summary>
         ///     Amount of items found after completing a search
         /// </summary>
         private int _amountResults;
@@ -60,7 +67,7 @@ namespace MainScreen.Sidebar
             // Search for every key-stroke
             userInput.onValueChanged.AddListener(SearchForResults);
 
-            // Hide search related buttons on start
+            // Hide search related result indication on start
             textAmountResults.gameObject.SetActive(false);
         }
 
@@ -75,41 +82,43 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
+        ///     Search for items in the hierarchy list
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">Item name to be searched for</param>
         private void SearchForResults(string input)
         {
-            Debug.Log("Searching for objects...");
-
-            // Search for gameObjects with the given name
-            _amountResults = 10;
+            // Reset search results and index position
+            _amountResults = 0;
             _currentIndex = 0;
 
-            // TODO :: Find every hierarchy object with the name "input"
-            // TODO :: Save list of those objects (or their rect-transforms)
-            var view = hierarchyViewController.hierarchyView;
-            Debug.Log("Test");
+            // Collect all game objects with the given input name
+            _foundObjects.Clear();
 
-            // No results, disable arrows and text indication
+            Utility.FillListWithChildrenByName(
+                hierarchyViewController.hierarchyView.transform,
+                input,
+                _foundObjects
+            );
+
+            // Update number of results according to the list
+            _amountResults = _foundObjects.Count;
+
+            // No results, disable text indication and reset index
             if (_amountResults == 0)
             {
                 _currentIndex = 0;
-                
                 textAmountResults.gameObject.SetActive(false);
             }
+            // One or more results
             else
             {
                 // Set index to first item
                 _currentIndex = 1;
+                UpdateResultsText();
 
-                // More than one result -> update string of found objects -> enable arrows
-                if (_amountResults > 1)
-                {
-                    UpdateResultsText();
-                }
-
+                // Enable text indication
                 textAmountResults.gameObject.SetActive(true);
-                
+
                 // TODO :: Jump to first item using hierarchyViewController's skipTo method from better-rename-control
             }
         }
@@ -128,8 +137,6 @@ namespace MainScreen.Sidebar
         /// </summary>
         private void SkipToNextResult()
         {
-            Debug.Log("Next...");
-
             // Check if there is more than 1 result
             if (_amountResults <= 1) return;
 
@@ -146,8 +153,6 @@ namespace MainScreen.Sidebar
         /// </summary>
         private void SkipToPreviousResult()
         {
-            Debug.Log("Previous...");
-
             // Check if there is more than 1 result
             if (_amountResults <= 1) return;
 

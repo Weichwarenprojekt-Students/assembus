@@ -111,7 +111,7 @@ namespace MainScreen.Sidebar
                 // Enable text indication
                 textAmountResults.gameObject.SetActive(true);
 
-                JumpToItemInListView();
+                JumpToItemInListView(-1);
             }
         }
 
@@ -132,22 +132,37 @@ namespace MainScreen.Sidebar
             // Check if there is more than 1 result
             if (_foundObjects.Count <= 1) return;
 
+            var previousIndex = _currentIndex;
+
             // Increase index or go back to first object
             _currentIndex = _currentIndex == _foundObjects.Count ? 1 : _currentIndex + 1;
             UpdateResultsText();
 
             // Skip to the next result
-            JumpToItemInListView();
+            JumpToItemInListView(previousIndex);
         }
 
         /// <summary>
         ///     Jump to the current item in the list view
         /// </summary>
-        private void JumpToItemInListView()
+        /// <param name="previousIndex">Index of the previously selected item (negative if there was none)</param>
+        private void JumpToItemInListView(int previousIndex)
         {
+            var targetObject = _foundObjects[_currentIndex - 1];
+
+            // Remove previous highlighting in list
+            if (previousIndex >= 0)
+                hierarchyViewController.SetColor(
+                    _foundObjects[previousIndex - 1].GetComponent<HierarchyItemController>(),
+                    false
+                );
+
+            // Highlight current item in list
+            hierarchyViewController.SetColor(targetObject.GetComponent<HierarchyItemController>(), true);
+
             // TODO :: use hierarchyViewController's skipTo method from better-rename-control
             // hierarchyViewController.ScrollToItem(
-            //     _foundObjects[_currentIndex - 1].GetComponent<RectTransform>()
+            //     targetObject.GetComponent<RectTransform>()
             // );
         }
 
@@ -159,12 +174,14 @@ namespace MainScreen.Sidebar
             // Check if there is more than 1 result
             if (_foundObjects.Count <= 1) return;
 
+            var previousIndex = _currentIndex;
+
             // Decrease index or go to last object
             _currentIndex = _currentIndex == 1 ? _foundObjects.Count : _currentIndex - 1;
             UpdateResultsText();
 
             // Go back to previous result
-            JumpToItemInListView();
+            JumpToItemInListView(previousIndex);
         }
 
         /// <summary>

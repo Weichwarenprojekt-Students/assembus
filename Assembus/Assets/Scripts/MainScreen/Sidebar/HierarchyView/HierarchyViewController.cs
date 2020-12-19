@@ -330,7 +330,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         /// <param name="item"></param>
         /// <param name="selected">The flag that indicates if the item is selected</param>
-        private void SetColor(HierarchyItemController item, bool selected)
+        public void SetColor(HierarchyItemController item, bool selected)
         {
             item.background.color = selected ? selectedColor : normalColor;
         }

@@ -890,6 +890,7 @@ MonoBehaviour:
   settings: {fileID: 1379669017}
   stationController: {fileID: 541487803}
   componentHighlighting: {fileID: 963194230}
+  inputController: {fileID: 1260382474}
 --- !u!1 &45048247
 GameObject:
   m_ObjectHideFlags: 0

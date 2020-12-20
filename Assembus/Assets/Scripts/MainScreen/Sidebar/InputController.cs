@@ -95,10 +95,14 @@ namespace MainScreen.Sidebar
         {
             // Reset previous highlighting
             if (_currentIndex != 0)
-                hierarchyViewController.SetColor(
-                    _foundObjects[_currentIndex - 1].GetComponent<HierarchyItemController>(),
-                    false
-                );
+            {
+                var previousController = _foundObjects[_currentIndex - 1].GetComponent<HierarchyItemController>();
+                if (!hierarchyViewController.IsSelected(previousController))
+                    hierarchyViewController.SetColor(
+                        previousController,
+                        false
+                    );
+            }
 
             // Don't search for empty string
             if (input.Equals("")) return;
@@ -168,17 +172,26 @@ namespace MainScreen.Sidebar
         /// <param name="previousIndex">Index of the previously selected item (negative if there was none)</param>
         private void JumpToItemInListView(int previousIndex)
         {
-            var targetObject = _foundObjects[_currentIndex - 1];
-
             // Remove previous highlighting in list
             if (previousIndex >= 0)
-                hierarchyViewController.SetColor(
-                    _foundObjects[previousIndex - 1].GetComponent<HierarchyItemController>(),
-                    false
-                );
+            {
+                var previousController = _foundObjects[previousIndex - 1].GetComponent<HierarchyItemController>();
+                if (!hierarchyViewController.IsSelected(previousController))
+                    hierarchyViewController.SetColor(
+                        previousController,
+                        false
+                    );
+            }
 
             // Highlight current item in list
-            hierarchyViewController.SetColor(targetObject.GetComponent<HierarchyItemController>(), true);
+            var targetObject = _foundObjects[_currentIndex - 1];
+            var targetController = targetObject.GetComponent<HierarchyItemController>();
+
+            if (hierarchyViewController.IsSelected(targetController))
+                Debug.Log("IsSelected");
+
+            if (!hierarchyViewController.IsSelected(targetController))
+                hierarchyViewController.SetColor(targetController, true);
 
             // TODO :: use hierarchyViewController's skipTo method from better-rename-control
             // hierarchyViewController.ScrollToItem(

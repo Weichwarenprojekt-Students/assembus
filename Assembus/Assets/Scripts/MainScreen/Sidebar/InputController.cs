@@ -11,6 +11,11 @@ namespace MainScreen.Sidebar
     public class InputController : MonoBehaviour
     {
         /// <summary>
+        ///     Placeholder string for the empty search field
+        /// </summary>
+        private const string Placeholder = "Search...";
+
+        /// <summary>
         ///     Reference to HierarchyViewController to skip to items in the list
         /// </summary>
         public HierarchyViewController hierarchyViewController;
@@ -46,6 +51,11 @@ namespace MainScreen.Sidebar
         private readonly List<GameObject> _foundObjects = new List<GameObject>();
 
         /// <summary>
+        ///     Allows userInput to be reset to the placeholder text
+        /// </summary>
+        private bool _allowInputReset;
+
+        /// <summary>
         ///     Current index when skipping through items
         /// </summary>
         private int _currentIndex;
@@ -56,8 +66,9 @@ namespace MainScreen.Sidebar
         public void Reset()
         {
             _foundObjects.Clear();
-            userInput.SetTextWithoutNotify("Search...");
+            userInput.SetTextWithoutNotify(Placeholder);
             textAmountResults.gameObject.SetActive(false);
+            _allowInputReset = false;
         }
 
         /// <summary>
@@ -70,8 +81,10 @@ namespace MainScreen.Sidebar
             nextSearch.onClick.AddListener(SkipToNextResult);
             previousSearch.onClick.AddListener(SkipToPreviousResult);
 
-            // Search for every key-stroke
+            // Assign listeners to input field
             userInput.onValueChanged.AddListener(SearchForResults);
+            userInput.onSelect.AddListener(OnClick);
+            userInput.onEndEdit.AddListener(OnExit);
 
             // Hide search related result indication on start
             textAmountResults.gameObject.SetActive(false);
@@ -85,6 +98,35 @@ namespace MainScreen.Sidebar
             // Set focus on search bar on CTRL-F
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
                 userInput.ActivateInputField();
+
+            if (!_allowInputReset || !userInput.text.Equals(string.Empty)) return;
+
+            _foundObjects.Clear();
+            textAmountResults.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Method that is called on clicking into the input field
+        /// </summary>
+        /// <param name="input">String that is contained in the input field</param>
+        private void OnClick(string input)
+        {
+            if (!input.Equals(Placeholder)) return;
+
+            userInput.SetTextWithoutNotify(string.Empty);
+            _allowInputReset = false;
+        }
+
+        /// <summary>
+        ///     Method that is called on losing focus in the input field
+        /// </summary>
+        /// <param name="input">String that is contained in the input field</param>
+        private void OnExit(string input)
+        {
+            if (!input.Equals(string.Empty)) return;
+
+            userInput.SetTextWithoutNotify(Placeholder);
+            _allowInputReset = true;
         }
 
         /// <summary>
@@ -94,7 +136,7 @@ namespace MainScreen.Sidebar
         private void SearchForResults(string input)
         {
             // Reset previous highlighting
-            if (_currentIndex != 0)
+            if (_currentIndex != 0 && _foundObjects.Count != 0)
             {
                 var previousController = _foundObjects[_currentIndex - 1].GetComponent<HierarchyItemController>();
                 if (!hierarchyViewController.IsSelected(previousController))
@@ -105,14 +147,14 @@ namespace MainScreen.Sidebar
             }
 
             // Don't search for empty string
-            if (input.Equals("")) return;
+            if (input.Equals(string.Empty)) return;
 
-            // Reset search results and index position
+            // Reset search state
             _currentIndex = 0;
-
-            // Collect all game objects with the given input name
             _foundObjects.Clear();
-
+            _allowInputReset = true;
+            
+            // Collect all game objects with the given input name
             Utility.FillListWithChildrenByName(
                 hierarchyViewController.hierarchyView.transform,
                 input,
@@ -186,9 +228,6 @@ namespace MainScreen.Sidebar
             // Highlight current item in list
             var targetObject = _foundObjects[_currentIndex - 1];
             var targetController = targetObject.GetComponent<HierarchyItemController>();
-
-            if (hierarchyViewController.IsSelected(targetController))
-                Debug.Log("IsSelected");
 
             if (!hierarchyViewController.IsSelected(targetController))
                 hierarchyViewController.SetColor(targetController, true);

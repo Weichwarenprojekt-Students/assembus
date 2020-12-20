@@ -212,6 +212,8 @@ namespace Shared
             // Go through all the child objects of the parent
             foreach (Transform child in parent)
             {
+                if (!child.gameObject.name.StartsWith("assembus")) continue;
+
                 // Look for a child called "Content"
                 var itemContent = child.Find("Content");
 

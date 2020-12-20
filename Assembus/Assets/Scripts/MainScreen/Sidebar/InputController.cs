@@ -51,6 +51,16 @@ namespace MainScreen.Sidebar
         private int _currentIndex;
 
         /// <summary>
+        ///     Reset search state
+        /// </summary>
+        public void Reset()
+        {
+            _foundObjects.Clear();
+            userInput.SetTextWithoutNotify("Search...");
+            textAmountResults.gameObject.SetActive(false);
+        }
+
+        /// <summary>
         ///     Set listeners for buttons and hide unnecessary UI elements
         /// </summary>
         public void Start()
@@ -83,6 +93,16 @@ namespace MainScreen.Sidebar
         /// <param name="input">Item name to be searched for</param>
         private void SearchForResults(string input)
         {
+            // Reset previous highlighting
+            if (_currentIndex != 0)
+                hierarchyViewController.SetColor(
+                    _foundObjects[_currentIndex - 1].GetComponent<HierarchyItemController>(),
+                    false
+                );
+
+            // Don't search for empty string
+            if (input.Equals("")) return;
+
             // Reset search results and index position
             _currentIndex = 0;
 

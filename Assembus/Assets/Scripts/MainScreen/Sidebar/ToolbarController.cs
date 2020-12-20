@@ -1,5 +1,5 @@
-﻿using Services.Serialization;
-using MainScreen.StationView;
+﻿using MainScreen.StationView;
+using Services.Serialization;
 using Services.UndoRedo;
 using Shared;
 using Shared.Toast;
@@ -54,6 +54,11 @@ namespace MainScreen.Sidebar
         ///     The component highlighting script
         /// </summary>
         public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
+        ///     InputController script
+        /// </summary>
+        public InputController inputController;
 
         /// <summary>
         ///     The configuration manager
@@ -200,6 +205,7 @@ namespace MainScreen.Sidebar
 
                     // Remove GameObject of current project
                     componentHighlighting.ResetHighlighting();
+                    inputController.Reset();
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen

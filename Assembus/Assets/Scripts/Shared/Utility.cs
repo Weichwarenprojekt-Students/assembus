@@ -214,7 +214,7 @@ namespace Shared
             {
                 // Look for a child called "Content"
                 var itemContent = child.Find("Content");
-                
+
                 // Find children with a name sub-child
                 var itemContentName = child.Find("Item/ItemContent/Name");
 
@@ -223,8 +223,8 @@ namespace Shared
                 {
                     // Go through the children or current parent
                     FillListWithChildrenByName(itemContent, childName, foundObjects);
-                    
-                    if(itemContentName == null)
+
+                    if (itemContentName == null)
                         continue;
                 }
 
@@ -232,7 +232,8 @@ namespace Shared
                 if (itemContentName == null) continue;
 
                 // Get displayed name of the game object and check for matches
-                if (itemContentName.GetComponent<TMP_Text>().text.Contains(childName))
+                if (itemContentName.GetComponent<TMP_Text>().text.ToLowerInvariant()
+                    .Contains(childName.ToLowerInvariant()))
                     foundObjects.Add(child.gameObject);
             }
         }

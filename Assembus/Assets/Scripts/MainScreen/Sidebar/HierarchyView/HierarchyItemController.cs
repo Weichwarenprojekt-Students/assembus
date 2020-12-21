@@ -534,7 +534,6 @@ namespace MainScreen.Sidebar.HierarchyView
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
-
             // Scroll to First selected Game object
             var groupItem = gameObject.transform.parent.parent;
             hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());

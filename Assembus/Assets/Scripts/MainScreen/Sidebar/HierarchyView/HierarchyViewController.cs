@@ -499,7 +499,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="targetItem"></param>
         public void ScrollToItem(RectTransform targetItem)
         {
+            scroll.enabled = false;
             Canvas.ForceUpdateCanvases();
+            scroll.enabled = true;
+
             // Top border of the actual viewport
             var topBorder = contentPanel.localPosition.y;
 
@@ -512,26 +515,24 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Check if item is outside the borders, if so, scroll to the item
             if (!(itemPosition < lowerBorder && topBorder < itemPosition))
-            {
                 StartCoroutine(ScrollToTarget(itemPosition - 200));
-            }
         }
-        
+
         /// <summary>
         ///     Coroutine for smoth scrolling to an new item
         /// </summary>
         /// <param name="targetValue"></param>
         /// <returns></returns>
-        IEnumerator ScrollToTarget(float targetValue) {
-            
+        private IEnumerator ScrollToTarget(float targetValue)
+        {
             var interpolatedFloat = new InterpolatedFloat(contentPanel.anchoredPosition.y);
-            
-            while (interpolatedFloat != targetValue) {
-                
+
+            while (interpolatedFloat != targetValue)
+            {
                 interpolatedFloat.ToValue(targetValue);
-                
+
                 contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value());
-                
+
                 // Check, if the scroll view will scroll outside the viewport
                 if (scroll.normalizedPosition.y < 0)
                 {
@@ -543,7 +544,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     scroll.normalizedPosition = scroll.viewport.anchorMax;
                     break;
                 }
-                
+
                 yield return new WaitForEndOfFrame();
             }
         }

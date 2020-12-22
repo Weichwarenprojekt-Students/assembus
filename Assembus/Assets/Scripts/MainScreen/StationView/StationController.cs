@@ -67,6 +67,7 @@ namespace MainScreen.StationView
         /// <summary>
         ///     Add selected items to this station
         /// </summary>
+        /// <param name="eventData">Event data</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (!HierarchyItemController.Dragging) return;
@@ -77,6 +78,7 @@ namespace MainScreen.StationView
         /// <summary>
         ///     Stop adding selected items to this station
         /// </summary>
+        /// <param name="eventData">Event data</param>
         public void OnPointerExit(PointerEventData eventData)
         {
             insertionArea.SetActive(false);

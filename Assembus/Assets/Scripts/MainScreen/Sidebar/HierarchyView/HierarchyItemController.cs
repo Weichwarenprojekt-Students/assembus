@@ -800,7 +800,7 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Start hovering overing overing over the insertion area to insert another item into this item
+        ///     Start hovering over the insertion area to insert another item into this item
         ///     (only works with if this item is a group)
         /// </summary>
         /// <param name="data">Event data</param>

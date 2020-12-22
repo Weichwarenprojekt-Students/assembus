@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Services;
 using Shared;
@@ -166,7 +167,7 @@ namespace MainScreen
 
             var go = hit.transform.gameObject;
 
-            componentHighlighting.HighlightGameObject(go);
+            componentHighlighting.HighlightGameObjects(new List<GameObject> {go}, true);
             hierarchyViewController.SetItemStatusFromList(new[] {go.name});
             SetFocus(GetBounds(go).center);
             StoreLastMousePosition();

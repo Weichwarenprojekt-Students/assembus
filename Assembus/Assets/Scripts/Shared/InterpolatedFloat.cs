@@ -1,15 +1,13 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Shared
 {
     public class InterpolatedFloat
     {
-        
         /// <summary>
         ///     The power of the linear interpolation
         /// </summary>
-        private float _power;
+        private readonly float _power;
 
         /// <summary>
         ///     The actual value
@@ -21,11 +19,12 @@ namespace Shared
         /// </summary>
         /// <param name="value">The actual value</param>
         /// <param name="power">The power of the linear interpolation</param>
-        public InterpolatedFloat(float value = 0f,float power = 3f)
+        public InterpolatedFloat(float value = 0f, float power = 3f)
         {
             _value = value;
             _power = power;
         }
+
         /// <summary>
         ///     Overloading == operator
         /// </summary>

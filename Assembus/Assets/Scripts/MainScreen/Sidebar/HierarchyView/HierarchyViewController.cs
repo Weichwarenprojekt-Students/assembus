@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Models;
 using Models.Project;
 using Services.Serialization;
 using Services.UndoRedo;
@@ -539,6 +537,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     scroll.normalizedPosition = scroll.viewport.anchorMin;
                     break;
                 }
+
                 if (scroll.normalizedPosition.y > 1)
                 {
                     scroll.normalizedPosition = scroll.viewport.anchorMax;

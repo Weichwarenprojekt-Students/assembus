@@ -138,4 +138,23 @@ footer img {
 
 .logo-box p {
     text-align: left;
+    padding: 0 16px;
+}
+
+button.pronounce {
+    border: 0;
+    background-color: transparent;
+}
+
+
+
+/**
+ *
+ * Documentation specific
+ *
+ */
+
+
+.clean section:nth-child(even) {
+    background-color: #ffffff;
 }

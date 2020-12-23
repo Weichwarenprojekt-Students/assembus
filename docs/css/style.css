@@ -25,7 +25,7 @@ section {
     padding: 80px 0;
 }
 
-section.dark {
+section:nth-child(even) {
     background-color: var(--prime-1);
 }
 
@@ -96,7 +96,7 @@ footer p {
 }
 
 footer img {
-    height: 40px;
+    height: 80px;
     width: auto;
     display: inline-block;
     margin-left: 16px;
@@ -118,4 +118,24 @@ footer img {
 
 .section-buttons {
     margin-top: 48px;
+}
+
+.logo-box {
+    text-align: center;
+    padding: 16px 48px;
+}
+
+.logo-image {
+    height: 120px;
+    width: 100%;
+    padding: 16px 0;
+}
+
+.logo-box .logo-image img {
+    height: 100%;
+    width: auto;
+}
+
+.logo-box p {
+    text-align: left;
 }

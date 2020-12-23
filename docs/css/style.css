@@ -121,13 +121,12 @@ footer img {
 }
 
 .logo-box {
-    text-align: center;
-    padding: 16px 48px;
+    display: inline-block;
+    padding: 40px 80px 0 0;
 }
 
 .logo-image {
     height: 120px;
-    width: 100%;
     padding: 16px 0;
 }
 

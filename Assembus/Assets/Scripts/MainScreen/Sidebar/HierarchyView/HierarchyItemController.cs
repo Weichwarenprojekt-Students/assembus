@@ -582,9 +582,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void FuseGroup()
         {
-            itemInfo.ItemInfo.isFused = !itemInfo.ItemInfo.isFused;
-            UpdateVisuals();
-            stationController.UpdateStation();
+            _undoService.AddCommand(new FuseCommand(itemInfo.ItemInfo.isFused, item.name));
         }
 
         /// <summary>

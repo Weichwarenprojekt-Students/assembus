@@ -79,11 +79,12 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
-        ///     Check if either CTRL-Z, CTRL-Y or CTRL-SHIFT_Z was used
+        ///     Check if either CTRL-Z, CTRL-Y, CTRL-SHIFT_Z or CTRL-S was used
         /// </summary>
         private void Update()
         {
             // Check which keys were pressed
+            var ctrlS = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S);
             var ctrlZ = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z);
             var ctrlShiftZ = ctrlZ && Input.GetKey(KeyCode.LeftShift);
             var ctrlY = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y);
@@ -92,6 +93,8 @@ namespace MainScreen.Sidebar
             if (ctrlShiftZ || ctrlY) RedoAction();
             // Check if an action should be undone
             else if (ctrlZ) UndoAction();
+            // Check if the project should be saved
+            else if (ctrlS) SaveProject();
         }
 
         /// <summary>

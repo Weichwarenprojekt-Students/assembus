@@ -1,13 +1,22 @@
-﻿using CinemaScreen.Models;
+﻿using System.Collections.Generic;
+using CinemaScreen.Models;
 using MainScreen;
 using Services.Serialization;
 using Shared;
+using Shared.Tooltip;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace CinemaScreen
 {
     public class CinemaController : MonoBehaviour
     {
+        /// <summary>
+        ///     The size of a gap between stations on the progress bar
+        /// </summary>
+        private const int GapSize = 10;
+
         /// <summary>
         ///     References to main and cinema screen
         /// </summary>
@@ -17,6 +26,11 @@ namespace CinemaScreen
         ///     References to the cinema control buttons
         /// </summary>
         public SwitchableButton playButton, pauseButton, previousButton, nextButton, skipStart, skipEnd;
+
+        /// <summary>
+        ///     The canvas of the cinema screen
+        /// </summary>
+        public Canvas canvas;
 
         /// <summary>
         ///     The animation controller
@@ -29,9 +43,44 @@ namespace CinemaScreen
         public ComponentHighlighting componentHighlighting;
 
         /// <summary>
+        ///     The progress bar and the foreground and background objects
+        /// </summary>
+        public RectTransform progressBar, progressBarBack, progressBarFront, progressBarDot;
+
+        /// <summary>
+        ///     The title of the station view (shows the current station)
+        /// </summary>
+        public TextMeshProUGUI title;
+
+        /// <summary>
+        ///     The tooltip controller
+        /// </summary>
+        public TooltipController tooltip;
+
+        /// <summary>
+        ///     The rectangles that are placed on the progress bar for each station
+        /// </summary>
+        private List<RectTransform> _backRects, _frontRects;
+
+        /// <summary>
         ///     Private field for the cinema state machine
         /// </summary>
         private CinemaStateMachine _cinemaStateMachine;
+
+        /// <summary>
+        ///     The total amount of components
+        /// </summary>
+        private int _componentCount;
+
+        /// <summary>
+        ///     True if the mouse is in the progress bar
+        /// </summary>
+        private bool _mouseInProgressBar;
+
+        /// <summary>
+        ///     The information about the stations
+        /// </summary>
+        private List<Station> _stations;
 
         /// <summary>
         ///     Property for the cinema state machine
@@ -46,6 +95,15 @@ namespace CinemaScreen
                 // When a new cinema state machine is set, subscribe to its events
                 SubscribeToStateMachine();
             }
+        }
+
+        /// <summary>
+        ///     Update the progress bar
+        /// </summary>
+        private void Update()
+        {
+            UpdateProgressBar();
+            ShowTooltip();
         }
 
         /// <summary>
@@ -79,8 +137,171 @@ namespace CinemaScreen
             skipEnd.Enable(true);
             nextButton.Enable(true);
 
-            // Pass the cinema state machine to the animation controller
+            // Initialize the animation controller
+            (_componentCount, _stations) = animationController.Initialize();
             animationController.CinemaStateMachine = CinemaStateMachine;
+            SetUpProgressBar();
+        }
+
+        /// <summary>
+        ///     Update the progress bar by respecting the progress
+        ///     of the animation controller
+        /// </summary>
+        private void UpdateProgressBar()
+        {
+            var scale = canvas.transform.localScale.y;
+            var width = Screen.width / scale - (_stations.Count - 1) * GapSize;
+            var progress = animationController.Index;
+            for (var i = 0; i < _stations.Count; i++)
+            {
+                // Position the rectangles
+                _frontRects[i].anchoredPosition = _backRects[i].anchoredPosition = new Vector2(
+                    (float) _stations[i].PreviousItems / _componentCount * width + i * GapSize,
+                    0
+                );
+
+                // Adjust the size of the backgrounds
+                var fullWidth = (float) _stations[i].ChildCount / _componentCount * width;
+                _backRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, fullWidth);
+
+                // Adjust the size of the foregrounds and update the station name
+                if (_stations[i].PreviousItems + _stations[i].ChildCount < progress)
+                {
+                    _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, fullWidth);
+                    if (i != _stations.Count - 1) continue;
+                    progressBarDot.anchoredPosition = new Vector2(
+                        _frontRects[i].anchoredPosition.x + _frontRects[i].sizeDelta.x,
+                        0
+                    );
+                    title.text = _stations[i].Name;
+                }
+                else if (_stations[i].PreviousItems < progress)
+                {
+                    _frontRects[i].SetSizeWithCurrentAnchors(
+                        RectTransform.Axis.Horizontal,
+                        (progress - _stations[i].PreviousItems) / _componentCount * width
+                    );
+                    progressBarDot.anchoredPosition = new Vector2(
+                        _frontRects[i].anchoredPosition.x + _frontRects[i].sizeDelta.x,
+                        0
+                    );
+                    title.text = _stations[i].Name;
+                }
+                else
+                {
+                    _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0);
+                    if (i != 0) continue;
+                    progressBarDot.anchoredPosition = new Vector2(0, 0);
+                    title.text = _stations[i].Name;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Show the tooltip for the progress bar
+        /// </summary>
+        private void ShowTooltip()
+        {
+            var scale = canvas.transform.localScale.y;
+            if (!_mouseInProgressBar) return;
+            float start = 0, position = Input.mousePosition.x;
+            for (var i = 0; i < _stations.Count; i++)
+            {
+                var end = (_backRects[i].anchoredPosition.x + _backRects[i].sizeDelta.x) * scale;
+                if (position > start && position < end)
+                    tooltip.ShowTooltip(
+                        position,
+                        progressBar.position.y + 55 * scale,
+                        _stations[i].Name + " \u2022 " + _stations[i].ChildCount + " Items",
+                        true
+                    );
+                start = end;
+            }
+        }
+
+        /// <summary>
+        ///     Set up the progress bar
+        /// </summary>
+        private void SetUpProgressBar()
+        {
+            // Destroy the previous children
+            _frontRects = new List<RectTransform>();
+            _backRects = new List<RectTransform>();
+            for (var i = 3; i < progressBar.transform.childCount; i++)
+                Destroy(progressBar.transform.GetChild(i).gameObject);
+
+            // Add the new background
+            for (var i = 0; i < _stations.Count; i++)
+            {
+                _backRects.Add(
+                    Instantiate(
+                        progressBarBack,
+                        progressBar.transform,
+                        true
+                    )
+                );
+                _frontRects.Add(
+                    Instantiate(
+                        progressBarFront,
+                        progressBar.transform,
+                        true
+                    )
+                );
+            }
+        }
+
+
+        /// <summary>
+        ///     React to clicking or dragging on the progress bar
+        /// </summary>
+        /// <param name="data">The event data</param>
+        public void OnProgressBarDrag(BaseEventData data)
+        {
+            var pointerData = (PointerEventData) data;
+
+            // Calculate the right index
+            var index = 0;
+            if (pointerData.position.x > Screen.width)
+            {
+                index = _componentCount;
+            }
+            else if (pointerData.position.x > 0)
+            {
+                float start = 0, position = pointerData.position.x / canvas.transform.localScale.x;
+                for (var i = 0; i < _stations.Count; i++)
+                {
+                    var end = _backRects[i].anchoredPosition.x + _backRects[i].sizeDelta.x;
+                    if (position > start && position < end)
+                    {
+                        var relativePosition = position - _backRects[i].anchoredPosition.x;
+                        index = _stations[i].PreviousItems;
+                        index += (int) (relativePosition / _backRects[i].sizeDelta.x * _stations[i].ChildCount);
+                    }
+
+                    start = end;
+                }
+            }
+
+            animationController.SkipTo(index);
+        }
+
+        /// <summary>
+        ///     React to hovering over the progress bar
+        /// </summary>
+        /// <param name="data">The event data</param>
+        public void OnProgressBarHover(BaseEventData data)
+        {
+            _mouseInProgressBar = true;
+        }
+
+        /// <summary>
+        ///     Hide the tooltip on mouse exit
+        /// </summary>
+        /// <param name="data"></param>
+        public void OnProgressBarExit(BaseEventData data)
+        {
+            _mouseInProgressBar = false;
+            tooltip.HideTooltip();
         }
 
         /// <summary>

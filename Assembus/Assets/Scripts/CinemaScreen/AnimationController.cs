@@ -28,11 +28,6 @@ namespace CinemaScreen
         private Coroutine _currentCoroutine;
 
         /// <summary>
-        ///     Current index in the playback list (-1 is the beginning _playbackList.Count - 1 is the end)
-        /// </summary>
-        private int _index;
-
-        /// <summary>
         ///     List that contains all animation items
         /// </summary>
         private List<GameObject> _playbackList;
@@ -41,6 +36,11 @@ namespace CinemaScreen
         ///     True if the current playback animation should be skipped
         /// </summary>
         private bool _shouldSkipFw, _shouldSkipBw;
+
+        /// <summary>
+        ///     Current index in the playback list (-1 is the beginning _playbackList.Count - 1 is the end)
+        /// </summary>
+        public int Index { get; private set; }
 
         /// <summary>
         ///     The state machine which controls the cinema states
@@ -68,33 +68,71 @@ namespace CinemaScreen
         private bool ShouldPause { get; set; }
 
         /// <summary>
-        ///     Initialize the animation controller on enabling it
-        /// </summary>
-        private void OnEnable()
-        {
-            // Set playback speed to 1
-            speedSlider.value = 1;
-
-            // Set index of the playback list to the beginning
-            _index = -1;
-
-            // Initialize the empty playback list
-            _playbackList = new List<GameObject>();
-
-            // Fill the playback list with the objects from the 3d model
-            FillList(ProjectManager.Instance.CurrentProject.ObjectModel);
-
-            // Reset should pause to false, necessary if cinema mode was exited while playing was acitve
-            ShouldPause = false;
-        }
-
-        /// <summary>
         ///     Stop the playback when the cinema mode is exited
         /// </summary>
         private void OnDisable()
         {
             if (CurrentState.In(CinemaStateMachine.PlayingFw, CinemaStateMachine.PlayingBw))
                 Pause();
+        }
+
+        /// <summary>
+        ///     Initialize the animation controller on enabling it
+        /// </summary>
+        /// <returns>A tuple consisting of the total child count and the station data</returns>
+        public (int, List<Station>) Initialize()
+        {
+            // Set playback speed to 1
+            speedSlider.value = 1;
+
+            // Set index of the playback list to the beginning
+            Index = -1;
+
+            // Reset should pause to false, necessary if cinema mode was exited while playing was acitve
+            ShouldPause = false;
+
+            // Load the model and station data and return it
+            return LoadData();
+        }
+
+        /// <summary>
+        ///     Load all the model and station data
+        /// </summary>
+        /// <returns>A tuple consisting of the total child count and the station data</returns>
+        private (int, List<Station>) LoadData()
+        {
+            // Reset the lists
+            _playbackList = new List<GameObject>();
+            var stations = new List<Station>();
+
+            // Iterate through the stations
+            var modelRoot = ProjectManager.Instance.CurrentProject.ObjectModel;
+            var count = 0;
+            foreach (Transform station in modelRoot.transform)
+            {
+                FillList(station.gameObject);
+                var itemInfo = station.GetComponent<ItemInfoController>().ItemInfo;
+                stations.Add(
+                    new Station
+                    {
+                        Name = itemInfo.displayName,
+                        ChildCount = _playbackList.Count - count,
+                        PreviousItems = count
+                    }
+                );
+                count = _playbackList.Count;
+            }
+
+            return (_playbackList.Count, stations);
+        }
+
+        /// <summary>
+        ///     Skip the animation to a given position
+        /// </summary>
+        /// <param name="index">The new position</param>
+        public void SkipTo(int index)
+        {
+            Index = index;
         }
 
         /// <summary>
@@ -172,7 +210,7 @@ namespace CinemaScreen
         private void SkipToStart()
         {
             // Set index to the beginning of the list
-            _index = -1;
+            Index = -1;
 
             var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
 
@@ -193,7 +231,7 @@ namespace CinemaScreen
         private void SkipToEnd()
         {
             // Set index to the end of the list
-            _index = _playbackList.Count - 1;
+            Index = _playbackList.Count - 1;
 
             var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
 
@@ -232,12 +270,12 @@ namespace CinemaScreen
         private IEnumerator PlayAnimationForward()
         {
             // Increase index to be on the item which should be faded in
-            _index++;
+            Index++;
 
             // Fade in the current item
             yield return PlayFadeAnimation(true);
 
-            if (_index >= _playbackList.Count - 1)
+            if (Index >= _playbackList.Count - 1)
             {
                 // The animation reached the end
                 CinemaStateMachine.ReachEnd();
@@ -288,9 +326,9 @@ namespace CinemaScreen
             yield return PlayFadeAnimation(false);
 
             // Decrease the index to be on the previous item
-            _index--;
+            Index--;
 
-            if (_index <= -1)
+            if (Index <= -1)
             {
                 // The animation reached the start
                 CinemaStateMachine.ReachStart();
@@ -341,30 +379,30 @@ namespace CinemaScreen
                 for (var i = 0; i < 2; i++)
                 {
                     // select next item
-                    _index++;
-                    var currentObject = _playbackList[_index];
+                    Index++;
+                    var currentObject = _playbackList[Index];
 
                     // Show item
                     SetOpacity(currentObject, 1);
                     Utility.ApplyRecursively(currentObject, obj => obj.SetActive(true), false);
 
                     // Don't go over the edge of the list
-                    if (_index >= _playbackList.Count - 1) break;
+                    if (Index >= _playbackList.Count - 1) break;
                 }
             else if (_shouldSkipBw)
                 // repeat twice
                 for (var i = 0; i < 2; i++)
                 {
                     // Get previous item
-                    var currentObject = _playbackList[_index];
-                    _index--;
+                    var currentObject = _playbackList[Index];
+                    Index--;
 
                     // Hide item
                     SetOpacity(currentObject, 0);
                     Utility.ApplyRecursively(currentObject, obj => obj.SetActive(false), false);
 
                     // Don't got over the edge of the list
-                    if (_index <= -1) break;
+                    if (Index <= -1) break;
                 }
 
             // Reset skip flags
@@ -402,7 +440,7 @@ namespace CinemaScreen
         private IEnumerator PlayFadeAnimation(bool fadeIn)
         {
             // Get the item to fade in
-            var currentObject = _playbackList[_index];
+            var currentObject = _playbackList[Index];
 
             if (fadeIn)
             {

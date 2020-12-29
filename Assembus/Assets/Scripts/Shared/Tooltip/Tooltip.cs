@@ -38,7 +38,7 @@ namespace Shared.Tooltip
             var y = position.y + offsetY * scale.y;
 
             // Show the tooltip
-            tooltip.ShowTooltip(x, y, text, center, scale.x);
+            tooltip.ShowTooltip(x, y, text, center);
         }
 
         /// <summary>

@@ -179,7 +179,7 @@ namespace CinemaScreen
                 {
                     _frontRects[i].SetSizeWithCurrentAnchors(
                         RectTransform.Axis.Horizontal,
-                        (progress - _stations[i].PreviousItems) / _componentCount * width
+                        (float) (progress - _stations[i].PreviousItems) / _componentCount * width
                     );
                     progressBarDot.anchoredPosition = new Vector2(
                         _frontRects[i].anchoredPosition.x + _frontRects[i].sizeDelta.x,

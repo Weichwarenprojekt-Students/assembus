@@ -15,12 +15,15 @@
     <link rel="stylesheet" href="css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="css/bootstrap-adjust.css">
     <link rel="stylesheet" href="css/style.css">
+
+    <script type="text/javascript" src="js/zooming.min.js"></script>
+
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body class="clean">
 <nav class="navbar navbar-expand-sm fixed-top navbar-dark bg-primary">
     <div class="container-md">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="index.html">
             <img src="img/assembus-logo.png" alt="" height="30">
         </a>
 
@@ -81,7 +84,7 @@
     <div class="container-md">
         <h1>Project Creation / Loading</h1>
         <div class="manual-image-container">
-            <img src="img/manual/project-creation.png" alt="project creation">
+            <img src="img/manual/project-creation.png" data-action="zoom" alt="project creation">
         </div>
         <p>
             After opening the application you see the project creation window. At the right-hand side, you can create a
@@ -101,7 +104,7 @@
     <div class="container-md">
         <h1>Getting Familiar with Assembus</h1>
         <div class="manual-image-container">
-            <img src="img/manual/overview.png" alt="overview">
+            <img src="img/manual/overview.png" data-action="zoom" alt="overview">
         </div>
         <p>
             After opening Assembus you are greeted by the hierarchical component listing and the 3D preview of the
@@ -201,6 +204,10 @@
         </p>
     </div>
 </section>
+
+<script type="text/javascript">
+    new Zooming().listen("[data-action='zoom']")
+</script>
 
 </body>
 </html>

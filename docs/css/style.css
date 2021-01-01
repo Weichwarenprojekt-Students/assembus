@@ -170,6 +170,9 @@ button.pronounce {
  * Navigation
  *
  */
+.fixed-top {
+    z-index: 900; /* Fix image zoom */
+}
 
 @media screen and (max-width: 576px) {
     .navbar-collapse {
@@ -297,4 +300,24 @@ button.pronounce {
 
 .clean section:nth-child(even) {
     background-color: #ffffff;
+}
+
+.manual-image-container img {
+    width: 400px;
+    height: auto;
+}
+
+
+
+
+
+/**
+ *
+ * Zoomerang layout
+ *
+ */
+img[data-action="zoom"] {
+    cursor: pointer;
+    cursor: -webkit-zoom-in;
+    cursor: -moz-zoom-in;
 }

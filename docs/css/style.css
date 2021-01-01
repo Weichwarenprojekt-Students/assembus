@@ -144,6 +144,20 @@ footer img {
     padding: 0 16px;
 }
 
+@media screen and (max-width: 576px) {
+    .logo-image {
+        height: auto;
+    }
+    .logo-box {
+        padding: 40px 0 0 0;
+        text-align: center;
+    }
+    .logo-box .logo-image img {
+        height: auto;
+        width: 90%;
+    }
+}
+
 button.pronounce {
     border: 0;
     background-color: transparent;

@@ -13,6 +13,10 @@ body {
     min-height: 100%;
 }
 
+a {
+    text-decoration: none;
+}
+
 .btn i.zmdi {
     margin-right: 8px;
 }

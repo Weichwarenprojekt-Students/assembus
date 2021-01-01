@@ -30,7 +30,7 @@ section:nth-child(even) {
 }
 
 #intro {
-    margin-top: 59px;
+    margin-top: 58px;
     padding: 32px 0 64px;
     color: var(--text);
     background-color: var(--prime-5);
@@ -147,10 +147,125 @@ button.pronounce {
 }
 
 
+/**
+ *
+ * Navigation
+ *
+ */
+
+@media screen and (max-width: 576px) {
+    .navbar-collapse {
+        top: 58px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: fixed;
+        background-color: var(--prime-5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .navbar-nav .nav-link {
+        text-align: center;
+        font-size: 3rem;
+        color: white !important;
+        background-image: linear-gradient(white 50%, white 50%);
+        background-size: 10000px 4px;
+        background-repeat: no-repeat;
+        background-position: -10000px 4.5rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+        background-position: 0 4.5rem;
+        transition: background-position 2s ease-in-out;
+    }
+}
+
+/* From: https://codepen.io/jorenerene/pen/vxKbJb */
+@media screen and (min-width: 577px) {
+    .navbar-toggle {
+        display: none;
+    }
+}
+@media screen and (max-width: 576px) {
+    .navbar-toggle.toggle-x {
+        border: none;
+        background: transparent !important;
+        outline: none;
+    }
+
+    .navbar-toggle.toggle-x:hover {
+        background: transparent !important;
+    }
+
+    .navbar-toggle.toggle-x .icon-bar {
+        width: 22px;
+        height: 2px;
+        display: block;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
+        background-color: #fff;
+    }
+
+    .navbar-toggle.toggle-x .icon-bar:nth-of-type(1) {
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        -webkit-transform-origin: 10% 10%;
+        -ms-transform-origin: 10% 10%;
+        transform-origin: 10% 10%;
+    }
+
+    .navbar-toggle.toggle-x .icon-bar:nth-of-type(2) {
+        margin-top: 4px;
+        opacity: 0;
+        filter: alpha(opacity=0);
+    }
+
+    .navbar-toggle.toggle-x .icon-bar:nth-of-type(3) {
+        margin-top: 4px;
+        -webkit-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+        -webkit-transform-origin: 10% 90%;
+        -ms-transform-origin: 10% 90%;
+        transform-origin: 10% 90%;
+    }
+
+    .navbar-toggle.toggle-x.collapsed .icon-bar:nth-of-type(1) {
+        -webkit-transform: rotate(0);
+        -ms-transform: rotate(0);
+        transform: rotate(0);
+    }
+
+    .navbar-toggle.toggle-x.collapsed .icon-bar:nth-of-type(2) {
+        opacity: 1;
+        filter: alpha(opacity=100);
+    }
+
+    .navbar-toggle.toggle-x.collapsed .icon-bar:nth-of-type(3) {
+        -webkit-transform: rotate(0);
+        -ms-transform: rotate(0);
+        transform: rotate(0);
+    }
+
+    .navbar-header {
+        float: none;
+    }
+
+    .navbar-toggle {
+        display: block;
+        padding: 9px 10px;
+    }
+}
+
+
+
 
 /**
  *
- * Documentation specific
+ * Manual specific
  *
  */
 
@@ -161,6 +276,7 @@ button.pronounce {
 .clean section {
     padding: 32px 0 0;
 }
+
 .clean section:nth-child(even) {
     background-color: #ffffff;
 }

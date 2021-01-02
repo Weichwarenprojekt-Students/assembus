@@ -132,7 +132,21 @@ namespace CinemaScreen
         /// <param name="index">The new position</param>
         public void SkipTo(int index)
         {
-            Index = index;
+            // Check if the value actually changed
+            if (Index == index - 1) return;
+            
+            // Make sure the current item is hidden
+            if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
+            if (Index >= 0) SetOpacity(_playbackList[Index], 0);
+            
+            // Prepare everything for the new position
+            Index = index - 1;
+            for (var i = 0; i <= index; i++) SetOpacity(_playbackList[i], 1);
+            for (var i = index; i < _playbackList.Count; i++) SetOpacity(_playbackList[i], 0);
+
+            // Check if the machine reached the start or the end
+            if (Index < 0) CinemaStateMachine.ReachStart();
+            else if (Index >= _playbackList.Count - 1) CinemaStateMachine.ReachEnd();
         }
 
         /// <summary>
@@ -212,16 +226,8 @@ namespace CinemaScreen
             // Set index to the beginning of the list
             Index = -1;
 
-            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
-
-            // Hide all items recursively (except groups)
-            Utility.ApplyRecursively(
-                objectModel,
-                o => o.SetActive(false),
-                false
-            );
-
             // Set opacity of all components to fully transparent
+            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
             SetOpacity(objectModel, 0);
         }
 
@@ -233,16 +239,8 @@ namespace CinemaScreen
             // Set index to the end of the list
             Index = _playbackList.Count - 1;
 
-            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
-
-            // Show all items recursively (except groups)
-            Utility.ApplyRecursively(
-                objectModel,
-                o => o.SetActive(true),
-                false
-            );
-
             // Set opacity of all components to fully opaque
+            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
             SetOpacity(objectModel, 1);
         }
 
@@ -384,7 +382,6 @@ namespace CinemaScreen
 
                     // Show item
                     SetOpacity(currentObject, 1);
-                    Utility.ApplyRecursively(currentObject, obj => obj.SetActive(true), false);
 
                     // Don't go over the edge of the list
                     if (Index >= _playbackList.Count - 1) break;
@@ -399,7 +396,6 @@ namespace CinemaScreen
 
                     // Hide item
                     SetOpacity(currentObject, 0);
-                    Utility.ApplyRecursively(currentObject, obj => obj.SetActive(false), false);
 
                     // Don't got over the edge of the list
                     if (Index <= -1) break;
@@ -448,7 +444,6 @@ namespace CinemaScreen
                 SetOpacity(currentObject, 0);
 
                 // Set the item or its child components to be visible
-                Utility.ApplyRecursively(currentObject, obj => obj.SetActive(true), false);
             }
 
             for (float opacity = 0; opacity <= 1; opacity += 3 * Time.deltaTime)
@@ -463,17 +458,7 @@ namespace CinemaScreen
                 yield return null;
             }
 
-            if (!fadeIn)
-            {
-                // Set the item or its child components to be hidden
-                SetOpacity(currentObject, 0);
-                Utility.ApplyRecursively(currentObject, obj => obj.SetActive(false), false);
-            }
-            else
-            {
-                // Reset opacity so its always opaque
-                SetOpacity(currentObject, 1);
-            }
+            SetOpacity(currentObject, !fadeIn ? 0 : 1);
         }
 
         /// <summary>

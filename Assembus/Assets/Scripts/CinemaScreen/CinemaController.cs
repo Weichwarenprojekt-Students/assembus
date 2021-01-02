@@ -15,7 +15,7 @@ namespace CinemaScreen
         /// <summary>
         ///     The size of a gap between stations on the progress bar
         /// </summary>
-        private const int GapSize = 10;
+        private const int GapSize = 15;
 
         /// <summary>
         ///     References to main and cinema screen
@@ -117,11 +117,7 @@ namespace CinemaScreen
             var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
 
             // Hide all components
-            Utility.ApplyRecursively(
-                objectModel,
-                o => o.SetActive(false),
-                false
-            );
+            Utility.ApplyRecursively(objectModel,o => o.SetActive(true), true);
             AnimationController.SetOpacity(objectModel, 0);
 
             // Initialize new state machine
@@ -151,7 +147,7 @@ namespace CinemaScreen
         {
             var scale = canvas.transform.localScale.y;
             var width = Screen.width / scale - (_stations.Count - 1) * GapSize;
-            var progress = animationController.Index;
+            var progress = animationController.Index + 1;
             for (var i = 0; i < _stations.Count; i++)
             {
                 // Position the rectangles
@@ -164,8 +160,8 @@ namespace CinemaScreen
                 var fullWidth = (float) _stations[i].ChildCount / _componentCount * width;
                 _backRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, fullWidth);
 
-                // Adjust the size of the foregrounds and update the station name
-                if (_stations[i].PreviousItems + _stations[i].ChildCount < progress)
+                // Check if the stations is already passed (foreground size: full)
+                if (_stations[i].PreviousItems + _stations[i].ChildCount <= progress)
                 {
                     _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, fullWidth);
                     if (i != _stations.Count - 1) continue;
@@ -175,18 +171,19 @@ namespace CinemaScreen
                     );
                     title.text = _stations[i].Name;
                 }
-                else if (_stations[i].PreviousItems < progress)
+                // Check if the station is currently shown (foreground size: relative)
+                else if (_stations[i].PreviousItems <= progress)
                 {
-                    _frontRects[i].SetSizeWithCurrentAnchors(
-                        RectTransform.Axis.Horizontal,
-                        (float) (progress - _stations[i].PreviousItems) / _componentCount * width
-                    );
+                    var relativeWidth = (float) (progress - _stations[i].PreviousItems) /
+                                        (_stations[i].ChildCount - 1) + _backRects[i].sizeDelta.x; 
+                    _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, relativeWidth);
                     progressBarDot.anchoredPosition = new Vector2(
                         _frontRects[i].anchoredPosition.x + _frontRects[i].sizeDelta.x,
                         0
                     );
                     title.text = _stations[i].Name;
                 }
+                // Check if the station isn't reached yet (foreground size: zero)
                 else
                 {
                     _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0);
@@ -267,18 +264,28 @@ namespace CinemaScreen
             }
             else if (pointerData.position.x > 0)
             {
+                // Iterate through the stations and check if the cursor is on a station
                 float start = 0, position = pointerData.position.x / canvas.transform.localScale.x;
                 for (var i = 0; i < _stations.Count; i++)
                 {
                     var end = _backRects[i].anchoredPosition.x + _backRects[i].sizeDelta.x;
-                    if (position > start && position < end)
+                    
+                    // Check if cursor is on a station bar
+                    if (position >= start && position <= end)
                     {
                         var relativePosition = position - _backRects[i].anchoredPosition.x;
                         index = _stations[i].PreviousItems;
                         index += (int) (relativePosition / _backRects[i].sizeDelta.x * _stations[i].ChildCount);
+                        break;
                     }
-
-                    start = end;
+                    
+                    // Check if cursor is on a gap
+                    if (position > end && position < end + GapSize)
+                    {
+                        index = _stations[i].PreviousItems + _stations[i].ChildCount;
+                        break;
+                    }
+                    start = end + GapSize;
                 }
             }
 

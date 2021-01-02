@@ -747,5 +747,15 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             scrollRect.OnScroll((PointerEventData) data);
         }
+
+        /// <summary>
+        ///     Stop inserting an item into this item
+        /// </summary>
+        /// <param name="data">Event data</param>
+        public void SelectTextInput(BaseEventData data)
+        {
+            Debug.Log("Hallo");
+            nameInput.Select();
+        }
     }
 }

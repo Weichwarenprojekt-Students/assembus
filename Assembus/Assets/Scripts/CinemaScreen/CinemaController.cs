@@ -114,9 +114,8 @@ namespace CinemaScreen
             // Disable component highlighting
             componentHighlighting.isActive = false;
 
-            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
-
             // Hide all components
+            var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
             Utility.ApplyRecursively(objectModel,o => o.SetActive(true), true);
             AnimationController.SetOpacity(objectModel, 0);
 
@@ -174,8 +173,8 @@ namespace CinemaScreen
                 // Check if the station is currently shown (foreground size: relative)
                 else if (_stations[i].PreviousItems <= progress)
                 {
-                    var relativeWidth = (float) (progress - _stations[i].PreviousItems) /
-                                        (_stations[i].ChildCount - 1) + _backRects[i].sizeDelta.x; 
+                    var relativeWidth = (float) (progress - _stations[i].PreviousItems) / _stations[i].ChildCount
+                                        * _backRects[i].sizeDelta.x; 
                     _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, relativeWidth);
                     progressBarDot.anchoredPosition = new Vector2(
                         _frontRects[i].anchoredPosition.x + _frontRects[i].sizeDelta.x,

@@ -145,7 +145,7 @@ namespace CinemaScreen
             }
             
             // Prepare everything for the new position
-            Index = index - 1;
+            Index = currentlyPlaying ? index - 2 : index - 1;
             for (var i = 0; i < index; i++) SetOpacity(_playbackList[i], 1);
             for (var i = index; i < _playbackList.Count; i++) SetOpacity(_playbackList[i], 0);
 
@@ -257,7 +257,11 @@ namespace CinemaScreen
         /// <param name="skip">True if the state change is caused by skip</param>
         public void Play(bool skip = false)
         {
-            if (speedSlider.value >= 0) CinemaStateMachine.PlayFw(skip);
+            if (speedSlider.value >= 0)
+            {
+                if (CurrentState == CinemaStateMachine.StoppedEnd) CinemaStateMachine.SkipToStart();
+                CinemaStateMachine.PlayFw(skip);
+            }
             else CinemaStateMachine.PlayBw(skip);
         }
 

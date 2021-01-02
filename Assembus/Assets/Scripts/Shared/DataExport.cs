@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.IO.Compression;
 using System.Xml.Linq;
 using Models.Project;
 using Services.Serialization;
@@ -20,10 +21,37 @@ namespace Shared
             // Save chosen file name
             ProjectManager.CurrentProject.ExportFileName = Path.GetFileName(exportPath);
 
+            // Export the file locally first, because an error might lead to an incomplete zip archive
+            var localExportPath = Path.Combine(ProjectManager.CurrentProjectDir, "export.bus");
+
             try
             {
-                // Export data structure to XML file
-                ConvertToExportXml().Save(exportPath);
+                // Create new file for zip archive
+                using (var zipToSave = new FileStream(localExportPath, FileMode.Create))
+                {
+                    using (var archive = new ZipArchive(zipToSave, ZipArchiveMode.Update))
+                    {
+                        // Create entry in zip file for the xml export
+                        var xmlExportEntry = archive.CreateEntry(ProjectManager.CurrentProject.Name + ".xml");
+
+                        using (var writer = new StreamWriter(xmlExportEntry.Open()))
+                        {
+                            // Write the xml export data to the archive entry
+                            ConvertToExportXml().Save(writer);
+                        }
+
+                        // Create entry from the obj file of the project
+                        var objFileName = ProjectManager.CurrentProject.ObjectFile;
+
+                        archive.CreateEntryFromFile(
+                            Path.Combine(ProjectManager.CurrentProjectDir, objFileName),
+                            objFileName
+                        );
+                    }
+                }
+
+                // Copy the finished archive to the intended path
+                File.Copy(localExportPath, exportPath, true);
             }
             catch (ModelManager.ToplevelComponentException e)
             {
@@ -33,6 +61,12 @@ namespace Shared
             {
                 return (false, "Error while exporting data!");
             }
+            finally
+            {
+                // Always delete the local export archive
+                if (File.Exists(localExportPath)) File.Delete(localExportPath);
+            }
+
             return (true, "");
         }
 

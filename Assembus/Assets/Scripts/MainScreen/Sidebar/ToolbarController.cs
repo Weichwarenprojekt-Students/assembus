@@ -187,7 +187,7 @@ namespace MainScreen.Sidebar
                 string.IsNullOrEmpty(previousExportFileName)
                     ? _projectManager.CurrentProject.Name
                     : previousExportFileName,
-                "xml"
+                "bus"
             );
 
             // If save dialog was canceled, string is empty

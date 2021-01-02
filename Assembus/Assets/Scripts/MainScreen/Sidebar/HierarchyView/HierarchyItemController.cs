@@ -499,6 +499,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void AddGroup()
         {
+            // Save the item state
             var state = new ItemState(
                 _projectManager.GetNextGroupID(),
                 "Group",

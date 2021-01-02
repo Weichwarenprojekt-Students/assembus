@@ -58,12 +58,12 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     RectTransform from Scroll View
         /// </summary>
-        public RectTransform scrollRect;
+        public RectTransform scrollRectTrans;
 
         /// <summary>
         ///     ScrollRect from Scroll View
         /// </summary>
-        public ScrollRect scroll;
+        public ScrollRect scrollRect;
 
         /// <summary>
         ///     The project manager
@@ -91,12 +91,20 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchyView;
 
         /// <summary>
+        ///     Gets true if the user scrolls manually while auto scroll to stop auto scroll
+        /// </summary>
+        private bool _stopAutoScroll;
+        
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
         {
             if (_updateHierarchyView)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView.GetComponent<RectTransform>());
+            
+            // Stop autoscroll if user manually scrolls
+            if (Input.mouseScrollDelta != Vector2.zero) _stopAutoScroll = true;
         }
 
         /// <summary>
@@ -497,19 +505,19 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="targetItem"></param>
         public void ScrollToItem(RectTransform targetItem)
         {
-            scroll.enabled = false;
+            scrollRect.enabled = false;
             Canvas.ForceUpdateCanvases();
-            scroll.enabled = true;
+            scrollRect.enabled = true;
 
             // Top border of the actual viewport
             var topBorder = contentPanel.localPosition.y;
 
             // Lower border of the actual viewport
-            var lowerBorder = topBorder + 1000;
+            var lowerBorder = topBorder + scrollRectTrans.rect.height;
 
             // Target item position in the viewport
-            var itemPosition = scrollRect.InverseTransformPoint(contentPanel.position).y -
-                               scrollRect.transform.InverseTransformPoint(targetItem.position).y;
+            var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -
+                                    scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
 
             // Check if item is outside the borders, if so, scroll to the item
             if (!(itemPosition < lowerBorder && topBorder < itemPosition))
@@ -524,23 +532,23 @@ namespace MainScreen.Sidebar.HierarchyView
         private IEnumerator ScrollToTarget(float targetValue)
         {
             var interpolatedFloat = new InterpolatedFloat(contentPanel.anchoredPosition.y);
-
-            while (interpolatedFloat != targetValue)
+            _stopAutoScroll = false;
+            while (!interpolatedFloat.IsAtValue(targetValue) && !_stopAutoScroll)
             {
                 interpolatedFloat.ToValue(targetValue);
 
-                contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value());
+                contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value);
 
                 // Check, if the scroll view will scroll outside the viewport
-                if (scroll.normalizedPosition.y < 0)
+                if (scrollRect.normalizedPosition.y < 0)
                 {
-                    scroll.normalizedPosition = scroll.viewport.anchorMin;
+                    scrollRect.normalizedPosition = scrollRect.viewport.anchorMin;
                     break;
                 }
 
-                if (scroll.normalizedPosition.y > 1)
+                if (scrollRect.normalizedPosition.y > 1)
                 {
-                    scroll.normalizedPosition = scroll.viewport.anchorMax;
+                    scrollRect.normalizedPosition = scrollRect.viewport.anchorMax;
                     break;
                 }
 

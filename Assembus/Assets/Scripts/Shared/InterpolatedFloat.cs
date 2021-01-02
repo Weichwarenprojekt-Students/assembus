@@ -12,7 +12,7 @@ namespace Shared
         /// <summary>
         ///     The actual value
         /// </summary>
-        private float _value;
+        public float Value { get; private set; }
 
         /// <summary>
         ///     Constructor
@@ -21,31 +21,20 @@ namespace Shared
         /// <param name="power">The power of the linear interpolation</param>
         public InterpolatedFloat(float value = 0f, float power = 3f)
         {
-            _value = value;
+            Value = value;
             _power = power;
         }
 
         /// <summary>
-        ///     Overloading == operator
+        ///     Checks if the interpolated float is at a certain value
         /// </summary>
-        /// <param name="interpolatedFloat"></param>
         /// <param name="value"></param>
-        /// <returns></returns>
-        public static bool operator ==(InterpolatedFloat interpolatedFloat, float value)
+        /// <returns>True if the values are equal</returns>
+        public bool IsAtValue(float value)
         {
-            return interpolatedFloat != null && Mathf.Abs(interpolatedFloat.Value() - value) < 0.1f;
+            return Mathf.Abs(Value - value) < 0.1f;
         }
-
-        /// <summary>
-        ///     Overloading != operator
-        /// </summary>
-        /// <param name="interpolatedFloat"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static bool operator !=(InterpolatedFloat interpolatedFloat, float value)
-        {
-            return !(interpolatedFloat == value);
-        }
+        
 
         /// <summary>
         ///     Interpolate the new value (with respect to the given delta time)
@@ -53,16 +42,7 @@ namespace Shared
         /// <param name="newValue">The new value that shall be targeted</param>
         public void ToValue(float newValue)
         {
-            _value += (newValue - _value) * _power * Time.deltaTime;
-        }
-
-        /// <summary>
-        ///     Returns the current value of the interpolation
-        /// </summary>
-        /// <returns>The current value</returns>
-        public float Value()
-        {
-            return _value;
+            Value += (newValue - Value) * _power * Time.deltaTime;
         }
     }
 }

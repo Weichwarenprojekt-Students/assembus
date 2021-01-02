@@ -7587,8 +7587,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 665188724}
   m_HandleRect: {fileID: 665188723}
   m_Direction: 0
-  m_Value: 0.0000019073486
-  m_Size: 0.9747634
+  m_Value: 0
+  m_Size: 0.9747635
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10678,8 +10678,8 @@ MonoBehaviour:
   normalColor: {r: 0.20784314, g: 0.28627452, b: 0.40392157, a: 1}
   contextMenu: {fileID: 1647295334}
   contentPanel: {fileID: 441038524}
-  scrollRect: {fileID: 22417656}
-  scroll: {fileID: 22417657}
+  scrollRectTrans: {fileID: 22417656}
+  scrollRect: {fileID: 22417657}
 --- !u!224 &2006810629
 RectTransform:
   m_ObjectHideFlags: 0

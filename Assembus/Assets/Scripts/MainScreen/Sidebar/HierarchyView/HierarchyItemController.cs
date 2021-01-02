@@ -176,6 +176,16 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool HasChildren => item.transform.childCount > 0;
 
         /// <summary>
+        ///     The CommandGroup instance
+        /// </summary>
+        private CommandGroup _commandGroup;
+        
+        /// <summary>
+        ///     Is the rename from a new Group
+        /// </summary>
+        private static bool _isRenameInitial;
+
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
@@ -189,16 +199,21 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Apply rename of component on press enter key
             if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf)
+            {
                 ApplyRenaming();
-
+            }
+            
             // Cancel renaming a component on press escape key
             if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
                 CancelRenaming();
 
             // Check if the object is active and if the mouse is clicked
             if (!Input.GetMouseButtonDown(0) || !nameInputObject.activeSelf) return;
+            
             if (EventSystem.current.currentSelectedGameObject != nameInputObject)
+            {
                 ApplyRenaming();
+            }
         }
 
         /// <summary>
@@ -384,7 +399,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 {
                     Icon = contextMenu.edit,
                     Name = "Rename",
-                    Action = RenameItem
+                    Action = () => RenameItem()
                 }
             };
 
@@ -455,8 +470,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Start a renaming action
         /// </summary>
-        public void RenameItem()
+        public void RenameItem(bool isInitial = false, CommandGroup commandGroup = null)
         {
+            _commandGroup = commandGroup;
+            _isRenameInitial = isInitial;
             nameInput.text = nameText.text;
             nameInputObject.SetActive(true);
             nameInput.Select();
@@ -527,7 +544,11 @@ namespace MainScreen.Sidebar.HierarchyView
                 item.transform.parent.name,
                 Utility.GetNeighbourID(item.transform)
             );
-            _undoService.AddCommand(new CreateCommand(true, state));
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
 
             // Move the items
             _dragItem =
@@ -535,16 +556,17 @@ namespace MainScreen.Sidebar.HierarchyView
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
+            
             // Scroll to First selected Game object
             var groupItem = gameObject.transform.parent.parent;
             hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
-            groupItem.GetComponent<HierarchyItemController>().RenameItem();
+            groupItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>
         ///     Cancel a rename action
         /// </summary>
-        public void CancelRenaming()
+        private void CancelRenaming()
         {
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
@@ -553,7 +575,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Apply a rename action
         /// </summary>
-        public void ApplyRenaming()
+        private void ApplyRenaming()
         {
             // Check if there's a name given
             var newName = nameInput.text;
@@ -562,13 +584,25 @@ namespace MainScreen.Sidebar.HierarchyView
                 toast.Error(Toast.Short, "Name cannot be empty!");
                 return;
             }
-
+            
             // Hide the input field an show the name field
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
+            
+            // Check if nothing is changed
+            if (nameInput.text == item.name) return;
 
-            // Add the new action to the undo redo service
-            _undoService.AddCommand(new RenameCommand(item.name, nameText.text, newName));
+            var renameCommand = new RenameCommand(item.name, nameText.text, newName);
+            
+            
+            // Add the Command to the group if there is "Group Selected"
+            if (_isRenameInitial)
+            {
+                _commandGroup.AddToGroup(renameCommand);
+                renameCommand.Redo();
+                _isRenameInitial = false;
+            }
+            else _undoService.AddCommand(renameCommand);
         }
 
         /// <summary>
@@ -643,7 +677,9 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new MoveCommand(oldStates, newStates));
+            var moveCommand = new MoveCommand(oldStates, newStates);
+            _commandGroup.AddToGroup(moveCommand);
+            moveCommand.Redo();
         }
 
         /// <summary>

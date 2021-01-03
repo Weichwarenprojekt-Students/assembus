@@ -7,6 +7,7 @@ using Shared.Tooltip;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace CinemaScreen
 {
@@ -58,6 +59,11 @@ namespace CinemaScreen
         public TooltipController tooltip;
 
         /// <summary>
+        ///     The slider for the speed regulation
+        /// </summary>
+        public Slider speedSlider;
+
+        /// <summary>
         ///     The rectangles that are placed on the progress bar for each station
         /// </summary>
         private List<RectTransform> _backRects, _frontRects;
@@ -98,12 +104,13 @@ namespace CinemaScreen
         }
 
         /// <summary>
-        ///     Update the progress bar
+        ///     Update the UI
         /// </summary>
         private void Update()
         {
             UpdateProgressBar();
             ShowTooltip();
+            UpdateSlider();
         }
 
         /// <summary>
@@ -116,7 +123,7 @@ namespace CinemaScreen
 
             // Hide all components
             var objectModel = ProjectManager.Instance.CurrentProject.ObjectModel;
-            Utility.ApplyRecursively(objectModel,o => o.SetActive(true), true);
+            Utility.ApplyRecursively(objectModel, o => o.SetActive(true), true);
             AnimationController.SetOpacity(objectModel, 0);
 
             // Initialize new state machine
@@ -136,6 +143,15 @@ namespace CinemaScreen
             (_componentCount, _stations) = animationController.Initialize();
             animationController.CinemaStateMachine = CinemaStateMachine;
             SetUpProgressBar();
+        }
+
+        /// <summary>
+        ///     Keep the slider's fill area centered
+        /// </summary>
+        private void UpdateSlider()
+        {
+            speedSlider.fillRect.anchorMin = new Vector2(Mathf.Clamp(speedSlider.handleRect.anchorMin.x, 0, 0.5f), 0);
+            speedSlider.fillRect.anchorMax = new Vector2(Mathf.Clamp(speedSlider.handleRect.anchorMin.x, 0.5f, 1), 1);
         }
 
         /// <summary>
@@ -174,7 +190,7 @@ namespace CinemaScreen
                 else if (_stations[i].PreviousItems <= progress)
                 {
                     var relativeWidth = (float) (progress - _stations[i].PreviousItems) / _stations[i].ChildCount
-                                        * _backRects[i].sizeDelta.x; 
+                                        * _backRects[i].sizeDelta.x;
                     _frontRects[i].SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, relativeWidth);
                     progressBarDot.anchoredPosition = new Vector2(
                         _frontRects[i].anchoredPosition.x + _frontRects[i].sizeDelta.x,
@@ -268,7 +284,7 @@ namespace CinemaScreen
                 for (var i = 0; i < _stations.Count; i++)
                 {
                     var end = _backRects[i].anchoredPosition.x + _backRects[i].sizeDelta.x;
-                    
+
                     // Check if cursor is on a station bar
                     if (position >= start && position <= end)
                     {
@@ -277,13 +293,14 @@ namespace CinemaScreen
                         index += (int) (relativePosition / _backRects[i].sizeDelta.x * _stations[i].ChildCount);
                         break;
                     }
-                    
+
                     // Check if cursor is on a gap
                     if (position > end && position < end + GapSize)
                     {
                         index = _stations[i].PreviousItems + _stations[i].ChildCount;
                         break;
                     }
+
                     start = end + GapSize;
                 }
             }

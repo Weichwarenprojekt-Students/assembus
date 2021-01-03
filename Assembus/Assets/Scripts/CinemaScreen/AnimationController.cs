@@ -134,16 +134,16 @@ namespace CinemaScreen
         {
             // Check if the value actually changed
             if (Index == index - 1) return;
-            
+
             // Make sure the current item is hidden
             var currentlyPlaying = CurrentState == CinemaStateMachine.PlayingFw ||
-                            CurrentState == CinemaStateMachine.PlayingBw;
+                                   CurrentState == CinemaStateMachine.PlayingBw;
             if (currentlyPlaying)
             {
                 if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
                 if (Index >= 0) SetOpacity(_playbackList[Index], 0);
             }
-            
+
             // Prepare everything for the new position
             Index = currentlyPlaying ? index - 2 : index - 1;
             for (var i = 0; i < index; i++) SetOpacity(_playbackList[i], 1);
@@ -262,7 +262,10 @@ namespace CinemaScreen
                 if (CurrentState == CinemaStateMachine.StoppedEnd) CinemaStateMachine.SkipToStart();
                 CinemaStateMachine.PlayFw(skip);
             }
-            else CinemaStateMachine.PlayBw(skip);
+            else
+            {
+                CinemaStateMachine.PlayBw(skip);
+            }
         }
 
         /// <summary>
@@ -424,8 +427,8 @@ namespace CinemaScreen
         /// <returns>IEnumerator for the coroutine</returns>
         private IEnumerator WaitAccordingToSpeedSlider()
         {
-            // Calculate delay until next fading, between 2s and 200ms
-            var waitTime = -0.9 * Math.Abs(speedSlider.value) + 2;
+            // Calculate delay until next fading, between 2s and 0s
+            var waitTime = -1f * Math.Abs(speedSlider.value) + 2f;
 
             var passedTime = 0.0;
             while (passedTime <= waitTime)
@@ -451,12 +454,10 @@ namespace CinemaScreen
             var currentObject = _playbackList[Index];
 
             if (fadeIn)
-            {
                 // Set item to be fully transparent
                 SetOpacity(currentObject, 0);
 
-                // Set the item or its child components to be visible
-            }
+            // Set the item or its child components to be visible
 
             for (float opacity = 0; opacity <= 1; opacity += 3 * Time.deltaTime)
             {

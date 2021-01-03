@@ -264,6 +264,7 @@ namespace CinemaScreen
             }
             else
             {
+                if (CurrentState == CinemaStateMachine.StoppedStart) CinemaStateMachine.SkipToEnd();
                 CinemaStateMachine.PlayBw(skip);
             }
         }

@@ -329,7 +329,33 @@ button.pronounce {
 
 
 
+/**
+ *
+ * Download specific
+ *
+ */
 
+section#download {
+    color: var(--text);
+    background-color: var(--prime-5);
+    min-height: calc(100vh - 80px);
+    padding: 96px 0;
+}
+
+section#download .jumbotron > * {
+    text-align: center;
+}
+
+img.download-logo {
+    width: 90%;
+    height: auto;
+    max-width: 250px;
+    margin: 24px auto;
+}
+
+span.manual-teaser {
+    margin-top: 8px;
+}
 
 /**
  *

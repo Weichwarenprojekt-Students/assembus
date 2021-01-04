@@ -52,7 +52,6 @@
     <div class="container-md">
         <div class="row">
             <div class="contents-container col-md-4 order-1">
-                <h4>Contents</h4>
                 <ul class="list-group">
                     <li class="list-group-item"><a href="#project-creation">Project Creation / Loading</a></li>
                     <li class="list-group-item"><a href="#getting-familiar">Getting Familiar with Assembus</a></li>
@@ -104,7 +103,7 @@
     <div class="container-md">
         <h1>Getting Familiar with Assembus</h1>
         <div class="manual-image-container">
-            <img src="img/manual/overview.png" data-action="zoom" alt="overview">
+            <img src="img/manual/overview.png" data-action="zoom" alt="Overview">
         </div>
         <p>
             After opening Assembus you are greeted by the hierarchical component listing and the 3D preview of the
@@ -113,12 +112,20 @@
         <p>
             The 3D preview visualizes all components of the assembled model. You can easily inspect the 3D model by
             using your mouse.
-            To rotate the object, hold the left mouse button while moving the mouse. The mousewheel can be used to zoom
+            To rotate the object, hold the right mouse button while moving the mouse. The mousewheel can be used to zoom
             in and out. Additionally, you can change the focus of the camera by double clicking a component of the 3D
             model or an entry of the hierarchical list.
+        </p>
+
+        <div class="manual-image-container">
+            <img src="img/manual/highlighting.png" data-action="zoom" alt="Highlighting">
+        </div>
+
+        <p>
             To identify an element of the hierarchical list in the preview, simply click on it. This works in both
             directions - clicking on a component of the 3D model will highlight the corresponding entry in the list.
         </p>
+
         <p>
             If you want to revert any changes you go a step back in the history by clicking the Undo-button in the
             sidebar navigation. Similarly, you can move one step forward with the Redo-button. Alternatively, both
@@ -132,35 +139,37 @@
 <section id="edit">
     <div class="container-md">
         <h1>Editing the Assembly Line</h1>
+
+        <div class="manual-image-container">
+            <img src="img/manual/context-menu.png" data-action="zoom" alt="Context menu">
+        </div>
+
         <p>
             The editing of your assembly sequence is done in the hierarchical list. The actual assembly sequence is
-            defined
-            by the ordering of the elements inside the hierarchical list.
+            defined by the ordering of the elements inside the hierarchical list.
             The ordering can be modified by dragging elements. Multiple items can be selected by clicking and
             holding <kbd>Ctrl</kbd> while selecting items in the list. Press <kbd>Shift</kbd> to select all items
             between two boundaries.
-
+        </p>
+        <p>
             By default, all components are located inside the "Default Station". New assembly stations can be created by
-            clicking the overflow-menu
-            in the top and selecting "Create Station". Simply move components into the new station by using Drag&Drop.
-
+            clicking the overflow-menu in the top and selecting "Create Station". The station will be added as a top-level group.
+            Simply move components into the new station by using Drag&Drop.
+            The separation into station is used by the <a href=#station-view>Station View</a>.
+        </p>
+        <p>
             To keep the project clean and tidy, multiple components can be grouped into groups.
             You can either right-click on an assembly station and select "Add Group" to create a new empty group or you
-            can
-            select multiple items to be grouped and right click on the selection and select "Group selected" to group
+            can select multiple items to be grouped and right click on the selection and select "Group selected" to group
             the marked components.
             If you want to abstract pre-built components, you can fuse existing groups by right-clicking on a group and
-            selecting "Fuse Group" to
-            hide all items of the group from the user. Fused groups are marked with a chain icon and their content can
-            be shown by
-            Top-level groups represent stations of the assembly line. <a href=#station-view>Station View</a>
-
+            selecting "Fuse Group" to hide all items of the group from the user. Fused groups are marked with a chain icon
+            and their content can be toggled by clicking at the icon.
+        </p>
+        <p>
             To rename a component, component group or assembly station, open the context menu with a right-click and
             select "Rename" to alter the displayed name.
         </p>
-        <div class="manual-image-container">
-            <img src="TODO" alt="Context menu">
-        </div>
     </div>
 </section>
 
@@ -171,8 +180,31 @@
 
         <h2 id="station-view"></h2>
 
+        <div class="manual-image-container">
+            <img src="img/manual/station-view.png" data-action="zoom" alt="Station View">
+        </div>
+
+        <p>
+
+        </p>
+
+        <div class="manual-image-container">
+            <img src="img/manual/context-menu-station-view.png" data-action="zoom" alt="Context menu Station View">
+        </div>
+
+        <p>
+
+        </p>
 
         <h2 id="cinema-mode"></h2>
+
+        <div class="manual-image-container">
+            <img src="img/manual/cinema-mode.png" data-action="zoom" alt="Cinema Mode">
+        </div>
+
+        <p>
+
+        </p>
 
 
         Editing the Assembly Line

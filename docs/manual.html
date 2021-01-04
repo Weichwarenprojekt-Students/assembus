@@ -177,62 +177,93 @@
     <div class="container-md">
         <h1>Assembly Line Visualization</h1>
 
-
-        <h2 id="station-view"></h2>
+        <h2 id="station-view">Station View</h2>
 
         <div class="manual-image-container">
             <img src="img/manual/station-view.png" data-action="zoom" alt="Station View">
         </div>
 
         <p>
-
+            The StationView allows to fully assemble and disassemble the 3D model in realtime.
+            It allows you to visualize and understand your built assembly line through the help
+            of the 3D preview. You can use the default mouse navigation to view the 3D model.
         </p>
-
-        <div class="manual-image-container">
-            <img src="img/manual/context-menu-station-view.png" data-action="zoom" alt="Context menu Station View">
-        </div>
 
         <p>
-
+            The StationView allows you to assemble all parts which are part of a specific assembly station.
+            To open the StationView for a specific assembly station, simply click on the box-pointer-icon
+            of the corresponding station in the list.
         </p>
 
-        <h2 id="cinema-mode"></h2>
+
+        <p>
+            Use the skip-arrows on the bottom of the screen to incrementally assemble or disassemble all components.
+            The dot-icon and the color highlighting in the hierarchical list indicates which components have already
+            been assembled into the final model. <br/>
+            Alternatively you can right-click on a list item and select "Skip To" to jump to the selected component.
+
+            To switch the currently visible station, simply click on the navigation arrows on the top of the screen.
+            The name of the currently visible station is displayed on the top of the screen.
+        </p>
+
+
+        <p>
+            By default, all components which have been assembled in previous stations, are hidden to ensure clarity.
+            You can enable visibility of components from preciding stations by clicking the eye-button in the upper right
+            corner of the screen.
+        </p>
+
+
+        <div class="manual-image-container">
+            <img src="img/manual/context-menu-station-view.png" data-action="zoom" alt="Context Menu Station View">
+        </div>
+
+
+        <h2 id="cinema-mode">Cinema Mode</h2>
 
         <div class="manual-image-container">
             <img src="img/manual/cinema-mode.png" data-action="zoom" alt="Cinema Mode">
         </div>
 
         <p>
-
+            The CinemaMode offers a movie-like experience to visualize the assembly process and to train assembly personell.
+            This mode works similiar to the StationView but is is not indended to apply changes to the assembly line but to solely
+            playback the entire assembly process for employee training.
         </p>
 
+        <p>
+            To open the CinemaMode, simply click on the box-triangle icon on the sidebar. The CinemaMode screen will appear and start with
+            the very first assembly station. To start playback, click the triangle button. To stop playback, click on the playback button again.
+            You can skip to the previous or next component with the skip buttons. The assembly speed/delay can be modified with the speed slider right next
+            to the playback control buttons. Move the slider left to the center to disassemble the model, move the slider to the right of the slider center to
+            assemble the vehicle.
+        </p>
 
-        Editing the Assembly Line
-        - Visibility
-
-        Assembly Line Visualization
-        - StationView
-        - Dot Indicator
-        - Step by step
-        - Skip to menu
-        - Visibility
-
-        - CinemaMode
-        - Skip
-        - Speed slider and direction
-        - Play
-
-        Export
-
-
+        <p>
+            Alternatively you can click and drag around the dot indicator which is placed on the progress bar, which is located above the playback controls to go one step back
+            or forth. Each section of the progress bar represents one assembly station. The dot indicator shows the assembly progess inside the current station. To show the
+            name of the assembly station and the amount of components, simply hover the mouse above the desired progress bar section.
+        </p>
     </div>
 </section>
 
 <section id="export">
     <div class="container-md">
         <h1>Export</h1>
-        <p>
 
+        <p>
+            The export function allows you to easily export your entire assembly line configuration, which includes all defined assembly stations, component ordering
+            and (fused) component groups.
+        </p>
+
+        <p>
+            Assembus exports your assembly line configuration as a simple ZIP file which uses the .bus file-ending. The ZIP directory contains the actual 3D OBJ file
+            and the assembly line configuration which uses the XML meta language to describe the assembly sequence.
+        </p>
+
+        <p>
+            To invoke the export, simply click on the box icon with the upwards arrow, which is located in the sidebar. Specify a export directory and the desired
+            export filename. Finally click the save button to export the Assembus project.
         </p>
     </div>
 </section>

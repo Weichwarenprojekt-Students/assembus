@@ -96,6 +96,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _stopAutoScroll;
         
         /// <summary>
+        ///     The CommandGroup instance
+        /// </summary>
+        private CommandGroup _commandGroup;
+        
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
@@ -282,12 +287,18 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.CurrentProject.ObjectModel.name,
                 ItemState.Last
             );
-            _undoService.AddCommand(new CreateCommand(true, state));
+            //_undoService.AddCommand(new CreateCommand(true, state));
+            // Add the new action to the undo redo service
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
 
             // Scroll to the created station
             var stationItem = hierarchyView.transform.GetChild(hierarchyView.transform.childCount - 1);
             ScrollToItem(stationItem.GetComponent<RectTransform>());
-            stationItem.GetComponent<HierarchyItemController>().RenameItem();
+            stationItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>

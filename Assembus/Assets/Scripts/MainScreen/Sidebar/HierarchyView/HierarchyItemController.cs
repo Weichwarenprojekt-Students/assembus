@@ -186,6 +186,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private static bool _isRenameInitial;
 
         /// <summary>
+        ///     Is a Item shifted to a Group
+        /// </summary>
+        private static bool _isItemShifted;
+        
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
@@ -524,12 +529,16 @@ namespace MainScreen.Sidebar.HierarchyView
                 ItemState.Last
             );
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new CreateCommand(true, state));
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
 
             // Scroll to the created group in the group
             var groupItem = childrenContainer.transform.GetChild(childrenContainer.transform.childCount - 1);
             hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
-            groupItem.GetComponent<HierarchyItemController>().RenameItem();
+            groupItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>
@@ -646,7 +655,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Reset the drag event
             dragPreview.SetActive(false);
             _dragging = false;
-
+            _isItemShifted = true;
             // Insert the items (Only if the dragged item was selected)
             if (_selectedItems.Count != 0 && hierarchyViewController.IsSelected(this)) InsertItems();
         }
@@ -678,8 +687,16 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Add the new action to the undo redo service
             var moveCommand = new MoveCommand(oldStates, newStates);
-            _commandGroup.AddToGroup(moveCommand);
-            moveCommand.Redo();
+            if (_isItemShifted)
+            {
+                _undoService.AddCommand(moveCommand);
+                _isItemShifted = false;
+            }
+            else
+            {
+                _commandGroup.AddToGroup(moveCommand);
+                moveCommand.Redo();
+            }
         }
 
         /// <summary>

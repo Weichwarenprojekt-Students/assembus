@@ -303,6 +303,10 @@ button.pronounce {
     background-color: #ffffff;
 }
 
+.clean footer {
+    margin-top: 64px;
+}
+
 .manual-image-container {
     width: 30%;
     height: auto;

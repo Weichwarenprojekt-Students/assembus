@@ -89,14 +89,13 @@ footer {
 
 footer .container-md {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     height: 100%;
 }
 
-footer p {
+footer span {
     display: inline-block;
-    margin-bottom: 0;
 }
 
 footer img {

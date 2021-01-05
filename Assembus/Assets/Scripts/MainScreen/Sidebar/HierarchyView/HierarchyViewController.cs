@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Models.Project;
 using Services.Serialization;
@@ -50,6 +51,21 @@ namespace MainScreen.Sidebar.HierarchyView
         public ContextMenuController contextMenu;
 
         /// <summary>
+        ///     RectTransform from Content
+        /// </summary>
+        public RectTransform contentPanel;
+
+        /// <summary>
+        ///     RectTransform from Scroll View
+        /// </summary>
+        public RectTransform scrollRectTrans;
+
+        /// <summary>
+        ///     ScrollRect from Scroll View
+        /// </summary>
+        public ScrollRect scrollRect;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -70,6 +86,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
+        ///     Gets true if the user scrolls manually while auto scroll to stop auto scroll
+        /// </summary>
+        private bool _stopAutoScroll;
+
+        /// <summary>
         ///     True if hierarchy view needs to be updated
         /// </summary>
         private bool _updateHierarchyView;
@@ -81,6 +102,9 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             if (_updateHierarchyView)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView.GetComponent<RectTransform>());
+
+            // Stop autoscroll if user manually scrolls
+            if (Input.mouseScrollDelta != Vector2.zero) _stopAutoScroll = true;
         }
 
         /// <summary>
@@ -255,7 +279,18 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.CurrentProject.ObjectModel.name,
                 ItemState.Last
             );
-            _undoService.AddCommand(new CreateCommand(true, state));
+
+            // Add the new action to the undo redo service
+            var createCommand = new CreateCommand(true, state);
+            var commandGroup = new CommandGroup();
+            _undoService.AddCommand(commandGroup);
+            commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
+
+            // Scroll to the created station
+            var stationItem = hierarchyView.transform.GetChild(hierarchyView.transform.childCount - 1);
+            ScrollToItem(stationItem.GetComponent<RectTransform>());
+            stationItem.GetComponent<HierarchyItemController>().RenameItem(true, commandGroup);
         }
 
         /// <summary>
@@ -465,6 +500,63 @@ namespace MainScreen.Sidebar.HierarchyView
             if (parent == null) return;
             if (SelectedItems.Contains(parent)) DeselectItem(parent);
             else DeselectParent(parent.transform);
+        }
+
+        /// <summary>
+        ///     Scrolls to the targetItem
+        /// </summary>
+        /// <param name="targetItem"></param>
+        public void ScrollToItem(RectTransform targetItem)
+        {
+            scrollRect.enabled = false;
+            Canvas.ForceUpdateCanvases();
+            scrollRect.enabled = true;
+
+            // Top border of the actual viewport
+            var topBorder = contentPanel.localPosition.y;
+
+            // Lower border of the actual viewport
+            var lowerBorder = topBorder + scrollRectTrans.rect.height;
+
+            // Target item position in the viewport
+            var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -
+                               scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
+
+            // Check if item is outside the borders, if so, scroll to the item
+            if (!(itemPosition < lowerBorder && topBorder < itemPosition))
+                StartCoroutine(ScrollToTarget(itemPosition - 200));
+        }
+
+        /// <summary>
+        ///     Coroutine for smoth scrolling to an new item
+        /// </summary>
+        /// <param name="targetValue"></param>
+        /// <returns></returns>
+        private IEnumerator ScrollToTarget(float targetValue)
+        {
+            var interpolatedFloat = new InterpolatedFloat(contentPanel.anchoredPosition.y);
+            _stopAutoScroll = false;
+            while (!interpolatedFloat.IsAtValue(targetValue) && !_stopAutoScroll)
+            {
+                interpolatedFloat.ToValue(targetValue);
+
+                contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value);
+
+                // Check, if the scroll view will scroll outside the viewport
+                if (scrollRect.normalizedPosition.y < 0)
+                {
+                    scrollRect.normalizedPosition = scrollRect.viewport.anchorMin;
+                    break;
+                }
+
+                if (scrollRect.normalizedPosition.y > 1)
+                {
+                    scrollRect.normalizedPosition = scrollRect.viewport.anchorMax;
+                    break;
+                }
+
+                yield return new WaitForEndOfFrame();
+            }
         }
     }
 }

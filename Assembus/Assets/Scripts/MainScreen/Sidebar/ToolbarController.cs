@@ -1,6 +1,7 @@
-﻿using Services.Serialization;
-using MainScreen.StationView;
+﻿using MainScreen.StationView;
+using Services.Serialization;
 using Services.UndoRedo;
+using SFB;
 using Shared;
 using Shared.Toast;
 using TMPro;
@@ -39,11 +40,6 @@ namespace MainScreen.Sidebar
         ///     The buttons that can be disabled
         /// </summary>
         public SwitchableButton undo, redo;
-
-        /// <summary>
-        ///     The settings controller
-        /// </summary>
-        public SettingsController settings;
 
         /// <summary>
         ///     The controller of the station view
@@ -180,6 +176,40 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
+        ///     Export the assembly data to hard disk
+        /// </summary>
+        public void ExportData()
+        {
+            // Get the name of the previously exported file
+            var previousExportFileName = _projectManager.CurrentProject.ExportFileName;
+
+            // Open save dialog for the user
+            var exportPath = StandaloneFileBrowser.SaveFilePanel(
+                "Export Data",
+                "",
+                string.IsNullOrEmpty(previousExportFileName)
+                    ? _projectManager.CurrentProject.Name
+                    : previousExportFileName,
+                "bus"
+            );
+
+            // If save dialog was canceled, string is empty
+            if (string.IsNullOrEmpty(exportPath)) return;
+
+            // Export data to XML
+            var (success, message) = DataExport.ExportData(exportPath);
+
+            if (!success)
+            {
+                toast.Error(Toast.Short, message);
+                return;
+            }
+
+            // Export successful
+            toast.Success(Toast.Short, "Data was exported successfully!");
+        }
+
+        /// <summary>
         ///     Close a project
         /// </summary>
         public void CloseProject()
@@ -210,14 +240,6 @@ namespace MainScreen.Sidebar
                     startScreen.SetActive(true);
                 }
             );
-        }
-
-        /// <summary>
-        ///     Show the settings
-        /// </summary>
-        public void Settings()
-        {
-            settings.Show();
         }
     }
 }

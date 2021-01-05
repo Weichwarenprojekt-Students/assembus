@@ -96,6 +96,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchyView;
 
         /// <summary>
+        ///     Currently running scrolling-coroutine
+        /// </summary>
+        private Coroutine _scrollingCoroutine;
+
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
@@ -522,13 +527,16 @@ namespace MainScreen.Sidebar.HierarchyView
             var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -
                                scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
 
+            if (_scrollingCoroutine != null)
+                StopCoroutine(_scrollingCoroutine);
+
             // Check if item is outside the borders, if so, scroll to the item
-            if (!(itemPosition < lowerBorder && topBorder < itemPosition))
-                StartCoroutine(ScrollToTarget(itemPosition - 200));
+            if (!(itemPosition <= lowerBorder && topBorder <= itemPosition))
+                _scrollingCoroutine = StartCoroutine(ScrollToTarget(itemPosition - 200));
         }
 
         /// <summary>
-        ///     Coroutine for smoth scrolling to an new item
+        ///     Coroutine for smooth scrolling to an new item
         /// </summary>
         /// <param name="targetValue"></param>
         /// <returns></returns>

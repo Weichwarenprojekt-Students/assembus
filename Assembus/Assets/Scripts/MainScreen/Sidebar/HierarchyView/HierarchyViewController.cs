@@ -81,9 +81,19 @@ namespace MainScreen.Sidebar.HierarchyView
         public readonly List<HierarchyItemController> SelectedItems = new List<HierarchyItemController>();
 
         /// <summary>
+        ///     The CommandGroup instance
+        /// </summary>
+        private CommandGroup _commandGroup;
+
+        /// <summary>
         ///     The item selected before the currently selected one
         /// </summary>
         private HierarchyItemController _lastSelectedItem;
+
+        /// <summary>
+        ///     Gets true if the user scrolls manually while auto scroll to stop auto scroll
+        /// </summary>
+        private bool _stopAutoScroll;
 
         /// <summary>
         ///     True if hierarchy view needs to be updated
@@ -91,23 +101,13 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchyView;
 
         /// <summary>
-        ///     Gets true if the user scrolls manually while auto scroll to stop auto scroll
-        /// </summary>
-        private bool _stopAutoScroll;
-        
-        /// <summary>
-        ///     The CommandGroup instance
-        /// </summary>
-        private CommandGroup _commandGroup;
-        
-        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
         {
             if (_updateHierarchyView)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView.GetComponent<RectTransform>());
-            
+
             // Stop autoscroll if user manually scrolls
             if (Input.mouseScrollDelta != Vector2.zero) _stopAutoScroll = true;
         }
@@ -287,7 +287,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.CurrentProject.ObjectModel.name,
                 ItemState.Last
             );
-            //_undoService.AddCommand(new CreateCommand(true, state));
+
             // Add the new action to the undo redo service
             var createCommand = new CreateCommand(true, state);
             _commandGroup = new CommandGroup();
@@ -528,7 +528,7 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Target item position in the viewport
             var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -
-                                    scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
+                               scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
 
             // Check if item is outside the borders, if so, scroll to the item
             if (!(itemPosition < lowerBorder && topBorder < itemPosition))

@@ -10,11 +10,6 @@ namespace Shared
         private readonly float _power;
 
         /// <summary>
-        ///     The actual value
-        /// </summary>
-        public float Value { get; private set; }
-
-        /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="value">The actual value</param>
@@ -26,15 +21,20 @@ namespace Shared
         }
 
         /// <summary>
+        ///     The actual value
+        /// </summary>
+        public float Value { get; private set; }
+
+        /// <summary>
         ///     Checks if the interpolated float is at a certain value
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">Value to compare to the interpolated float</param>
         /// <returns>True if the values are equal</returns>
         public bool IsAtValue(float value)
         {
             return Mathf.Abs(Value - value) < 0.1f;
         }
-        
+
 
         /// <summary>
         ///     Interpolate the new value (with respect to the given delta time)

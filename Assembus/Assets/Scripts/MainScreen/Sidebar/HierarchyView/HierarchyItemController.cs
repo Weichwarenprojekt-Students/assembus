@@ -41,6 +41,16 @@ namespace MainScreen.Sidebar.HierarchyView
         private static List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
 
         /// <summary>
+        ///     Is the rename from a new Group
+        /// </summary>
+        private static bool _isRenameInitial;
+
+        /// <summary>
+        ///     Is a Item shifted to a Group
+        /// </summary>
+        private static bool _isItemShifted;
+
+        /// <summary>
         ///     The colors for the item
         /// </summary>
         public Color highlightedColor, normalColor;
@@ -156,6 +166,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _clicked;
 
         /// <summary>
+        ///     The CommandGroup instance
+        /// </summary>
+        private CommandGroup _commandGroup;
+
+        /// <summary>
         ///     The root element of the hierarchy view
         /// </summary>
         private RectTransform _hierarchyView;
@@ -176,21 +191,6 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool HasChildren => item.transform.childCount > 0;
 
         /// <summary>
-        ///     The CommandGroup instance
-        /// </summary>
-        private CommandGroup _commandGroup;
-        
-        /// <summary>
-        ///     Is the rename from a new Group
-        /// </summary>
-        private static bool _isRenameInitial;
-
-        /// <summary>
-        ///     Is a Item shifted to a Group
-        /// </summary>
-        private static bool _isItemShifted;
-        
-        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
@@ -203,22 +203,16 @@ namespace MainScreen.Sidebar.HierarchyView
             doubleClickDetector.CheckForSecondClick();
 
             // Apply rename of component on press enter key
-            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf)
-            {
-                ApplyRenaming();
-            }
-            
+            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf) ApplyRenaming();
+
             // Cancel renaming a component on press escape key
             if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
                 CancelRenaming();
 
             // Check if the object is active and if the mouse is clicked
             if (!Input.GetMouseButtonDown(0) || !nameInputObject.activeSelf) return;
-            
-            if (EventSystem.current.currentSelectedGameObject != nameInputObject)
-            {
-                ApplyRenaming();
-            }
+
+            if (EventSystem.current.currentSelectedGameObject != nameInputObject) ApplyRenaming();
         }
 
         /// <summary>
@@ -565,7 +559,7 @@ namespace MainScreen.Sidebar.HierarchyView
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
-            
+
             // Scroll to First selected Game object
             var groupItem = gameObject.transform.parent.parent;
             hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
@@ -593,17 +587,16 @@ namespace MainScreen.Sidebar.HierarchyView
                 toast.Error(Toast.Short, "Name cannot be empty!");
                 return;
             }
-            
+
             // Hide the input field an show the name field
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
-            
+
             // Check if nothing is changed
             if (nameInput.text == item.name) return;
 
             var renameCommand = new RenameCommand(item.name, nameText.text, newName);
-            
-            
+
             // Add the Command to the group if there is "Group Selected"
             if (_isRenameInitial)
             {
@@ -611,7 +604,10 @@ namespace MainScreen.Sidebar.HierarchyView
                 renameCommand.Redo();
                 _isRenameInitial = false;
             }
-            else _undoService.AddCommand(renameCommand);
+            else
+            {
+                _undoService.AddCommand(renameCommand);
+            }
         }
 
         /// <summary>

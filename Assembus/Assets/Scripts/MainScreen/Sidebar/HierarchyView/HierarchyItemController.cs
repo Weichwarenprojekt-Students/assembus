@@ -593,7 +593,7 @@ namespace MainScreen.Sidebar.HierarchyView
             nameTextObject.SetActive(true);
 
             // Check if nothing is changed
-            if (nameInput.text == item.name) return;
+            if (nameInput.text == nameText.text) return;
 
             var renameCommand = new RenameCommand(item.name, nameText.text, newName);
 

@@ -40,6 +40,10 @@ section:nth-child(even) {
     background-color: var(--prime-5);
 }
 
+.assembus-logo {
+    height: 30px;
+}
+
 @media screen and (max-width: 1199px) {
     #intro {
         padding-top: 72px;

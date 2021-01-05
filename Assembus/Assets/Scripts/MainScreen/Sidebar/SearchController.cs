@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace MainScreen.Sidebar
 {
-    public class InputController : MonoBehaviour
+    public class SearchController : MonoBehaviour
     {
         /// <summary>
         ///     Placeholder string for the empty search field

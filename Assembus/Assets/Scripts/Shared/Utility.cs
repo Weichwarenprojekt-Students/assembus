@@ -4,6 +4,7 @@ using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Models.Project;
 using Shared.Exceptions;
+using TMPro;
 using UnityEngine;
 
 namespace Shared
@@ -197,6 +198,38 @@ namespace Shared
             }
 
             return false;
+        }
+
+        /// <summary>
+        ///     Finds every child that has a given name in a list view recursively
+        ///     and fills a list that has to be forwarded to the function with the results
+        /// </summary>
+        /// <param name="parent">Game object to start recursive search from</param>
+        /// <param name="childName">Name of the list item to look for</param>
+        /// <param name="foundObjects">List that is filled with the results</param>
+        public static void FillListWithChildrenByName(Transform parent, string childName, List<GameObject> foundObjects)
+        {
+            // Go through all the child objects of the parent
+            foreach (Transform child in parent)
+            {
+                if (!child.gameObject.name.StartsWith("assembus")) continue;
+
+                // Look for a child called "Content"
+                var itemContent = child.Find("Content");
+
+                // Find children with a name sub-child
+                var itemContentName = child.Find("Item/ItemContent/Name");
+
+                // Get displayed name of the game object and check for matches
+                if (itemContentName.GetComponent<TMP_Text>().text.ToLowerInvariant()
+                    .Contains(childName.ToLowerInvariant()))
+                    foundObjects.Add(child.gameObject);
+
+                // Check if the item contains any children
+                if (itemContent.childCount > 0)
+                    // Go through the children or current parent
+                    FillListWithChildrenByName(itemContent, childName, foundObjects);
+            }
         }
     }
 }

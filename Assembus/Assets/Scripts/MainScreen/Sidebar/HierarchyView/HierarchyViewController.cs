@@ -96,6 +96,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _updateHierarchyView;
 
         /// <summary>
+        ///     Currently running scrolling-coroutine
+        /// </summary>
+        private Coroutine _scrollingCoroutine;
+
+        /// <summary>
         ///     Late update of the UI
         /// </summary>
         private void LateUpdate()
@@ -362,7 +367,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         /// <param name="item"></param>
         /// <param name="selected">The flag that indicates if the item is selected</param>
-        private void SetColor(HierarchyItemController item, bool selected)
+        public void SetColor(HierarchyItemController item, bool selected)
         {
             item.background.color = selected ? selectedColor : normalColor;
         }
@@ -513,22 +518,25 @@ namespace MainScreen.Sidebar.HierarchyView
             scrollRect.enabled = true;
 
             // Top border of the actual viewport
-            var topBorder = contentPanel.localPosition.y;
+            var topBorder = contentPanel.localPosition.y + 40.0f;
 
             // Lower border of the actual viewport
-            var lowerBorder = topBorder + scrollRectTrans.rect.height;
+            var lowerBorder = topBorder + scrollRectTrans.rect.height - 80.0f;
 
             // Target item position in the viewport
             var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -
                                scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
 
+            if (_scrollingCoroutine != null)
+                StopCoroutine(_scrollingCoroutine);
+
             // Check if item is outside the borders, if so, scroll to the item
-            if (!(itemPosition < lowerBorder && topBorder < itemPosition))
-                StartCoroutine(ScrollToTarget(itemPosition - 200));
+            if (!(itemPosition <= lowerBorder && topBorder <= itemPosition))
+                _scrollingCoroutine = StartCoroutine(ScrollToTarget(itemPosition - 200));
         }
 
         /// <summary>
-        ///     Coroutine for smoth scrolling to an new item
+        ///     Coroutine for smooth scrolling to an new item
         /// </summary>
         /// <param name="targetValue"></param>
         /// <returns></returns>

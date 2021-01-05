@@ -52,6 +52,11 @@ namespace MainScreen.Sidebar
         public ComponentHighlighting componentHighlighting;
 
         /// <summary>
+        ///     InputController script
+        /// </summary>
+        public SearchController searchController;
+
+        /// <summary>
         ///     The configuration manager
         /// </summary>
         private readonly ConfigurationManager _configManager = ConfigurationManager.Instance;
@@ -233,6 +238,7 @@ namespace MainScreen.Sidebar
 
                     // Remove GameObject of current project
                     componentHighlighting.ResetHighlighting();
+                    searchController.Reset();
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen

@@ -220,6 +220,11 @@ namespace Shared
                 // Find children with a name sub-child
                 var itemContentName = child.Find("Item/ItemContent/Name");
 
+                // Get displayed name of the game object and check for matches
+                if (itemContentName.GetComponent<TMP_Text>().text.ToLowerInvariant()
+                    .Contains(childName.ToLowerInvariant()))
+                    foundObjects.Add(child.gameObject);
+
                 // Check if the item contains any children
                 if (itemContent.childCount > 0)
                 {
@@ -232,11 +237,6 @@ namespace Shared
 
                 // Ignore if none exists
                 if (itemContentName == null) continue;
-
-                // Get displayed name of the game object and check for matches
-                if (itemContentName.GetComponent<TMP_Text>().text.ToLowerInvariant()
-                    .Contains(childName.ToLowerInvariant()))
-                    foundObjects.Add(child.gameObject);
             }
         }
     }

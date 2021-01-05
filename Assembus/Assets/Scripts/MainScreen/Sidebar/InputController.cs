@@ -232,10 +232,10 @@ namespace MainScreen.Sidebar
             if (!hierarchyViewController.IsSelected(targetController))
                 hierarchyViewController.SetColor(targetController, true);
 
-            // TODO :: use hierarchyViewController's skipTo method from better-rename-control
-            // hierarchyViewController.ScrollToItem(
-            //     targetObject.GetComponent<RectTransform>()
-            // );
+            // Scroll to the given item in the list-view
+            hierarchyViewController.ScrollToItem(
+                targetObject.GetComponent<RectTransform>()
+            );
         }
 
         /// <summary>

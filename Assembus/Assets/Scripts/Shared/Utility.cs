@@ -227,16 +227,8 @@ namespace Shared
 
                 // Check if the item contains any children
                 if (itemContent.childCount > 0)
-                {
                     // Go through the children or current parent
                     FillListWithChildrenByName(itemContent, childName, foundObjects);
-
-                    if (itemContentName == null)
-                        continue;
-                }
-
-                // Ignore if none exists
-                if (itemContentName == null) continue;
             }
         }
     }

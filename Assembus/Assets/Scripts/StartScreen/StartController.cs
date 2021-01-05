@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using MainScreen;
 using Models.AppConfiguration;
 using Services.Serialization;
 using SFB;
@@ -33,9 +34,9 @@ namespace StartScreen
         public GameObject listView;
 
         /// <summary>
-        ///     The two screens
+        ///     The main controller
         /// </summary>
-        public GameObject startScreen, mainScreen;
+        public MainController mainController;
 
         /// <summary>
         ///     The dialog controller
@@ -145,8 +146,8 @@ namespace StartScreen
                             }
 
                             // Show the new project
-                            startScreen.SetActive(false);
-                            mainScreen.SetActive(true);
+                            gameObject.SetActive(false);
+                            mainController.ShowEditor();
                             SaveWindowConfig();
                         },
                         2000
@@ -194,8 +195,8 @@ namespace StartScreen
                             }
 
                             // Show the main screen
-                            startScreen.SetActive(false);
-                            mainScreen.SetActive(true);
+                            gameObject.SetActive(false);
+                            mainController.ShowEditor();
 
                             // Write window config to XML file before leaving this window
                             SaveWindowConfig();
@@ -285,7 +286,7 @@ namespace StartScreen
                                 return;
                             }
 
-                            // Load the OBJ model
+                            // Load the OBJ model and the model configuration
                             var (loadSuccess, loadMessage) = _projectManager.LoadModel(false);
                             if (!loadSuccess)
                             {
@@ -294,8 +295,9 @@ namespace StartScreen
                             }
 
                             // Show the new project
-                            startScreen.SetActive(false);
-                            mainScreen.SetActive(true);
+                            gameObject.SetActive(false);
+                            mainController.ShowEditor();
+
                             SaveWindowConfig();
                         },
                         2000
@@ -371,17 +373,43 @@ namespace StartScreen
             var lastProject = _configManager.Config.lastProject;
             if (lastProject.Equals("")) return;
 
-            // Try to load the project
-            var (success, _) = _projectManager.LoadProject(lastProject);
-            if (!success) return;
+            // Show the loading screen
+            loadingScreen.ShowLoadingScreen(
+                () => _projectManager.LoadProject(lastProject),
+                result =>
+                {
+                    // Check if the object was loaded
+                    var (success, message) = result;
+                    if (!success)
+                    {
+                        toast.Error(Toast.Short, message);
+                        
+                        // Remove the last opened project. Stop trying opening the project on next startup!
+                        _configManager.Config.lastProject = "";
+                        _configManager.SaveConfig();
+                        
+                        return;
+                    }
 
-            // Load the OBJ model
-            var (loadSuccess, _) = _projectManager.LoadModel(false);
-            if (!loadSuccess) return;
-
-            // Show the main screen
-            startScreen.SetActive(false);
-            mainScreen.SetActive(true);
+                    // Load the OBJ model and the model configuration
+                    var (loadSuccess, loadMessage) = _projectManager.LoadModel(false);
+                    if (!loadSuccess)
+                    {
+                        toast.Error(Toast.Short, loadMessage);
+                        
+                        // Remove the last opened project. Stop trying opening the project on next startup!
+                        _configManager.Config.lastProject = "";
+                        _configManager.SaveConfig();
+                        
+                        return;
+                    }
+                    
+                    // Show the new project
+                    gameObject.SetActive(false);
+                    mainController.ShowEditor();
+                },
+                2000
+            );
         }
     }
 }

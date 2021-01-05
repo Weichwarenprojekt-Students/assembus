@@ -25,6 +25,11 @@ namespace MainScreen
         public Color colorHover, colorSelectedGroup, colorSelectedSingle;
 
         /// <summary>
+        ///     Flag if component highlighting is active
+        /// </summary>
+        public bool isActive = true;
+
+        /// <summary>
         ///     List of selected game objects and their initial color value
         /// </summary>
         private readonly Dictionary<GameObject, Color> _selectedGameObjects = new Dictionary<GameObject, Color>();
@@ -71,7 +76,7 @@ namespace MainScreen
         private void LateUpdate()
         {
             // Prevent highlighting updates when mouse is not over the 3d editor
-            if (!MouseOverViewport || _cam is null) return;
+            if (!MouseOverViewport || _cam is null || !isActive) return;
 
             // Create ray from mouse position
             var ray = _cam.ScreenPointToRay(Input.mousePosition);
@@ -172,7 +177,7 @@ namespace MainScreen
 
                 // Highlight either single or collection of clicked game objects
                 if (_selectedGameObjects.Count > 1)
-                    HighlightGameObjects(_selectedGameObjects.Keys.ToList());
+                    HighlightGameObjects(_selectedGameObjects.Keys.ToList(), false);
                 else
                     clickedObject.GetComponent<Renderer>().material.color = colorSelectedSingle;
             }
@@ -217,7 +222,7 @@ namespace MainScreen
         /// <summary>
         ///     Reset state of all selected game objects
         /// </summary>
-        private void ResetPreviousSelections()
+        public void ResetPreviousSelections()
         {
             // Reset hover-highlighting on non-selected objects
             if (!(_hoveredObject is null || _selectedGameObjects.ContainsKey(_hoveredObject)))
@@ -236,29 +241,15 @@ namespace MainScreen
         }
 
         /// <summary>
-        ///     Highlight single game object
-        /// </summary>
-        /// <param name="gameObjects">Game object to be highlighted</param>
-        public void HighlightGameObject(GameObject gameObjects)
-        {
-            // Clear current selection, to preserve original color invariance
-            ResetPreviousSelections();
-
-            var material = gameObjects.GetComponent<Renderer>();
-
-            // Add to selection list and save original color
-            _selectedGameObjects.Add(gameObjects, material.material.color);
-
-            // Highlight selection
-            material.material.color = colorSelectedSingle;
-        }
-
-        /// <summary>
         ///     Highlight every game object or group contained in the list
         /// </summary>
         /// <param name="gameObjects">List of game objects or groups to be highlighted</param>
-        public void HighlightGameObjects(List<GameObject> gameObjects)
+        /// <param name="keepPreviousSelection">Should keep previous selections</param>
+        public void HighlightGameObjects(List<GameObject> gameObjects, bool keepPreviousSelection)
         {
+            if (keepPreviousSelection)
+                gameObjects.AddRange(_selectedGameObjects.Keys.ToList());
+
             // Clear current selection, to preserve original color invariance
             ResetPreviousSelections();
 
@@ -266,6 +257,7 @@ namespace MainScreen
             var groupedObjects = new List<GameObject>();
             var groups =
                 gameObjects.Where(g => g.GetComponent<ItemInfoController>().ItemInfo.isGroup);
+
             foreach (var group in groups)
                 groupedObjects.AddRange(Utility.GetAllChildren(group).ToList());
 
@@ -290,6 +282,27 @@ namespace MainScreen
                     itemRenderer.material.color = color;
                 }
             );
+        }
+
+        /// <summary>
+        ///     Highlights a given game object with the hovering color, used
+        ///     to indicate which object is hovered over in the item list-view
+        /// </summary>
+        /// <param name="gO">Game object to be highlighted</param>
+        public void HighlightHoverFromList(GameObject gO)
+        {
+            // Check if component has a Renderer
+            if (gO.GetComponent<Renderer>() != null)
+            {
+                HighlightHover(gO);
+            }
+            else
+            {
+                if (_hoveredObject == null) return;
+
+                _hoveredObject.GetComponent<Renderer>().material.color = _hoveredOriginalColor;
+                _hoveredObject = null;
+            }
         }
 
         /// <summary>

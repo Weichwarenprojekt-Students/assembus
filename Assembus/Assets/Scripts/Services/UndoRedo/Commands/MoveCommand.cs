@@ -46,21 +46,22 @@ namespace Services.UndoRedo.Commands
         /// <param name="state">The item state</param>
         public static void Move(ItemState state)
         {
+            if (state.ID == state.NeighbourID) return;
+
             // Get the item and the parent
-            var listItem = Utility.FindChild(HierarchyView.transform, state.ID);
+            var hierarchyItem = Utility.FindChild(HierarchyView.transform, state.ID);
             var container = HierarchyView.transform;
-            var listParent = Utility.FindChild(HierarchyView.transform, state.ParentID);
-            if (listParent != null)
-                container = listParent.GetComponent<HierarchyItemController>().childrenContainer.transform;
+            var hierarchyParent = Utility.FindChild(HierarchyView.transform, state.ParentID);
+            if (hierarchyParent != null)
+                container = hierarchyParent.GetComponent<HierarchyItemController>().childrenContainer.transform;
 
             // Get the sibling index
-            var siblingIndex = GetSiblingIndex(state, listItem, container);
+            var siblingIndex = GetSiblingIndex(state, hierarchyItem, container);
 
             // Move the item
-            var oldParent = listItem.parent.parent;
-            listItem.SetParent(container);
-            var offset = listParent == null ? 1 : 0;
-            listItem.SetSiblingIndex(siblingIndex + offset);
+            var oldParent = hierarchyItem.parent.parent;
+            hierarchyItem.SetParent(container);
+            hierarchyItem.SetSiblingIndex(siblingIndex);
 
             // Move the item in the actual object
             var modelItem = Utility.FindChild(Model.transform, state.ID);
@@ -75,15 +76,17 @@ namespace Services.UndoRedo.Commands
 
             // Expand the parent and indent the item
             var indentionDepth = 0f;
-            if (listParent != null)
+            if (hierarchyParent != null)
             {
-                var parentItem = listParent.GetComponent<HierarchyItemController>();
+                var parentItem = hierarchyParent.GetComponent<HierarchyItemController>();
                 indentionDepth = parentItem.GetIndention() + 16f;
                 parentItem.ExpandItem(true);
-                parentItem.childrenContainer.SetActive(true);
             }
 
-            IndentItems(listItem, indentionDepth);
+            IndentItems(hierarchyItem, indentionDepth);
+
+            // Update the button visuals
+            hierarchyItem.GetComponent<HierarchyItemController>().UpdateVisuals();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Services;
 using Shared;
@@ -158,9 +159,7 @@ namespace MainScreen
         /// </summary>
         private void UpdateCameraFocus()
         {
-            if (_cam is null) return;
-
-            if (!MouseOverViewport) return;
+            if (_cam is null || !MouseOverViewport || !componentHighlighting.isActive) return;
 
             var ray = _cam.ScreenPointToRay(Input.mousePosition);
 
@@ -168,7 +167,7 @@ namespace MainScreen
 
             var go = hit.transform.gameObject;
 
-            componentHighlighting.HighlightGameObject(go);
+            componentHighlighting.HighlightGameObjects(new List<GameObject> {go}, true);
             hierarchyViewController.SetItemStatusFromList(new[] {go.name});
             SetFocus(GetBounds(go).center);
             StoreLastMousePosition();

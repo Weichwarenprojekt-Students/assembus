@@ -108,9 +108,9 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Clear the selections
+        ///     Setup the hierarchy view
         /// </summary>
-        private void OnEnable()
+        public void SetupHierarchy()
         {
             SelectedItems.Clear();
 
@@ -130,34 +130,27 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         public void ShowContextMenu()
         {
-            var entries = new List<ContextMenuController.Item>();
-
-            entries.Add(
+            var entries = new List<ContextMenuController.Item>
+            {
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.add,
                     Name = "Create Station",
                     Action = CreateAssemblyStation
-                }
-            );
-
-            entries.Add(
+                },
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.show,
                     Name = "Show All",
                     Action = () => SetObjectVisibility(true)
-                }
-            );
-
-            entries.Add(
+                },
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.hide,
                     Name = "Hide All",
                     Action = () => SetObjectVisibility(false)
                 }
-            );
+            };
 
             contextMenu.Show(entries);
         }
@@ -167,13 +160,17 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void LoadModelIntoHierarchyView()
         {
-            defaultHierarchyViewItem.SetActive(true);
+            // Move default item out of hierarchy view
+            defaultHierarchyViewItem.transform.SetParent(null);
+
+            // Remove the old children
+            RemoveElementWithChildren(hierarchyView.transform);
+
+            // Move default item back into hierarchy view for instantiation
+            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
 
             // Get the root element of the object model
             var parent = _projectManager.CurrentProject.ObjectModel;
-
-            // Remove the old children
-            RemoveElementWithChildren(hierarchyView.transform, true);
 
             // Execute the recursive loading of game objects
             LoadElementWithChildren(hierarchyView, parent);
@@ -181,19 +178,19 @@ namespace MainScreen.Sidebar.HierarchyView
             // Force hierarchy view update
             _updateHierarchyView = true;
 
-            defaultHierarchyViewItem.SetActive(false);
+            // Move default item out of hierarchy view again
+            defaultHierarchyViewItem.transform.SetParent(null);
         }
 
         /// <summary>
         ///     Remove all previous list view items
         /// </summary>
         /// <param name="parent">The parent of the children that shall be removed</param>
-        /// <param name="first">True if it is the first (to make sure that the default item isn't deleted)</param>
-        private static void RemoveElementWithChildren(Transform parent, bool first)
+        private static void RemoveElementWithChildren(Transform parent)
         {
-            for (var i = first ? 1 : 0; i < parent.childCount; i++)
+            for (var i = 0; i < parent.childCount; i++)
             {
-                RemoveElementWithChildren(parent.GetChild(i).transform, false);
+                RemoveElementWithChildren(parent.GetChild(i).transform);
                 Destroy(parent.GetChild(i).gameObject);
             }
         }
@@ -244,7 +241,7 @@ namespace MainScreen.Sidebar.HierarchyView
             var itemController = newHierarchyItem.GetComponent<HierarchyItemController>();
 
             // initialize the item
-            itemController.Initialize(item, depth, hierarchyView);
+            itemController.Initialize(item, depth);
 
             return itemController;
         }
@@ -257,9 +254,9 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="depth">The depth of indention</param>
         public void AddSingleListItem(GameObject parent, GameObject item, float depth)
         {
-            defaultHierarchyViewItem.SetActive(true);
+            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
             AddListItem(parent, item, depth);
-            defaultHierarchyViewItem.SetActive(false);
+            defaultHierarchyViewItem.transform.SetParent(null);
         }
 
         /// <summary>
@@ -357,7 +354,7 @@ namespace MainScreen.Sidebar.HierarchyView
             var trans = _projectManager.CurrentProject.ObjectModel.transform;
             var list = SelectedItems.Select(item => Utility.FindChild(trans, item.name).gameObject).ToList();
 
-            componentHighlighting.HighlightGameObjects(list);
+            componentHighlighting.HighlightGameObjects(list, false);
         }
 
         /// <summary>
@@ -470,9 +467,9 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Return the selected GameObjects as a list in the right order
+        ///     Return the selected game objects as a list in the right order
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of selected game objects</returns>
         public List<HierarchyItemController> GetSelectedItems()
         {
             return SelectedItems.OrderByDescending(item => item.itemContent.position.y).ToList();

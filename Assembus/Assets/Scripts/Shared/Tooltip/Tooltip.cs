@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Shared.Tooltip
@@ -14,6 +15,11 @@ namespace Shared.Tooltip
         ///     The offset of the tooltip
         /// </summary>
         public int offsetX, offsetY;
+
+        /// <summary>
+        ///     True if the tooltip shall be centered
+        /// </summary>
+        public bool center;
 
         /// <summary>
         ///     The controller for the tooltip
@@ -32,13 +38,21 @@ namespace Shared.Tooltip
             var y = position.y + offsetY * scale.y;
 
             // Show the tooltip
-            tooltip.ShowTooltip(x, y, text);
+            tooltip.ShowTooltip(x, y, text, center, scale.x);
         }
 
         /// <summary>
         ///     Hide the tooltip
         /// </summary>
         public void OnPointerExit(PointerEventData eventData)
+        {
+            tooltip.HideTooltip();
+        }
+
+        /// <summary>
+        ///     Hide the tooltip on disable
+        /// </summary>
+        public void OnDisable()
         {
             tooltip.HideTooltip();
         }

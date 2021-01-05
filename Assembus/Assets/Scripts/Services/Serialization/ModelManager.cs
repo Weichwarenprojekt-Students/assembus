@@ -55,6 +55,7 @@ namespace Services.Serialization
         /// <summary>
         ///     Loads the object model into the scene
         /// </summary>
+        /// <param name="objPath">Path to the object model</param>
         /// <returns>Parent element of the loaded object model hierarchy</returns>
         private static GameObject LoadObjectModel(string objPath)
         {
@@ -64,12 +65,17 @@ namespace Services.Serialization
         /// <summary>
         ///     Collects the elements, that the object model contains
         /// </summary>
-        /// <returns>List of all game objects inside the object model</returns>
+        /// <param name="parent">Parent game object</param>
         private static void PrepareChildren(GameObject parent)
         {
             for (var i = 0; i < parent.transform.childCount; i++)
             {
                 var child = parent.transform.GetChild(i).gameObject;
+
+                // Use custom shader for transparency
+                var renderer = child.GetComponent<Renderer>();
+                var shader = Shader.Find("Transparent/Diffuse ZWrite");
+                renderer.material.shader = shader;
 
                 // Add a mesh collider
                 child.AddComponent<MeshCollider>();

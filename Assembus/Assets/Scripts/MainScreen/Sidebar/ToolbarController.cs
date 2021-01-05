@@ -1,5 +1,5 @@
-﻿using Services;
-using Services.Serialization;
+﻿using Services.Serialization;
+using MainScreen.StationView;
 using Services.UndoRedo;
 using Shared;
 using Shared.Toast;
@@ -11,9 +11,9 @@ namespace MainScreen.Sidebar
     public class ToolbarController : MonoBehaviour
     {
         /// <summary>
-        ///     The two screens
+        ///     The three screens
         /// </summary>
-        public GameObject startScreen, mainScreen;
+        public GameObject startScreen, mainScreen, cinemaScreen;
 
         /// <summary>
         ///     The toast controller
@@ -46,6 +46,11 @@ namespace MainScreen.Sidebar
         public SettingsController settings;
 
         /// <summary>
+        ///     The controller of the station view
+        /// </summary>
+        public StationController stationController;
+
+        /// <summary>
         ///     The component highlighting script
         /// </summary>
         public ComponentHighlighting componentHighlighting;
@@ -74,11 +79,12 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
-        ///     Check if either CTRL-Z, CTRL-Y or CTRL-SHIFT_Z was used
+        ///     Check if either CTRL-Z, CTRL-Y, CTRL-SHIFT_Z or CTRL-S was used
         /// </summary>
         private void Update()
         {
             // Check which keys were pressed
+            var ctrlS = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S);
             var ctrlZ = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z);
             var ctrlShiftZ = ctrlZ && Input.GetKey(KeyCode.LeftShift);
             var ctrlY = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y);
@@ -87,6 +93,8 @@ namespace MainScreen.Sidebar
             if (ctrlShiftZ || ctrlY) RedoAction();
             // Check if an action should be undone
             else if (ctrlZ) UndoAction();
+            // Check if the project should be saved
+            else if (ctrlS) SaveProject();
         }
 
         /// <summary>
@@ -111,6 +119,9 @@ namespace MainScreen.Sidebar
             // Enable the buttons
             undo.Enable(_undoService.HasUndo());
             redo.Enable(_undoService.HasRedo());
+
+            // Update the station view
+            stationController.UpdateStation();
         }
 
         /// <summary>
@@ -147,6 +158,25 @@ namespace MainScreen.Sidebar
             _projectManager.Saved = true;
             title.text = _projectManager.CurrentProject.Name;
             toast.Success(Toast.Short, "Project was saved successfully!");
+        }
+
+        /// <summary>
+        ///     Enter the cinema mode
+        /// </summary>
+        public void StartCinemaMode()
+        {
+            // Deselect all items
+            componentHighlighting.ResetPreviousSelections();
+
+            // Center camera focus
+            mainController.cameraController.ZoomOnObject(ProjectManager.Instance.CurrentProject.ObjectModel);
+
+            // Reset camera viewport
+            mainController.ResetCamera();
+
+            // Switch screens
+            mainScreen.SetActive(false);
+            cinemaScreen.SetActive(true);
         }
 
         /// <summary>

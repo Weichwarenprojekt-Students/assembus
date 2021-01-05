@@ -45,37 +45,9 @@ section:nth-child(even) {
     height: 30px;
 }
 
-.assembus-doc-nav {
-    width: 200px;
-    float: left;
-}
-
-.assembus-doc-nav > .navbar-brand {
-    padding-left: 1rem;
-}
-
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
     color: white;
     background-color: var(--prime-4);
-}
-
-hr {
-    margin: 64px 0;
-}
-
-.assembus-doc-content {
-    margin-left: 232px;
-}
-
-.sticky-top {
-    top: 91px;
-}
-
-:target {
-    display: block;
-    position: relative;
-    top: -64px;
-    visibility: hidden;
 }
 
 @media screen and (max-width: 1199px) {
@@ -356,6 +328,43 @@ button.pronounce {
     width: 100%;
     height: auto;
 }
+
+section#manual {
+    padding: 64px 0;
+}
+
+.assembus-doc-nav {
+    width: 200px;
+    float: left;
+}
+
+.assembus-doc-nav > ul {
+    width: 100%;
+}
+
+hr {
+    margin: 64px 0;
+}
+
+.sticky-top {
+    top: 123px;
+}
+
+:target {
+    display: block;
+    position: relative;
+    top: -64px;
+    visibility: hidden;
+}
+
+.assembus-doc-nav > .navbar-brand {
+    padding-left: 1rem;
+}
+
+.assembus-doc-content {
+    margin-left: 264px;
+}
+
 @media screen and (max-width: 1199px) {
     .manual-image-container {
         width: 50%;
@@ -377,9 +386,6 @@ button.pronounce {
  */
 
 section#download {
-    color: var(--text);
-    background-color: var(--prime-5);
-    min-height: calc(100vh - 80px);
     padding: 96px 0;
 }
 
@@ -392,6 +398,11 @@ img.download-logo {
     height: auto;
     max-width: 250px;
     margin: 24px auto;
+}
+
+.download-buttons {
+    margin-top: 16px;
+    margin-bottom: 32px;
 }
 
 span.manual-teaser {

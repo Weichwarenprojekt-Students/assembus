@@ -88,7 +88,7 @@ namespace CinemaScreen
             // Set index of the playback list to the beginning
             Index = -1;
 
-            // Reset should pause to false, necessary if cinema mode was exited while playing was acitve
+            // Reset should pause to false, necessary if cinema mode was exited while playing was active
             ShouldPause = false;
 
             // Load the model and station data and return it
@@ -494,6 +494,9 @@ namespace CinemaScreen
                     var c = material.color;
                     c.a = opacity;
                     material.color = c;
+                    
+                    // Check if the visibility should be switched off
+                    obj.SetActive(opacity != 0);
                 },
                 false
             );

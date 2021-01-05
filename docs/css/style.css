@@ -153,6 +153,12 @@ footer img {
     padding: 0 16px;
 }
 
+@media screen and (max-width: 1199px) {
+    .hidden-logo {
+        display: none;
+    }
+}
+
 @media screen and (max-width: 576px) {
     .logo-image {
         height: auto;

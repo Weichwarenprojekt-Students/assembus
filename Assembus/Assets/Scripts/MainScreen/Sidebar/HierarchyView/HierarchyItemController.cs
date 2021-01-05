@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MainScreen.StationView;
 using Models.Project;
 using Services;
@@ -41,6 +42,16 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     The selected items before starting a drag
         /// </summary>
         private static List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
+
+        /// <summary>
+        ///     Is the rename from a new Group
+        /// </summary>
+        private static bool _isRenameInitial;
+
+        /// <summary>
+        ///     Is a Item shifted to a Group
+        /// </summary>
+        private static bool _isItemShifted;
 
         /// <summary>
         ///     Reference to ComponentHighlighting script
@@ -183,6 +194,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _clicked;
 
         /// <summary>
+        ///     The CommandGroup instance
+        /// </summary>
+        private CommandGroup _commandGroup;
+
+        /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
         /// </summary>
         private bool _isExpanded = true;
@@ -206,11 +222,24 @@ namespace MainScreen.Sidebar.HierarchyView
             if (_updateHierarchy)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView);
 
+            // Detect double click on list item
             doubleClickDetector.CheckForSecondClick();
 
             // Scroll if dragging an item up/down
             if (Dragging)
                 ScrollOnDrag();
+            
+            // Apply rename of component on press enter key
+            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf) ApplyRenaming();
+
+            // Cancel renaming a component on press escape key
+            if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
+                CancelRenaming();
+
+            // Check if the object is active and if the mouse is clicked
+            if (!Input.GetMouseButtonDown(0) || !nameInputObject.activeSelf) return;
+
+            if (EventSystem.current.currentSelectedGameObject != nameInputObject) ApplyRenaming();
         }
 
         /// <summary>
@@ -404,7 +433,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Show/hide dot icon
             itemActive.SetActive(isActive);
         }
-        
+
         /// <summary>
         ///     Show a station in the station view
         /// </summary>
@@ -465,7 +494,12 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             var entries = new List<ContextMenuController.Item>
             {
-                new ContextMenuController.Item {Icon = contextMenu.edit, Name = "Rename", Action = RenameItem}
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.edit,
+                    Name = "Rename",
+                    Action = () => RenameItem()
+                }
             };
 
             var visible = item.activeSelf;
@@ -567,8 +601,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Start a renaming action
         /// </summary>
-        private void RenameItem()
+        public void RenameItem(bool isInitial = false, CommandGroup commandGroup = null)
         {
+            _commandGroup = commandGroup;
+            _isRenameInitial = isInitial;
             nameInput.text = nameText.text;
             showStation.SetActive(false);
             nameInputObject.SetActive(true);
@@ -581,9 +617,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void FuseGroup()
         {
-            itemInfo.ItemInfo.isFused = !itemInfo.ItemInfo.isFused;
-            UpdateVisuals();
-            stationController.UpdateStation();
+            _undoService.AddCommand(new FuseCommand(itemInfo.ItemInfo.isFused, item.name));
         }
 
         /// <summary>
@@ -622,7 +656,16 @@ namespace MainScreen.Sidebar.HierarchyView
             );
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new CreateCommand(true, state));
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
+
+            // Scroll to the created group in the group
+            var groupItem = childrenContainer.transform.GetChild(childrenContainer.transform.childCount - 1);
+            hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
+            groupItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>
@@ -637,7 +680,11 @@ namespace MainScreen.Sidebar.HierarchyView
                 item.transform.parent.name,
                 Utility.GetNeighbourID(item.transform)
             );
-            _undoService.AddCommand(new CreateCommand(true, state));
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
 
             // Move the items
             _dragItem =
@@ -645,12 +692,17 @@ namespace MainScreen.Sidebar.HierarchyView
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
+
+            // Scroll to First selected Game object
+            var groupItem = gameObject.transform.parent.parent;
+            hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
+            groupItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>
         ///     Cancel a rename action
         /// </summary>
-        public void CancelRenaming()
+        private void CancelRenaming()
         {
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
@@ -659,7 +711,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Apply a rename action
         /// </summary>
-        public void ApplyRenaming()
+        private void ApplyRenaming()
         {
             // Check if there's a name given
             var newName = nameInput.text;
@@ -674,8 +726,22 @@ namespace MainScreen.Sidebar.HierarchyView
             nameTextObject.SetActive(true);
             showStation.SetActive(IsStation);
 
-            // Add the new action to the undo redo service
-            _undoService.AddCommand(new RenameCommand(item.name, nameText.text, newName));
+            // Check if nothing is changed
+            if (nameInput.text == nameText.text) return;
+
+            var renameCommand = new RenameCommand(item.name, nameText.text, newName);
+
+            // Add the Command to the group if there is "Group Selected"
+            if (_isRenameInitial)
+            {
+                _commandGroup.AddToGroup(renameCommand);
+                renameCommand.Redo();
+                _isRenameInitial = false;
+            }
+            else
+            {
+                _undoService.AddCommand(renameCommand);
+            }
         }
 
         /// <summary>
@@ -719,13 +785,13 @@ namespace MainScreen.Sidebar.HierarchyView
             // Reset the drag event
             dragPreview.SetActive(false);
             Dragging = false;
-
+            _isItemShifted = true;
             // Insert the items (Only if the dragged item was selected)
             if (_selectedItems.Count != 0 && hierarchyViewController.IsSelected(this)) InsertItems();
         }
 
         /// <summary>
-        ///     Insert the currently selected items into a group
+        ///     Insert the currently selected items into a group or put them above another item
         /// </summary>
         private void InsertItems()
         {
@@ -738,6 +804,8 @@ namespace MainScreen.Sidebar.HierarchyView
             // Get the new parent and the new neighbour id
             var parent = _insertion ? _dragItem.gameObject.name : _dragItem.item.transform.parent.name;
             var neighbourID = _insertion ? ItemState.Last : Utility.GetNeighbourID(_dragItem.transform);
+
+            if (_selectedItems.Count == 1 && neighbourID == _selectedItems.First().name) return;
 
             // Create the item states
             List<ItemState> oldStates = new List<ItemState>(), newStates = new List<ItemState>();
@@ -761,14 +829,24 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new MoveCommand(oldStates, newStates));
+            var moveCommand = new MoveCommand(oldStates, newStates);
+            if (_isItemShifted)
+            {
+                _undoService.AddCommand(moveCommand);
+                _isItemShifted = false;
+            }
+            else
+            {
+                _commandGroup.AddToGroup(moveCommand);
+                moveCommand.Redo();
+            }
         }
 
         /// <summary>
-        ///     Put an item above this item
+        ///     Start hovering over the area to put an item above this item
         /// </summary>
         /// <param name="data">Event data</param>
-        public void PutAbove(BaseEventData data)
+        public void StartHoveringOverPutAboveArea(BaseEventData data)
         {
             // Change the color
             var selected = hierarchyViewController.IsSelected(this);
@@ -786,10 +864,10 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Stop putting an item above this item
+        ///     Stop hovering over the area to put an item above this item
         /// </summary>
         /// <param name="data">Event data</param>
-        public void StopPuttingAbove(BaseEventData data)
+        public void StopHoveringOverPutAboveArea(BaseEventData data)
         {
             movingIndicator.SetActive(false);
             if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;
@@ -797,11 +875,11 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Insert an item into this item
+        ///     Start hovering over the insertion area to insert another item into this item
         ///     (only works with if this item is a group)
         /// </summary>
         /// <param name="data">Event data</param>
-        public void InsertItem(BaseEventData data)
+        public void StartHoveringOverInsertingArea(BaseEventData data)
         {
             // Change the color
             var isGroup = itemInfo.ItemInfo.isGroup;
@@ -817,10 +895,10 @@ namespace MainScreen.Sidebar.HierarchyView
         }
 
         /// <summary>
-        ///     Stop inserting an item into this item
+        ///     Stop hovering over the insertion area of this item
         /// </summary>
         /// <param name="data">Event data</param>
-        public void StopInsertingItem(BaseEventData data)
+        public void StopHoveringOverInsertingArea(BaseEventData data)
         {
             _dragItem = null;
             if (!hierarchyViewController.IsSelected(this)) background.color = normalColor;
@@ -843,6 +921,15 @@ namespace MainScreen.Sidebar.HierarchyView
         public void OnScroll(BaseEventData data)
         {
             scrollRect.OnScroll((PointerEventData) data);
+        }
+
+        /// <summary>
+        ///     Select the name input to enable scrolling while renaming an item
+        /// </summary>
+        /// <param name="data">Event data</param>
+        public void SelectTextInput(BaseEventData data)
+        {
+            nameInput.Select();
         }
     }
 }

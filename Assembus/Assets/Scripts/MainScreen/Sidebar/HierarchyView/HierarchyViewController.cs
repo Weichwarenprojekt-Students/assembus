@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Models.Project;
 using Services.Serialization;
@@ -50,6 +51,21 @@ namespace MainScreen.Sidebar.HierarchyView
         public ContextMenuController contextMenu;
 
         /// <summary>
+        ///     RectTransform from Content
+        /// </summary>
+        public RectTransform contentPanel;
+
+        /// <summary>
+        ///     RectTransform from Scroll View
+        /// </summary>
+        public RectTransform scrollRectTrans;
+
+        /// <summary>
+        ///     ScrollRect from Scroll View
+        /// </summary>
+        public ScrollRect scrollRect;
+
+        /// <summary>
         ///     The project manager
         /// </summary>
         private readonly ProjectManager _projectManager = ProjectManager.Instance;
@@ -70,6 +86,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
+        ///     Gets true if the user scrolls manually while auto scroll to stop auto scroll
+        /// </summary>
+        private bool _stopAutoScroll;
+
+        /// <summary>
         ///     True if hierarchy view needs to be updated
         /// </summary>
         private bool _updateHierarchyView;
@@ -81,6 +102,9 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             if (_updateHierarchyView)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView.GetComponent<RectTransform>());
+
+            // Stop autoscroll if user manually scrolls
+            if (Input.mouseScrollDelta != Vector2.zero) _stopAutoScroll = true;
         }
 
         /// <summary>
@@ -106,34 +130,27 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         public void ShowContextMenu()
         {
-            var entries = new List<ContextMenuController.Item>();
-
-            entries.Add(
+            var entries = new List<ContextMenuController.Item>
+            {
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.add,
                     Name = "Create Station",
                     Action = CreateAssemblyStation
-                }
-            );
-
-            entries.Add(
+                },
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.show,
                     Name = "Show All",
                     Action = () => SetObjectVisibility(true)
-                }
-            );
-
-            entries.Add(
+                },
                 new ContextMenuController.Item
                 {
                     Icon = contextMenu.hide,
                     Name = "Hide All",
                     Action = () => SetObjectVisibility(false)
                 }
-            );
+            };
 
             contextMenu.Show(entries);
         }
@@ -143,13 +160,17 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void LoadModelIntoHierarchyView()
         {
-            defaultHierarchyViewItem.SetActive(true);
+            // Move default item out of hierarchy view
+            defaultHierarchyViewItem.transform.SetParent(null);
+
+            // Remove the old children
+            RemoveElementWithChildren(hierarchyView.transform);
+
+            // Move default item back into hierarchy view for instantiation
+            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
 
             // Get the root element of the object model
             var parent = _projectManager.CurrentProject.ObjectModel;
-
-            // Remove the old children
-            RemoveElementWithChildren(hierarchyView.transform, true);
 
             // Execute the recursive loading of game objects
             LoadElementWithChildren(hierarchyView, parent);
@@ -157,19 +178,19 @@ namespace MainScreen.Sidebar.HierarchyView
             // Force hierarchy view update
             _updateHierarchyView = true;
 
-            defaultHierarchyViewItem.SetActive(false);
+            // Move default item out of hierarchy view again
+            defaultHierarchyViewItem.transform.SetParent(null);
         }
 
         /// <summary>
         ///     Remove all previous list view items
         /// </summary>
         /// <param name="parent">The parent of the children that shall be removed</param>
-        /// <param name="first">True if it is the first (to make sure that the default item isn't deleted)</param>
-        private static void RemoveElementWithChildren(Transform parent, bool first)
+        private static void RemoveElementWithChildren(Transform parent)
         {
-            for (var i = first ? 1 : 0; i < parent.childCount; i++)
+            for (var i = 0; i < parent.childCount; i++)
             {
-                RemoveElementWithChildren(parent.GetChild(i).transform, false);
+                RemoveElementWithChildren(parent.GetChild(i).transform);
                 Destroy(parent.GetChild(i).gameObject);
             }
         }
@@ -233,9 +254,9 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="depth">The depth of indention</param>
         public void AddSingleListItem(GameObject parent, GameObject item, float depth)
         {
-            defaultHierarchyViewItem.SetActive(true);
+            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
             AddListItem(parent, item, depth);
-            defaultHierarchyViewItem.SetActive(false);
+            defaultHierarchyViewItem.transform.SetParent(null);
         }
 
         /// <summary>
@@ -258,7 +279,18 @@ namespace MainScreen.Sidebar.HierarchyView
                 _projectManager.CurrentProject.ObjectModel.name,
                 ItemState.Last
             );
-            _undoService.AddCommand(new CreateCommand(true, state));
+
+            // Add the new action to the undo redo service
+            var createCommand = new CreateCommand(true, state);
+            var commandGroup = new CommandGroup();
+            _undoService.AddCommand(commandGroup);
+            commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
+
+            // Scroll to the created station
+            var stationItem = hierarchyView.transform.GetChild(hierarchyView.transform.childCount - 1);
+            ScrollToItem(stationItem.GetComponent<RectTransform>());
+            stationItem.GetComponent<HierarchyItemController>().RenameItem(true, commandGroup);
         }
 
         /// <summary>
@@ -322,7 +354,7 @@ namespace MainScreen.Sidebar.HierarchyView
             var trans = _projectManager.CurrentProject.ObjectModel.transform;
             var list = SelectedItems.Select(item => Utility.FindChild(trans, item.name).gameObject).ToList();
 
-            componentHighlighting.HighlightGameObjects(list);
+            componentHighlighting.HighlightGameObjects(list, false);
         }
 
         /// <summary>
@@ -468,6 +500,63 @@ namespace MainScreen.Sidebar.HierarchyView
             if (parent == null) return;
             if (SelectedItems.Contains(parent)) DeselectItem(parent);
             else DeselectParent(parent.transform);
+        }
+
+        /// <summary>
+        ///     Scrolls to the targetItem
+        /// </summary>
+        /// <param name="targetItem"></param>
+        public void ScrollToItem(RectTransform targetItem)
+        {
+            scrollRect.enabled = false;
+            Canvas.ForceUpdateCanvases();
+            scrollRect.enabled = true;
+
+            // Top border of the actual viewport
+            var topBorder = contentPanel.localPosition.y;
+
+            // Lower border of the actual viewport
+            var lowerBorder = topBorder + scrollRectTrans.rect.height;
+
+            // Target item position in the viewport
+            var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -
+                               scrollRectTrans.transform.InverseTransformPoint(targetItem.position).y;
+
+            // Check if item is outside the borders, if so, scroll to the item
+            if (!(itemPosition < lowerBorder && topBorder < itemPosition))
+                StartCoroutine(ScrollToTarget(itemPosition - 200));
+        }
+
+        /// <summary>
+        ///     Coroutine for smoth scrolling to an new item
+        /// </summary>
+        /// <param name="targetValue"></param>
+        /// <returns></returns>
+        private IEnumerator ScrollToTarget(float targetValue)
+        {
+            var interpolatedFloat = new InterpolatedFloat(contentPanel.anchoredPosition.y);
+            _stopAutoScroll = false;
+            while (!interpolatedFloat.IsAtValue(targetValue) && !_stopAutoScroll)
+            {
+                interpolatedFloat.ToValue(targetValue);
+
+                contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value);
+
+                // Check, if the scroll view will scroll outside the viewport
+                if (scrollRect.normalizedPosition.y < 0)
+                {
+                    scrollRect.normalizedPosition = scrollRect.viewport.anchorMin;
+                    break;
+                }
+
+                if (scrollRect.normalizedPosition.y > 1)
+                {
+                    scrollRect.normalizedPosition = scrollRect.viewport.anchorMax;
+                    break;
+                }
+
+                yield return new WaitForEndOfFrame();
+            }
         }
     }
 }

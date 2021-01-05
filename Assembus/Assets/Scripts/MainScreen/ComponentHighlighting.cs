@@ -177,7 +177,7 @@ namespace MainScreen
 
                 // Highlight either single or collection of clicked game objects
                 if (_selectedGameObjects.Count > 1)
-                    HighlightGameObjects(_selectedGameObjects.Keys.ToList());
+                    HighlightGameObjects(_selectedGameObjects.Keys.ToList(), false);
                 else
                     clickedObject.GetComponent<Renderer>().material.color = colorSelectedSingle;
             }
@@ -241,29 +241,15 @@ namespace MainScreen
         }
 
         /// <summary>
-        ///     Highlight single game object
-        /// </summary>
-        /// <param name="gameObjects">Game object to be highlighted</param>
-        public void HighlightGameObject(GameObject gameObjects)
-        {
-            // Clear current selection, to preserve original color invariance
-            ResetPreviousSelections();
-
-            var material = gameObjects.GetComponent<Renderer>();
-
-            // Add to selection list and save original color
-            _selectedGameObjects.Add(gameObjects, material.material.color);
-
-            // Highlight selection
-            material.material.color = colorSelectedSingle;
-        }
-
-        /// <summary>
         ///     Highlight every game object or group contained in the list
         /// </summary>
         /// <param name="gameObjects">List of game objects or groups to be highlighted</param>
-        public void HighlightGameObjects(List<GameObject> gameObjects)
+        /// <param name="keepPreviousSelection">Should keep previous selections</param>
+        public void HighlightGameObjects(List<GameObject> gameObjects, bool keepPreviousSelection)
         {
+            if (keepPreviousSelection)
+                gameObjects.AddRange(_selectedGameObjects.Keys.ToList());
+
             // Clear current selection, to preserve original color invariance
             ResetPreviousSelections();
 
@@ -271,6 +257,7 @@ namespace MainScreen
             var groupedObjects = new List<GameObject>();
             var groups =
                 gameObjects.Where(g => g.GetComponent<ItemInfoController>().ItemInfo.isGroup);
+
             foreach (var group in groups)
                 groupedObjects.AddRange(Utility.GetAllChildren(group).ToList());
 

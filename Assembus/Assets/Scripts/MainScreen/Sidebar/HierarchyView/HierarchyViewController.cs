@@ -81,11 +81,6 @@ namespace MainScreen.Sidebar.HierarchyView
         public readonly List<HierarchyItemController> SelectedItems = new List<HierarchyItemController>();
 
         /// <summary>
-        ///     The CommandGroup instance
-        /// </summary>
-        private CommandGroup _commandGroup;
-
-        /// <summary>
         ///     The item selected before the currently selected one
         /// </summary>
         private HierarchyItemController _lastSelectedItem;
@@ -290,15 +285,15 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Add the new action to the undo redo service
             var createCommand = new CreateCommand(true, state);
-            _commandGroup = new CommandGroup();
-            _undoService.AddCommand(_commandGroup);
-            _commandGroup.AddToGroup(createCommand);
+            var commandGroup = new CommandGroup();
+            _undoService.AddCommand(commandGroup);
+            commandGroup.AddToGroup(createCommand);
             createCommand.Redo();
 
             // Scroll to the created station
             var stationItem = hierarchyView.transform.GetChild(hierarchyView.transform.childCount - 1);
             ScrollToItem(stationItem.GetComponent<RectTransform>());
-            stationItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
+            stationItem.GetComponent<HierarchyItemController>().RenameItem(true, commandGroup);
         }
 
         /// <summary>

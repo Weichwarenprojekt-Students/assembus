@@ -20,7 +20,9 @@
 
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
 </head>
-<body class="clean">
+
+<body class="clean" data-bs-offset="64" data-bs-spy="scroll" data-bs-target="#docs-navbar" tabindex="0">
+
 <nav class="navbar navbar-expand-sm fixed-top navbar-dark bg-primary">
     <div class="container-md">
         <a class="navbar-brand" href="index.html">
@@ -56,234 +58,304 @@
     </div>
 </nav>
 
-<section id="manual">
+<section id="intro">
     <div class="container-md">
         <div class="row">
-            <div class="contents-container col-md-4 order-1">
-                <ul class="list-group">
-                    <li class="list-group-item"><a href="#project-creation">Project Creation / Loading</a></li>
-                    <li class="list-group-item"><a href="#getting-familiar">Getting Familiar with Assembus</a></li>
-                    <li class="list-group-item"><a href="#edit">Editing the Assembly Line</a></li>
-                    <li class="list-group-item"><a href="#visualization">Assembly Line Visualization</a></li>
-                    <li class="list-group-item"><a href="#export">Export</a></li>
-                </ul>
-            </div>
-            <div class="col-md-8">
-                <h1>Manual</h1>
+            <h1>Manual</h1>
+            <p>
+                Assembus is a 3D environment supporting the initial model assembly phase.
+                It provides functionality to explicitly specify the component assembly sequence.
+                Multiple assembly stations can be created to map the real-world situation at the factory inside
+                Assembus.
+                Components can be ordered and grouped to component groups.
+                Assembus allows the user to partially or fully assemble and disassemble the model in a 3D preview in
+                realtime
+                to understand the construction process and to optimize the assembly process.
+                Additionally, the assembly line configuration can be exported for other applications.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="content">
+    <div class="container-md">
+        <nav class="navbar navbar-light bg-light px-3 sticky-top assembus-doc-nav" id="docs-navbar">
+            <a class="navbar-brand">Content</a>
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#project-creation">Project Creation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#getting-familiar">Getting Familiar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#editing-assembly">Editing Assembly</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#assembly-line">Assembly Line</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#export">Export</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="assembus-doc-content">
+
+            <div id="project-creation"></div>
+            <div>
+                <h1>Project Creation / Loading</h1>
+
+                <div class="manual-image-container">
+                    <img alt="project creation" data-action="zoom" src="img/manual/project-creation.png">
+                </div>
                 <p>
-                    Assembus is a 3D environment supporting the initial model assembly phase.
-                    It provides functionality to explicitly specify the component assembly sequence.
-                    Multiple assembly stations can be created to map the real-world situation at the factory inside
-                    Assembus.
-                    Components can be ordered and grouped to component groups.
-                    Assembus allows the user to partially or fully assemble and disassemble the model in a 3D preview in
-                    realtime
-                    to understand the construction process and to optimize the assembly process.
-                    Additionally, the assembly line configuration can be exported for other applications.
+                    After opening the application you see the project creation window. At the right-hand side, you can
+                    create a
+                    new project by entering your preferred project name, a destination where it should be saved, and the
+                    .obj-file of your assembled 3D model. Optionally, you can overwrite an existing project at the
+                    destination
+                    directory. Your project is created after clicking on the "Create"-button.
+                </p>
+                <p>
+                    On the left half of the window you can see previously created projects. You can open them by simply
+                    clicking
+                    on the project or delete it by clicking on the trashcan icon. Further, you are able to open projects
+                    which
+                    are not listed with the "Import"-button.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="getting-familiar"></div>
+            <div>
+                <h1>Getting Familiar with Assembus</h1>
+
+                <div class="manual-image-container">
+                    <img alt="Overview" data-action="zoom" src="img/manual/overview.png">
+                </div>
+                <p>
+                    After opening Assembus you are greeted by the hierarchical component listing and the 3D preview of
+                    the
+                    imported model.
+                </p>
+                <p>
+                    The 3D preview visualizes all components of the assembled model. You can easily inspect the 3D model
+                    by
+                    using your mouse.
+                    To rotate the object, hold the right mouse button while moving the mouse. The mousewheel can be used
+                    to
+                    zoom
+                    in and out. Additionally, you can change the focus of the camera by double clicking a component of
+                    the
+                    3D
+                    model or an entry of the hierarchical list.
+                </p>
+
+                <div class="manual-image-container">
+                    <img alt="Highlighting" data-action="zoom" src="img/manual/highlighting.png">
+                </div>
+
+                <p>
+                    To identify an element of the hierarchical list in the preview, simply click on it. This works in
+                    both
+                    directions - clicking on a component of the 3D model will highlight the corresponding entry in the
+                    list.
+                </p>
+
+                <p>
+                    If you want to revert any changes you go a step back in the history by clicking the Undo-button in
+                    the
+                    sidebar navigation. Similarly, you can move one step forward with the Redo-button. Alternatively,
+                    both
+                    action are mapped to a shortcut:
+                    <kbd><kbd>Ctrl</kbd>+<kbd>Z</kbd></kbd> to Undo and
+                    <kbd><kbd>Ctrl</kbd>+<kbd>Y</kbd></kbd> or <kbd><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></kbd>
+                    to
+                    Redo.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="editing-assembly"></div>
+            <div>
+                <h1>Editing the Assembly Line</h1>
+
+                <div class="manual-image-container">
+                    <img alt="Context menu" data-action="zoom" src="img/manual/context-menu.png">
+                </div>
+
+                <p>
+                    The editing of your assembly sequence is done in the hierarchical list. The actual assembly sequence
+                    is
+                    defined by the ordering of the elements inside the hierarchical list.
+                    The ordering can be modified by dragging elements. Multiple items can be selected by clicking and
+                    holding <kbd>Ctrl</kbd> while selecting items in the list. Press <kbd>Shift</kbd> to select all
+                    items
+                    between two boundaries.
+                </p>
+                <p>
+                    By default, all components are located inside the "Default Station". New assembly stations can be
+                    created by
+                    clicking the overflow-menu in the top and selecting "Create Station". The station will be added as a
+                    top-level group.
+                    Simply move components into the new station by using Drag&Drop.
+                    The separation into station is used by the <a href=#station-view>Station View</a>.
+                </p>
+                <p>
+                    To keep the project clean and tidy, multiple components can be grouped into groups.
+                    You can either right-click on an assembly station and select "Add Group" to create a new empty group
+                    or
+                    you
+                    can select multiple items to be grouped and right click on the selection and select "Group selected"
+                    to
+                    group
+                    the marked components.
+                    If you want to abstract pre-built components, you can fuse existing groups by right-clicking on a
+                    group
+                    and
+                    selecting "Fuse Group" to hide all items of the group from the user. Fused groups are marked with a
+                    chain
+                    icon
+                    and their content can be toggled by clicking at the icon.
+                </p>
+                <p>
+                    To rename a component, component group or assembly station, open the context menu with a right-click
+                    and
+                    select "Rename" to alter the displayed name.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="assembly-line"></div>
+            <div>
+                <h1>Assembly Line Visualization</h1>
+
+                <h2 id="station-view">Station View</h2>
+
+                <div class="manual-image-container">
+                    <img alt="Station View" data-action="zoom" src="img/manual/station-view.png">
+                </div>
+
+                <p>
+                    The StationView allows to fully assemble and disassemble the 3D model in realtime.
+                    It allows you to visualize and understand your built assembly line through the help
+                    of the 3D preview. You can use the default mouse navigation to view the 3D model.
+                </p>
+
+                <p>
+                    The StationView allows you to assemble all parts which are part of a specific assembly station.
+                    To open the StationView for a specific assembly station, simply click on the box-pointer-icon
+                    of the corresponding station in the list.
+                </p>
+
+
+                <p>
+                    Use the skip-arrows on the bottom of the screen to incrementally assemble or disassemble all
+                    components.
+                    The dot-icon and the color highlighting in the hierarchical list indicates which components have
+                    already
+                    been assembled into the final model. <br/>
+                    Alternatively you can right-click on a list item and select "Skip To" to jump to the selected
+                    component.
+
+                    To switch the currently visible station, simply click on the navigation arrows on the top of the
+                    screen.
+                    The name of the currently visible station is displayed on the top of the screen.
+                </p>
+
+
+                <p>
+                    By default, all components which have been assembled in previous stations, are hidden to ensure
+                    clarity.
+                    You can enable visibility of components from preceding stations by clicking the eye-button in the
+                    upper
+                    right
+                    corner of the screen.
+                </p>
+
+
+                <h2 id="cinema-mode">Cinema Mode</h2>
+
+                <div class="manual-image-container">
+                    <img alt="Cinema Mode" data-action="zoom" src="img/manual/cinema-mode.png">
+                </div>
+
+                <p>
+                    The CinemaMode offers a movie-like experience to visualize the assembly process and to train
+                    assembly
+                    personnel.
+                    This mode works similar to the StationView but is is not indented to apply changes to the assembly
+                    line
+                    but
+                    to solely
+                    playback the entire assembly process for employee training.
+                </p>
+
+                <p>
+                    To open the CinemaMode, simply click on the box-triangle icon on the sidebar. The CinemaMode screen
+                    will
+                    appear and start with
+                    the very first assembly station. To start playback, click the triangle button. To stop playback,
+                    click
+                    on
+                    the playback button again.
+                    You can skip to the previous or next component with the skip buttons. The assembly speed/delay can
+                    be
+                    modified with the speed slider right next
+                    to the playback control buttons. Move the slider left to the center to disassemble the model, move
+                    the
+                    slider to the right of the slider center to
+                    assemble the vehicle.
+                </p>
+
+                <p>
+                    Alternatively you can click and drag around the dot indicator which is placed on the progress bar,
+                    which
+                    is
+                    located above the playback controls to go one step back
+                    or forth. Each section of the progress bar represents one assembly station. The dot indicator shows
+                    the
+                    assembly progress inside the current station. To show the
+                    name of the assembly station and the amount of components, simply hover the mouse above the desired
+                    progress
+                    bar section.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="export"></div>
+            <div>
+                <h1>Export</h1>
+                <p>
+                    The export function allows you to easily export your entire assembly line configuration, which
+                    includes
+                    all
+                    defined assembly stations, component ordering
+                    and (fused) component groups.
+                </p>
+
+                <p>
+                    Assembus exports your assembly line configuration as a simple ZIP file which uses the .bus
+                    file-ending.
+                    The
+                    ZIP directory contains the actual 3D OBJ file
+                    and the assembly line configuration which uses the XML meta language to describe the assembly
+                    sequence.
+                </p>
+
+                <p>
+                    To invoke the export, simply click on the box icon with the upwards arrow, which is located in the
+                    sidebar.
+                    Specify a export directory and the desired
+                    export filename. Finally click the save button to export the Assembus project.
                 </p>
             </div>
         </div>
-    </div>
-</section>
-
-
-<section id="project-creation">
-    <div class="container-md">
-        <h1>Project Creation / Loading</h1>
-        <div class="manual-image-container">
-            <img alt="project creation" data-action="zoom" src="img/manual/project-creation.png">
-        </div>
-        <p>
-            After opening the application you see the project creation window. At the right-hand side, you can create a
-            new project by entering your preferred project name, a destination where it should be saved, and the
-            .obj-file of your assembled 3D model. Optionally, you can overwrite an existing project at the destination
-            directory. Your project is created after clicking on the "Create"-button.
-        </p>
-        <p>
-            On the left half of the window you can see previously created projects. You can open them by simply clicking
-            on the project or delete it by clicking on the trashcan icon. Further, you are able to open projects which
-            are not listed with the "Import"-button.
-        </p>
-    </div>
-</section>
-
-<section id="getting-familiar">
-    <div class="container-md">
-        <h1>Getting Familiar with Assembus</h1>
-        <div class="manual-image-container">
-            <img alt="Overview" data-action="zoom" src="img/manual/overview.png">
-        </div>
-        <p>
-            After opening Assembus you are greeted by the hierarchical component listing and the 3D preview of the
-            imported model.
-        </p>
-        <p>
-            The 3D preview visualizes all components of the assembled model. You can easily inspect the 3D model by
-            using your mouse.
-            To rotate the object, hold the right mouse button while moving the mouse. The mousewheel can be used to zoom
-            in and out. Additionally, you can change the focus of the camera by double clicking a component of the 3D
-            model or an entry of the hierarchical list.
-        </p>
-
-        <div class="manual-image-container">
-            <img alt="Highlighting" data-action="zoom" src="img/manual/highlighting.png">
-        </div>
-
-        <p>
-            To identify an element of the hierarchical list in the preview, simply click on it. This works in both
-            directions - clicking on a component of the 3D model will highlight the corresponding entry in the list.
-        </p>
-
-        <p>
-            If you want to revert any changes you go a step back in the history by clicking the Undo-button in the
-            sidebar navigation. Similarly, you can move one step forward with the Redo-button. Alternatively, both
-            action are mapped to a shortcut:
-            <kbd><kbd>Ctrl</kbd>+<kbd>Z</kbd></kbd> to Undo and
-            <kbd><kbd>Ctrl</kbd>+<kbd>Y</kbd></kbd> or <kbd><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></kbd> to Redo.
-        </p>
-    </div>
-</section>
-
-<section id="edit">
-    <div class="container-md">
-        <h1>Editing the Assembly Line</h1>
-
-        <div class="manual-image-container">
-            <img alt="Context menu" data-action="zoom" src="img/manual/context-menu.png">
-        </div>
-
-        <p>
-            The editing of your assembly sequence is done in the hierarchical list. The actual assembly sequence is
-            defined by the ordering of the elements inside the hierarchical list.
-            The ordering can be modified by dragging elements. Multiple items can be selected by clicking and
-            holding <kbd>Ctrl</kbd> while selecting items in the list. Press <kbd>Shift</kbd> to select all items
-            between two boundaries.
-        </p>
-        <p>
-            By default, all components are located inside the "Default Station". New assembly stations can be created by
-            clicking the overflow-menu in the top and selecting "Create Station". The station will be added as a
-            top-level group.
-            Simply move components into the new station by using Drag&Drop.
-            The separation into station is used by the <a href=#station-view>Station View</a>.
-        </p>
-        <p>
-            To keep the project clean and tidy, multiple components can be grouped into groups.
-            You can either right-click on an assembly station and select "Add Group" to create a new empty group or you
-            can select multiple items to be grouped and right click on the selection and select "Group selected" to
-            group
-            the marked components.
-            If you want to abstract pre-built components, you can fuse existing groups by right-clicking on a group and
-            selecting "Fuse Group" to hide all items of the group from the user. Fused groups are marked with a chain
-            icon
-            and their content can be toggled by clicking at the icon.
-        </p>
-        <p>
-            To rename a component, component group or assembly station, open the context menu with a right-click and
-            select "Rename" to alter the displayed name.
-        </p>
-    </div>
-</section>
-
-<section id="visualization">
-    <div class="container-md">
-        <h1>Assembly Line Visualization</h1>
-
-        <h2 id="station-view">Station View</h2>
-
-        <div class="manual-image-container">
-            <img alt="Station View" data-action="zoom" src="img/manual/station-view.png">
-        </div>
-
-        <p>
-            The StationView allows to fully assemble and disassemble the 3D model in realtime.
-            It allows you to visualize and understand your built assembly line through the help
-            of the 3D preview. You can use the default mouse navigation to view the 3D model.
-        </p>
-
-        <p>
-            The StationView allows you to assemble all parts which are part of a specific assembly station.
-            To open the StationView for a specific assembly station, simply click on the box-pointer-icon
-            of the corresponding station in the list.
-        </p>
-
-
-        <p>
-            Use the skip-arrows on the bottom of the screen to incrementally assemble or disassemble all components.
-            The dot-icon and the color highlighting in the hierarchical list indicates which components have already
-            been assembled into the final model. <br/>
-            Alternatively you can right-click on a list item and select "Skip To" to jump to the selected component.
-
-            To switch the currently visible station, simply click on the navigation arrows on the top of the screen.
-            The name of the currently visible station is displayed on the top of the screen.
-        </p>
-
-
-        <p>
-            By default, all components which have been assembled in previous stations, are hidden to ensure clarity.
-            You can enable visibility of components from preceding stations by clicking the eye-button in the upper
-            right
-            corner of the screen.
-        </p>
-
-
-        <h2 id="cinema-mode">Cinema Mode</h2>
-
-        <div class="manual-image-container">
-            <img alt="Cinema Mode" data-action="zoom" src="img/manual/cinema-mode.png">
-        </div>
-
-        <p>
-            The CinemaMode offers a movie-like experience to visualize the assembly process and to train assembly
-            personnel.
-            This mode works similar to the StationView but is is not indented to apply changes to the assembly line but
-            to solely
-            playback the entire assembly process for employee training.
-        </p>
-
-        <p>
-            To open the CinemaMode, simply click on the box-triangle icon on the sidebar. The CinemaMode screen will
-            appear and start with
-            the very first assembly station. To start playback, click the triangle button. To stop playback, click on
-            the playback button again.
-            You can skip to the previous or next component with the skip buttons. The assembly speed/delay can be
-            modified with the speed slider right next
-            to the playback control buttons. Move the slider left to the center to disassemble the model, move the
-            slider to the right of the slider center to
-            assemble the vehicle.
-        </p>
-
-        <p>
-            Alternatively you can click and drag around the dot indicator which is placed on the progress bar, which is
-            located above the playback controls to go one step back
-            or forth. Each section of the progress bar represents one assembly station. The dot indicator shows the
-            assembly progress inside the current station. To show the
-            name of the assembly station and the amount of components, simply hover the mouse above the desired progress
-            bar section.
-        </p>
-    </div>
-</section>
-
-<section id="export">
-    <div class="container-md">
-        <h1>Export</h1>
-
-        <p>
-            The export function allows you to easily export your entire assembly line configuration, which includes all
-            defined assembly stations, component ordering
-            and (fused) component groups.
-        </p>
-
-        <p>
-            Assembus exports your assembly line configuration as a simple ZIP file which uses the .bus file-ending. The
-            ZIP directory contains the actual 3D OBJ file
-            and the assembly line configuration which uses the XML meta language to describe the assembly sequence.
-        </p>
-
-        <p>
-            To invoke the export, simply click on the box icon with the upwards arrow, which is located in the sidebar.
-            Specify a export directory and the desired
-            export filename. Finally click the save button to export the Assembus project.
-        </p>
     </div>
 </section>
 
@@ -293,10 +365,6 @@
         <img alt="Made with Unity" src="img/made-with-unity.png">
     </div>
 </footer>
-
-<script type="text/javascript">
-    new Zooming().listen("[data-action='zoom']")
-</script>
 
 </body>
 </html>

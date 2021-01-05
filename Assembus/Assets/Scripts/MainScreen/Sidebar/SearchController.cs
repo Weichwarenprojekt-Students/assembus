@@ -99,6 +99,11 @@ namespace MainScreen.Sidebar
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.F))
                 userInput.ActivateInputField();
 
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F3))
+                SkipToPreviousResult();
+            else if (Input.GetKeyDown(KeyCode.F3))
+                SkipToNextResult();
+
             if (!_allowInputReset || !userInput.text.Equals(string.Empty)) return;
 
             _foundObjects.Clear();
@@ -153,7 +158,7 @@ namespace MainScreen.Sidebar
             _currentIndex = 0;
             _foundObjects.Clear();
             _allowInputReset = true;
-            
+
             // Collect all game objects with the given input name
             Utility.FillListWithChildrenByName(
                 hierarchyViewController.hierarchyView.transform,

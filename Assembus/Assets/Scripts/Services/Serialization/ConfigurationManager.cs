@@ -14,6 +14,21 @@ namespace Services.Serialization
         private const string FileName = "assembus.xml";
 
         /// <summary>
+        ///     Path to the systems local config directory
+        ///         Windows: %userprofile%\AppData\Local
+        ///         Linux: ~/.local/share
+        /// </summary>
+        private static readonly string ConfigDirPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "assembus"
+        );
+
+        /// <summary>
+        ///     Combined path of config directory and file name
+        /// </summary>
+        private static readonly string FilePath = Path.Combine(ConfigDirPath, FileName);
+
+        /// <summary>
         ///     The XML writer/reader instance
         /// </summary>
         private readonly XmlDeSerializer<Configuration> _xmlDeSerializer = new XmlDeSerializer<Configuration>();
@@ -42,12 +57,12 @@ namespace Services.Serialization
         /// </summary>
         private void LoadConfig()
         {
-            if (!File.Exists(FileName)) Debug.Log("No XML config file existing!");
+            if (!File.Exists(FilePath)) Debug.Log("No XML config file existing!");
 
             try
             {
                 // Read object from XML
-                Config = _xmlDeSerializer.DeserializeData(FileName);
+                Config = _xmlDeSerializer.DeserializeData(FilePath);
             }
             catch (Exception e)
             {
@@ -62,9 +77,11 @@ namespace Services.Serialization
         /// <returns>True if the saving was successful</returns>
         public bool SaveConfig()
         {
+            if (!Directory.Exists(ConfigDirPath)) Directory.CreateDirectory(ConfigDirPath);
+
             try
             {
-                _xmlDeSerializer.SerializeData(FileName, Config);
+                _xmlDeSerializer.SerializeData(FilePath, Config);
                 return true;
             }
             catch (Exception)

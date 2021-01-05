@@ -518,10 +518,10 @@ namespace MainScreen.Sidebar.HierarchyView
             scrollRect.enabled = true;
 
             // Top border of the actual viewport
-            var topBorder = contentPanel.localPosition.y;
+            var topBorder = contentPanel.localPosition.y + 40.0f;
 
             // Lower border of the actual viewport
-            var lowerBorder = topBorder + scrollRectTrans.rect.height;
+            var lowerBorder = topBorder + scrollRectTrans.rect.height - 80.0f;
 
             // Target item position in the viewport
             var itemPosition = scrollRectTrans.transform.InverseTransformPoint(contentPanel.position).y -

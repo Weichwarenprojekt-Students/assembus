@@ -5,17 +5,23 @@
     --prime-4: #213451;
     --prime-5: #102138;
     --text: #f5f5f5;
+    --footer-height: 80px;
+    --header-height: 60px;
 }
 
 body {
     color: #333;
     overflow-x: hidden;
-    min-height: 100%;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
     position: relative;
 }
 
 a {
     text-decoration: none;
+}
+
+.header {
+    height: var(--header-height);
 }
 
 .btn i.zmdi {
@@ -35,7 +41,7 @@ section:nth-child(even) {
 }
 
 #intro {
-    margin-top: 58px;
+    margin-top: var(--header-height);
     padding: 32px 0 64px;
     color: var(--text);
     background-color: var(--prime-5);
@@ -93,8 +99,11 @@ section:nth-child(even) {
 
 footer {
     background-color: var(--prime-5);
-    height: 80px;
+    height: var(--footer-height);
     color: var(--text);
+    position: absolute;
+    width: 100%;
+    bottom: calc(-1 * var(--footer-height));
 }
 
 footer .container-md {
@@ -151,6 +160,15 @@ footer img {
 .logo-box p {
     text-align: left;
     padding: 0 16px;
+}
+
+@media screen and (max-width: 900px) {
+    .assembus-doc-nav {
+        display: none;
+    }
+    div > .assembus-doc-content {
+        margin-left: 0;
+    }
 }
 
 @media screen and (max-width: 1199px) {
@@ -306,7 +324,7 @@ button.pronounce {
  */
 
 .clean {
-    margin-top: 59px;
+    margin-top: var(--header-height);
 }
 
 .clean section {
@@ -353,7 +371,7 @@ hr {
 }
 
 .sticky-top {
-    top: 123px;
+    top: calc(64px + var(--header-height));
 }
 
 :target {
@@ -406,6 +424,10 @@ img.download-logo {
     margin: 24px auto;
 }
 
+.download-title {
+    margin-top: 32px;
+}
+
 .download-buttons {
     margin-top: 16px;
     margin-bottom: 32px;
@@ -413,15 +435,4 @@ img.download-logo {
 
 span.manual-teaser {
     margin-top: 8px;
-}
-
-/**
- *
- * Zoomerang layout
- *
- */
-img[data-action="zoom"] {
-    cursor: pointer;
-    cursor: -webkit-zoom-in;
-    cursor: -moz-zoom-in;
 }

@@ -458,8 +458,6 @@ namespace CinemaScreen
                 // Set item to be fully transparent
                 SetOpacity(currentObject, 0);
 
-            // Set the item or its child components to be visible
-
             for (float opacity = 0; opacity <= 1; opacity += 3 * Time.deltaTime)
             {
                 // Continuously increase the opacity of the item or its child components

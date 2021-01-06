@@ -67,7 +67,8 @@
                 <div>
                     <h1 class="display-3">Manual</h1>
                     <p class="intro-subheading text-muted">
-                        Assembus is an editor that provides a 3D environment supporting the initial model assembly phase.
+                        Assembus is an editor that provides a 3D environment supporting the initial model assembly
+                        phase.
                         It provides a lot of functionality to explicitly specify the component assembly sequence.
 
                     </p>
@@ -87,16 +88,16 @@
             <a class="navbar-brand">Content</a>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#project-creation">Project Creation</a>
+                    <a class="nav-link active" href="#getting-started">Getting Started</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#getting-familiar">Getting Familiar</a>
+                    <a class="nav-link" href="#project-management">Project Management</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#editing-assembly">Editing Assembly</a>
+                    <a class="nav-link" href="#editor">The Editor</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#assembly-line">Assembly Line</a>
+                    <a class="nav-link" href="#visualization">Visualization</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#export">Export</a>
@@ -106,21 +107,60 @@
 
         <div class="assembus-doc-content">
 
-            <div id="project-creation"></div>
+            <div id="getting-started"></div>
             <div>
-                <h1>Project Creation / Loading</h1>
+                <h1 class="display-3 assembus-doc-title"> Getting Started </h1>
+                <div>
 
-                <div class="manual-image-container">
-                    <img alt="project creation" data-action="zoom" src="img/manual/project-creation.png">
+                    <div class="getting-started-row">
+                        <div class="col-xl-5 col-lg-12 jumbotron getting-started-first">
+                            <div>
+                                <h1>Project Management</h1>
+                                <p class="intro-subheading">
+                                    Your first contact with Assembus will be the starting screen. This screen allows you
+                                    to create, delete and load projects.
+                                    <br>
+                                    <a href="#project-management"> More here. </a>
+                                </p>
+                            </div>
+                        </div>
+                        <img alt="logo" class="getting-started-second" src="img/manual/square-start-screen.png">
+                    </div>
+
+                    <div class="getting-started-row">
+                        <div class="col-xl-5 col-lg-12 jumbotron getting-started-second">
+                            <div>
+                                <h1>Manual</h1>
+                                <p class="intro-subheading">
+                                    Assembus is an editor that provides a 3D environment supporting the initial model
+                                    assembly
+                                    phase.
+                                    It provides a lot of functionality to explicitly specify the component assembly
+                                    sequence.
+                                    <br>
+                                    <a href="#editor"> More </a>
+                                </p>
+                            </div>
+                        </div>
+                        <img alt="logo" class="getting-started-first" src="img/manual/square-start-screen.png">
+                    </div>
                 </div>
+            </div>
+
+            <hr>
+
+            <div id="project-management"></div>
+            <div>
+                <h1 class="display-3 assembus-doc-title">Project Management</h1>
+
                 <p>
-                    After opening the application you see the project creation window. At the right-hand side, you can
-                    create a
-                    new project by entering your preferred project name, a destination where it should be saved, and the
-                    .obj-file of your assembled 3D model. Optionally, you can overwrite an existing project at the
-                    destination
-                    directory. Your project is created after clicking on the "Create"-button.
+                    After opening the application you will see the project creation window. At the right-hand side, you
+                    can create a new project by entering your preferred project name, a destination where it should be
+                    saved, and the .obj-file of your assembled 3D model. Optionally, you can overwrite an existing
+                    project at the destination directory. Your project is created after clicking on the "Create"-button.
                 </p>
+                <img alt="project creation" class="assembus-doc-image" data-action="zoom"
+                     src="img/manual/start-screen.png">
                 <p>
                     On the left half of the window you can see previously created projects. You can open them by simply
                     clicking
@@ -132,18 +172,12 @@
 
             <hr>
 
-            <div id="getting-familiar"></div>
+            <div id="editor"></div>
             <div>
-                <h1>Getting Familiar with Assembus</h1>
+                <h1 class="display-3 assembus-doc-title">The Editor</h1>
 
-                <div class="manual-image-container">
-                    <img alt="Overview" data-action="zoom" src="img/manual/overview.png">
-                </div>
-                <p>
-                    After opening Assembus you are greeted by the hierarchical component listing and the 3D preview of
-                    the
-                    imported model.
-                </p>
+                <img alt="Overview" class="assembus-doc-image" data-action="zoom" src="img/manual/overview.png">
+
                 <p>
                     The 3D preview visualizes all components of the assembled model. You can easily inspect the 3D model
                     by
@@ -157,9 +191,7 @@
                     model or an entry of the hierarchical list.
                 </p>
 
-                <div class="manual-image-container">
-                    <img alt="Highlighting" data-action="zoom" src="img/manual/highlighting.png">
-                </div>
+                <img alt="Highlighting" class="assembus-doc-image" data-action="zoom" src="img/manual/highlighting.png">
 
                 <p>
                     To identify an element of the hierarchical list in the preview, simply click on it. This works in
@@ -179,17 +211,10 @@
                     to
                     Redo.
                 </p>
-            </div>
+                <br>
+                <h1> Editing the Assembly Line</h1>
 
-            <hr>
-
-            <div id="editing-assembly"></div>
-            <div>
-                <h1>Editing the Assembly Line</h1>
-
-                <div class="manual-image-container">
-                    <img alt="Context menu" data-action="zoom" src="img/manual/context-menu.png">
-                </div>
+                <img alt="Context menu" class="assembus-doc-image-right" data-action="zoom" src="img/manual/context-menu.png">
 
                 <p>
                     The editing of your assembly sequence is done in the hierarchical list. The actual assembly sequence
@@ -234,28 +259,24 @@
 
             <hr>
 
-            <div id="assembly-line"></div>
+            <div id="visualization"></div>
             <div>
-                <h1>Assembly Line Visualization</h1>
+                <h1 class="display-3 assembus-doc-title">Visualization</h1>
 
-                <h2 id="station-view">Station View</h2>
-
-                <div class="manual-image-container">
-                    <img alt="Station View" data-action="zoom" src="img/manual/station-view.png">
-                </div>
+                <h1 id="station-view">Station View</h1>
 
                 <p>
-                    The StationView allows to fully assemble and disassemble the 3D model in realtime.
+                    The station view allows to fully assemble and disassemble the 3D model in realtime.
                     It allows you to visualize and understand your built assembly line through the help
                     of the 3D preview. You can use the default mouse navigation to view the 3D model.
                 </p>
 
+                <img alt="Station View" class="assembus-doc-image" data-action="zoom" src="img/manual/station-view.png">
+
                 <p>
-                    The StationView allows you to assemble all parts which are part of a specific assembly station.
                     To open the StationView for a specific assembly station, simply click on the box-pointer-icon
                     of the corresponding station in the list.
                 </p>
-
 
                 <p>
                     Use the skip-arrows on the bottom of the screen to incrementally assemble or disassemble all
@@ -282,11 +303,7 @@
                 </p>
 
 
-                <h2 id="cinema-mode">Cinema Mode</h2>
-
-                <div class="manual-image-container">
-                    <img alt="Cinema Mode" data-action="zoom" src="img/manual/cinema-mode.png">
-                </div>
+                <h1 id="cinema-mode">Cinema Mode</h1>
 
                 <p>
                     The CinemaMode offers a movie-like experience to visualize the assembly process and to train
@@ -298,6 +315,8 @@
                     to solely
                     playback the entire assembly process for employee training.
                 </p>
+
+                <img alt="Cinema Mode" class="assembus-doc-image" data-action="zoom" src="img/manual/cinema-mode.png">
 
                 <p>
                     To open the CinemaMode, simply click on the box-triangle icon on the sidebar. The CinemaMode screen
@@ -334,7 +353,7 @@
 
             <div id="export"></div>
             <div>
-                <h1>Export</h1>
+                <h1 class="display-3 assembus-doc-title">Export</h1>
                 <p>
                     The export function allows you to easily export your entire assembly line configuration, which
                     includes

@@ -7,6 +7,7 @@
     --text: #f5f5f5;
     --footer-height: 80px;
     --header-height: 60px;
+    --doc-nav-width: 220px;
 }
 
 body {
@@ -51,7 +52,7 @@ section:nth-child(even) {
     height: 30px;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
     color: white;
     background-color: var(--prime-4);
 }
@@ -166,6 +167,7 @@ footer img {
     .assembus-doc-nav {
         display: none;
     }
+
     div > .assembus-doc-content {
         margin-left: 0;
     }
@@ -181,10 +183,12 @@ footer img {
     .logo-image {
         height: auto;
     }
+
     .logo-box {
         padding: 40px 0 0 0;
         text-align: center;
     }
+
     .logo-box .logo-image img {
         height: auto;
         width: 90%;
@@ -242,6 +246,7 @@ button.pronounce {
         display: none;
     }
 }
+
 @media screen and (max-width: 576px) {
     .navbar-toggle.toggle-x {
         border: none;
@@ -315,8 +320,6 @@ button.pronounce {
 }
 
 
-
-
 /**
  *
  * Manual specific
@@ -340,17 +343,18 @@ button.pronounce {
     margin-top: 64px;
 }
 
-.manual-image-container {
-    width: 30%;
-    height: auto;
-    clear: right;
-    float: right;
-    padding: 8px 0 8px 8px;
+.assembus-doc-image {
+    width: 100%;
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 
-.manual-image-container img {
-    width: 100%;
-    height: auto;
+.assembus-doc-image-right {
+    width: 50%;
+    float: right;
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 
 section#manual {
@@ -358,7 +362,7 @@ section#manual {
 }
 
 .assembus-doc-nav {
-    width: 200px;
+    width: var(--doc-nav-width);
     float: left;
 }
 
@@ -386,21 +390,46 @@ hr {
 }
 
 .assembus-doc-content {
-    margin-left: 264px;
+    margin-left: calc(var(--doc-nav-width) + 64px);
 }
 
-@media screen and (max-width: 1199px) {
-    .manual-image-container {
-        width: 50%;
-    }
-}
-@media screen and (max-width: 576px) {
-    .manual-image-container {
-        padding: 0;
-        width: 95%;
-    }
+.assembus-doc-title {
+    margin-bottom: 32px;
 }
 
+.getting-started-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.getting-started-row > * {
+    width: 100%;
+    padding-bottom: 32px;
+    padding-top: 32px;
+}
+
+.getting-started-first {
+    padding-right: 32px;
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.getting-started-second {
+    padding-left: 32px;
+    grid-row: 1;
+    grid-column: 2;
+}
+
+@media screen and (max-width: 991px) {
+    .getting-started-row {
+        display: block;
+    }
+    .getting-started-first, .getting-started-second {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
 
 
 /**

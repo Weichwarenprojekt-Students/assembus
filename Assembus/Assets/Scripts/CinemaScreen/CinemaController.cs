@@ -305,6 +305,8 @@ namespace CinemaScreen
                 }
             }
 
+            // Make sure that the index is out of bounds
+            index = Mathf.Clamp(index, 0, _componentCount);
             animationController.SkipTo(index);
         }
 

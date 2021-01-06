@@ -239,7 +239,7 @@ namespace CinemaScreen
             // Destroy the previous children
             _frontRects = new List<RectTransform>();
             _backRects = new List<RectTransform>();
-            for (var i = 3; i < progressBar.transform.childCount; i++)
+            for (var i = 2; i < progressBar.transform.childCount; i++)
                 Destroy(progressBar.transform.GetChild(i).gameObject);
 
             // Add the new background

@@ -105,6 +105,7 @@ footer {
     position: absolute;
     width: 100%;
     bottom: calc(-1 * var(--footer-height));
+    clear: both;
 }
 
 footer .container-md {
@@ -424,10 +425,11 @@ hr {
 @media screen and (max-width: 991px) {
     .getting-started-row {
         display: block;
+        margin-bottom: 64px;
     }
+
     .getting-started-first, .getting-started-second {
-        padding-left: 0;
-        padding-right: 0;
+        padding: 0;
     }
 }
 

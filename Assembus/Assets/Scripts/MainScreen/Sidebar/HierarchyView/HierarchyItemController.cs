@@ -44,6 +44,16 @@ namespace MainScreen.Sidebar.HierarchyView
         private static List<HierarchyItemController> _selectedItems = new List<HierarchyItemController>();
 
         /// <summary>
+        ///     Is the rename from a new Group
+        /// </summary>
+        private static bool _isRenameInitial;
+
+        /// <summary>
+        ///     Is a Item shifted to a Group
+        /// </summary>
+        private static bool _isItemShifted;
+
+        /// <summary>
         ///     Reference to ComponentHighlighting script
         /// </summary>
         public ComponentHighlighting componentHighlighting;
@@ -184,6 +194,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private bool _clicked;
 
         /// <summary>
+        ///     The CommandGroup instance
+        /// </summary>
+        private CommandGroup _commandGroup;
+
+        /// <summary>
         ///     True if the child elements are expanded in the hierarchy view
         /// </summary>
         private bool _isExpanded = true;
@@ -207,11 +222,24 @@ namespace MainScreen.Sidebar.HierarchyView
             if (_updateHierarchy)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(hierarchyView);
 
+            // Detect double click on list item
             doubleClickDetector.CheckForSecondClick();
 
             // Scroll if dragging an item up/down
             if (Dragging)
                 ScrollOnDrag();
+            
+            // Apply rename of component on press enter key
+            if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf) ApplyRenaming();
+
+            // Cancel renaming a component on press escape key
+            if (Input.GetKey(KeyCode.Escape) && nameInputObject.activeSelf)
+                CancelRenaming();
+
+            // Check if the object is active and if the mouse is clicked
+            if (!Input.GetMouseButtonDown(0) || !nameInputObject.activeSelf) return;
+
+            if (EventSystem.current.currentSelectedGameObject != nameInputObject) ApplyRenaming();
         }
 
         /// <summary>
@@ -230,8 +258,8 @@ namespace MainScreen.Sidebar.HierarchyView
                         GetScrollSpeedFromPosition(Math.Abs(Screen.height * 0.05f - Input.mousePosition.y))
                     );
             }
-            // Scroll at top 10% of screen
-            else if (Input.mousePosition.y > Screen.height * 0.9f)
+            // Scroll at top 20% of screen
+            else if (Input.mousePosition.y > Screen.height * 0.8f)
             {
                 // Stop at bottom of scroll rect
                 if (scrollRect.normalizedPosition.y < 0.99999)
@@ -239,7 +267,7 @@ namespace MainScreen.Sidebar.HierarchyView
                     scrollRect.normalizedPosition += new Vector2(
                         0.0f,
                         GetScrollSpeedFromPosition(
-                            Math.Abs(Screen.height * 0.9f - Input.mousePosition.y)
+                            Math.Abs(Screen.height * 0.8f - Input.mousePosition.y)
                         )
                     );
             }
@@ -466,7 +494,12 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             var entries = new List<ContextMenuController.Item>
             {
-                new ContextMenuController.Item {Icon = contextMenu.edit, Name = "Rename", Action = RenameItem}
+                new ContextMenuController.Item
+                {
+                    Icon = contextMenu.edit,
+                    Name = "Rename",
+                    Action = () => RenameItem()
+                }
             };
 
             var visible = item.activeSelf;
@@ -568,8 +601,10 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Start a renaming action
         /// </summary>
-        private void RenameItem()
+        public void RenameItem(bool isInitial = false, CommandGroup commandGroup = null)
         {
+            _commandGroup = commandGroup;
+            _isRenameInitial = isInitial;
             nameInput.text = nameText.text;
             showStation.SetActive(false);
             nameInputObject.SetActive(true);
@@ -621,7 +656,16 @@ namespace MainScreen.Sidebar.HierarchyView
             );
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new CreateCommand(true, state));
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
+
+            // Scroll to the created group in the group
+            var groupItem = childrenContainer.transform.GetChild(childrenContainer.transform.childCount - 1);
+            hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
+            groupItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>
@@ -636,7 +680,11 @@ namespace MainScreen.Sidebar.HierarchyView
                 item.transform.parent.name,
                 Utility.GetNeighbourID(item.transform)
             );
-            _undoService.AddCommand(new CreateCommand(true, state));
+            var createCommand = new CreateCommand(true, state);
+            _commandGroup = new CommandGroup();
+            _undoService.AddCommand(_commandGroup);
+            _commandGroup.AddToGroup(createCommand);
+            createCommand.Redo();
 
             // Move the items
             _dragItem =
@@ -644,12 +692,17 @@ namespace MainScreen.Sidebar.HierarchyView
             _insertion = true;
             _selectedItems = hierarchyViewController.GetSelectedItems();
             InsertItems();
+
+            // Scroll to First selected Game object
+            var groupItem = gameObject.transform.parent.parent;
+            hierarchyViewController.ScrollToItem(groupItem.GetComponent<RectTransform>());
+            groupItem.GetComponent<HierarchyItemController>().RenameItem(true, _commandGroup);
         }
 
         /// <summary>
         ///     Cancel a rename action
         /// </summary>
-        public void CancelRenaming()
+        private void CancelRenaming()
         {
             nameInputObject.SetActive(false);
             nameTextObject.SetActive(true);
@@ -658,7 +711,7 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <summary>
         ///     Apply a rename action
         /// </summary>
-        public void ApplyRenaming()
+        private void ApplyRenaming()
         {
             // Check if there's a name given
             var newName = nameInput.text;
@@ -673,8 +726,22 @@ namespace MainScreen.Sidebar.HierarchyView
             nameTextObject.SetActive(true);
             showStation.SetActive(IsStation);
 
-            // Add the new action to the undo redo service
-            _undoService.AddCommand(new RenameCommand(item.name, nameText.text, newName));
+            // Check if nothing is changed
+            if (nameInput.text == nameText.text) return;
+
+            var renameCommand = new RenameCommand(item.name, nameText.text, newName);
+
+            // Add the Command to the group if there is "Group Selected"
+            if (_isRenameInitial)
+            {
+                _commandGroup.AddToGroup(renameCommand);
+                renameCommand.Redo();
+                _isRenameInitial = false;
+            }
+            else
+            {
+                _undoService.AddCommand(renameCommand);
+            }
         }
 
         /// <summary>
@@ -718,7 +785,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Reset the drag event
             dragPreview.SetActive(false);
             Dragging = false;
-
+            _isItemShifted = true;
             // Insert the items (Only if the dragged item was selected)
             if (_selectedItems.Count != 0 && hierarchyViewController.IsSelected(this)) InsertItems();
         }
@@ -762,7 +829,17 @@ namespace MainScreen.Sidebar.HierarchyView
             }
 
             // Add the new action to the undo redo service
-            _undoService.AddCommand(new MoveCommand(oldStates, newStates));
+            var moveCommand = new MoveCommand(oldStates, newStates);
+            if (_isItemShifted)
+            {
+                _undoService.AddCommand(moveCommand);
+                _isItemShifted = false;
+            }
+            else
+            {
+                _commandGroup.AddToGroup(moveCommand);
+                moveCommand.Redo();
+            }
         }
 
         /// <summary>
@@ -844,6 +921,15 @@ namespace MainScreen.Sidebar.HierarchyView
         public void OnScroll(BaseEventData data)
         {
             scrollRect.OnScroll((PointerEventData) data);
+        }
+
+        /// <summary>
+        ///     Select the name input to enable scrolling while renaming an item
+        /// </summary>
+        /// <param name="data">Event data</param>
+        public void SelectTextInput(BaseEventData data)
+        {
+            nameInput.Select();
         }
     }
 }

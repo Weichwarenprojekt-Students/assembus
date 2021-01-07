@@ -16,6 +16,11 @@ namespace Models.Project
         public int CurrentIndex;
 
         /// <summary>
+        ///     Name of the file the project was last exported as
+        /// </summary>
+        public string ExportFileName;
+
+        /// <summary>
         ///     The project's name
         /// </summary>
         public string Name;

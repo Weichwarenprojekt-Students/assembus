@@ -2,6 +2,7 @@
 using Models.Project;
 using Services.Serialization;
 using Services.UndoRedo;
+using SFB;
 using Shared;
 using Shared.Toast;
 using TMPro;
@@ -42,11 +43,6 @@ namespace MainScreen.Sidebar
         public SwitchableButton undo, redo;
 
         /// <summary>
-        ///     The settings controller
-        /// </summary>
-        public SettingsController settings;
-
-        /// <summary>
         ///     The controller of the station view
         /// </summary>
         public StationController stationController;
@@ -55,6 +51,11 @@ namespace MainScreen.Sidebar
         ///     The component highlighting script
         /// </summary>
         public ComponentHighlighting componentHighlighting;
+
+        /// <summary>
+        ///     InputController script
+        /// </summary>
+        public SearchController searchController;
 
         /// <summary>
         ///     The configuration manager
@@ -80,11 +81,12 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
-        ///     Check if either CTRL-Z, CTRL-Y or CTRL-SHIFT_Z was used
+        ///     Check if either CTRL-Z, CTRL-Y, CTRL-SHIFT_Z or CTRL-S was used
         /// </summary>
         private void Update()
         {
             // Check which keys were pressed
+            var ctrlS = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S);
             var ctrlZ = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z);
             var ctrlShiftZ = ctrlZ && Input.GetKey(KeyCode.LeftShift);
             var ctrlY = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y);
@@ -93,6 +95,8 @@ namespace MainScreen.Sidebar
             if (ctrlShiftZ || ctrlY) RedoAction();
             // Check if an action should be undone
             else if (ctrlZ) UndoAction();
+            // Check if the project should be saved
+            else if (ctrlS) SaveProject();
         }
 
         /// <summary>
@@ -191,6 +195,40 @@ namespace MainScreen.Sidebar
         }
 
         /// <summary>
+        ///     Export the assembly data to hard disk
+        /// </summary>
+        public void ExportData()
+        {
+            // Get the name of the previously exported file
+            var previousExportFileName = _projectManager.CurrentProject.ExportFileName;
+
+            // Open save dialog for the user
+            var exportPath = StandaloneFileBrowser.SaveFilePanel(
+                "Export Data",
+                "",
+                string.IsNullOrEmpty(previousExportFileName)
+                    ? _projectManager.CurrentProject.Name
+                    : previousExportFileName,
+                "bus"
+            );
+
+            // If save dialog was canceled, string is empty
+            if (string.IsNullOrEmpty(exportPath)) return;
+
+            // Export data to XML
+            var (success, message) = DataExport.ExportData(exportPath);
+
+            if (!success)
+            {
+                toast.Error(Toast.Short, message);
+                return;
+            }
+
+            // Export successful
+            toast.Success(Toast.Short, "Data was exported successfully!");
+        }
+
+        /// <summary>
         ///     Close a project
         /// </summary>
         public void CloseProject()
@@ -214,6 +252,7 @@ namespace MainScreen.Sidebar
 
                     // Remove GameObject of current project
                     componentHighlighting.ResetHighlighting();
+                    searchController.Reset();
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen
@@ -221,14 +260,6 @@ namespace MainScreen.Sidebar
                     startScreen.SetActive(true);
                 }
             );
-        }
-
-        /// <summary>
-        ///     Show the settings
-        /// </summary>
-        public void Settings()
-        {
-            settings.Show();
         }
     }
 }

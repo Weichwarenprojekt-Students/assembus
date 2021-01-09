@@ -64,9 +64,13 @@
                     <h1 class="display-4">Simplify Assembling.</h1>
                     <p>Get Assembus for Windows and Linux</p>
                     <div class="download-button">
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" id="windows-download-btn">
                             <i class="zmdi zmdi-download"></i>
                             Download Windows
+                        </button>
+                        <button type="button" class="btn btn-primary" id="linux-download-btn">
+                            <i class="zmdi zmdi-download"></i>
+                            Download Linux
                         </button>
                     </div>
                     <span class="manual-teaser">Beginner? Checkout the <a href="manual.html">Manual</a></span>
@@ -128,6 +132,19 @@
         <img alt="Made with Unity" src="img/made-with-unity.png">
     </div>
 </footer>
+
+<script type="text/javascript">
+    let userAgent = navigator.userAgent;
+
+    if (userAgent) {
+        if (userAgent.indexOf("Win") != -1)  {
+            document.getElementById("windows-download-btn").style.display = "block";
+        } else if (userAgent.indexOf("Linux") != -1) {
+            document.getElementById("linux-download-btn").style.display = "block";
+        }
+    }
+
+</script>
 
 </body>
 </html>

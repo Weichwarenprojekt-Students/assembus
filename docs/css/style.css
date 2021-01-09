@@ -457,6 +457,10 @@ img.download-logo {
     text-align: center;
 }
 
+.download-button button {
+    display: none;
+}
+
 @media all and (max-width: 991px) {
     #download .jumbotron {
         order: 2;

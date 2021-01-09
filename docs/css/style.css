@@ -441,11 +441,9 @@ hr {
  */
 
 section#download {
+    background-color: var(--prime-5);
     padding: 96px 0;
-}
-
-section#download .jumbotron > * {
-    text-align: center;
+    color: white;
 }
 
 img.download-logo {
@@ -453,6 +451,22 @@ img.download-logo {
     height: auto;
     max-width: 250px;
     margin: 24px auto;
+}
+
+.download-logo-container {
+    text-align: center;
+}
+
+@media all and (max-width: 991px) {
+    #download .jumbotron {
+        order: 2;
+    }
+
+    #download * {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
 }
 
 .download-title {
@@ -465,5 +479,6 @@ img.download-logo {
 }
 
 span.manual-teaser {
-    margin-top: 8px;
+    display: inline-block;
+    margin-top: 16px;
 }

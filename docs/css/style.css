@@ -471,6 +471,10 @@ img.download-logo {
         align-items: center;
         text-align: center;
     }
+
+    .general-download {
+        display: none;
+    }
 }
 
 .download-title {

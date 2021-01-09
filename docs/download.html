@@ -63,12 +63,12 @@
                 <div>
                     <h1 class="display-4">Simplify Assembling.</h1>
                     <p>Get Assembus for Windows and Linux</p>
-                    <div class="download-button">
-                        <button type="button" class="btn btn-primary" id="windows-download-btn">
+                    <div class="download-button general-download">
+                        <button class="btn btn-primary" id="windows-download-btn" type="button">
                             <i class="zmdi zmdi-download"></i>
                             Download Windows
                         </button>
-                        <button type="button" class="btn btn-primary" id="linux-download-btn">
+                        <button class="btn btn-primary" id="linux-download-btn" type="button">
                             <i class="zmdi zmdi-download"></i>
                             Download Linux
                         </button>
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="col-xl-7 col-lg-6 offset-xl-1 col-md-12 download-logo-container">
-                <img class="download-logo" src="img/logo.png" alt="Assembus">
+                <img alt="Assembus" class="download-logo" src="img/logo.png">
             </div>
         </div>
 
@@ -137,9 +137,9 @@
     let userAgent = navigator.userAgent;
 
     if (userAgent) {
-        if (userAgent.indexOf("Win") != -1)  {
+        if (userAgent.indexOf("Win") !== -1) {
             document.getElementById("windows-download-btn").style.display = "block";
-        } else if (userAgent.indexOf("Linux") != -1) {
+        } else if (userAgent.indexOf("Linux") !== -1) {
             document.getElementById("linux-download-btn").style.display = "block";
         }
     }

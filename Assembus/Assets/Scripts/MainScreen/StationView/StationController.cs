@@ -52,7 +52,7 @@ namespace MainScreen.StationView
         /// <summary>
         ///     True if there's a previous station
         /// </summary>
-        private bool HasPrevious => station.transform.GetSiblingIndex() > 1;
+        private bool HasPrevious => station.transform.GetSiblingIndex() > 0;
 
         /// <summary>
         ///     True if there's a next station

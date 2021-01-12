@@ -380,8 +380,17 @@
                 <p>
                     To invoke the export, simply click on the box icon with the upwards arrow, which is located in the
                     sidebar.
-                    Specify a export directory and the desired
+                    Specify an export directory and the desired
                     export filename. Finally click the save button to export the Assembus project.
+                </p>
+
+                <p>
+                    The XML file contains the hierarchy as specified in Assembus,
+                    with an <code>&lt;AssemblyLine&gt;</code> root element.
+                    Since it's not guaranteed, that the OBJ file only contains unique names, the association is
+                    done with an artificial id, specified in the <code>id</code> attribute.
+                    The id for components looks like this: <code>assembus_item_X</code>,
+                    where <code>X</code> is the index of the corresponding item in the OBJ file, starting with 0.
                 </p>
             </div>
         </div>

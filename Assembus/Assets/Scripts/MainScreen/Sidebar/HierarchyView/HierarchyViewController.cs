@@ -531,7 +531,6 @@ namespace MainScreen.Sidebar.HierarchyView
                 StopCoroutine(_scrollingCoroutine);
 
             // Check if item is outside the borders, if so, scroll to the item
-            // if (!(itemPosition <= lowerBorder && topBorder <= itemPosition))
             if (topBorder > itemPosition || itemPosition > lowerBorder)
                 _scrollingCoroutine = StartCoroutine(ScrollToTarget(itemPosition - 200));
         }

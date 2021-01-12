@@ -64,16 +64,22 @@
                     <h1 class="display-4">Simplify Assembling.</h1>
                     <p>Get Assembus for Windows and Linux</p>
                     <div class="download-button general-download">
-                        <button class="btn btn-primary" id="windows-download-btn" type="button">
+                        <a class="btn btn-primary"
+                           href="https://github.com/Weichwarenprojekt/Assembus/releases/download/1.0/assembus_installer_win_1.0.exe"
+                           id="windows-download-btn"
+                           role="button">
                             <img alt="Windows" class="download-icon" src="img/download/windows.svg"/>
                             Download Windows
-                        </button>
-                        <button class="btn btn-primary" id="linux-download-btn" type="button">
+                        </a>
+                        <a class="btn btn-primary"
+                           href="https://github.com/Weichwarenprojekt/Assembus/releases/download/1.0/assembus_bin_linux_1.0.tar.gz"
+                           id="linux-download-btn"
+                           role="button">
                             <img alt="Linux" class="download-icon" src="img/download/linux.svg"/>
                             Download Linux
-                        </button>
+                        </a>
                     </div>
-                    <span class="manual-teaser">Beginner? Checkout the <a href="manual.html">Manual</a></span>
+                    <span class="manual-teaser">Beginner? Checkout the <a href="manual.html">Manual.</a></span>
                 </div>
             </div>
             <div class="col-xl-7 col-lg-6 offset-xl-1 col-md-12 download-logo-container">
@@ -90,21 +96,27 @@
         <h1 class="display-3"> Windows </h1>
         <h3 class="download-title"> Recommended </h3>
         <div class="download-buttons">
-            <button class="btn btn-primary" type="button">
+            <a class="btn btn-primary"
+               href="https://github.com/Weichwarenprojekt/Assembus/releases/download/1.0/assembus_installer_win_1.0.exe"
+               role="button">
                 <i class="zmdi zmdi-download"></i>
-                MSI Installer
-            </button>
+                v1.0 Installer
+            </a>
         </div>
         <h3> Other Downloads </h3>
         <div class="download-buttons">
-            <button class="btn btn-primary" type="button">
+            <a class="btn btn-primary"
+               href="https://github.com/Weichwarenprojekt/Assembus/releases/download/1.0/assembus_bin_win_1.0.zip"
+               role="button">
                 <i class="zmdi zmdi-download"></i>
-                ZIP
-            </button>
-            <button class="btn btn-primary" type="button">
+                v1.0 ZIP
+            </a>
+            <a class="btn btn-primary"
+               href="https://github.com/Weichwarenprojekt/Assembus/archive/1.0.zip"
+               role="button">
                 <i class="zmdi zmdi-download"></i>
                 Source Code
-            </button>
+            </a>
         </div>
 
         <hr>
@@ -112,14 +124,18 @@
         <h1 class="display-3"> Linux </h1>
         <h3 class="download-title"> Downloads </h3>
         <div class="download-buttons">
-            <button class="btn btn-primary" type="button">
+            <a class="btn btn-primary"
+               href="https://github.com/Weichwarenprojekt/Assembus/releases/download/1.0/assembus_bin_linux_1.0.tar.gz"
+               role="button">
                 <i class="zmdi zmdi-download"></i>
-                TAR.GZ
-            </button>
-            <button class="btn btn-primary" type="button">
+                v1.0 TAR.GZ
+            </a>
+            <a class="btn btn-primary"
+               href="https://github.com/Weichwarenprojekt/Assembus/archive/1.0.tar.gz"
+               role="button">
                 <i class="zmdi zmdi-download"></i>
                 Source Code
-            </button>
+            </a>
         </div>
 
     </div>
@@ -138,9 +154,9 @@
 
     if (userAgent) {
         if (userAgent.indexOf("Win") !== -1) {
-            document.getElementById("windows-download-btn").style.display = "block";
+            document.getElementById("windows-download-btn").style.display = "inline-table";
         } else if (userAgent.indexOf("Linux") !== -1) {
-            document.getElementById("linux-download-btn").style.display = "block";
+            document.getElementById("linux-download-btn").style.display = "inline-table";
         }
     }
 

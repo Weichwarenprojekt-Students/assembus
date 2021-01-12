@@ -196,7 +196,7 @@ footer img {
     }
 }
 
-button.pronounce {
+a.pronounce {
     border: 0;
     background-color: transparent;
     outline: none;
@@ -457,7 +457,7 @@ img.download-logo {
     text-align: center;
 }
 
-.download-button button {
+.download-button a {
     display: none;
 }
 

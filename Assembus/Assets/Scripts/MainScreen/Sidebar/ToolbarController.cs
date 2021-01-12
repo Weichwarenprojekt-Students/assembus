@@ -245,6 +245,7 @@ namespace MainScreen.Sidebar
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen
+                    stationController.CloseStation();
                     mainScreen.SetActive(false);
                     startScreen.SetActive(true);
                 }

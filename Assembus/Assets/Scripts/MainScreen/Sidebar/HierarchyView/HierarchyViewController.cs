@@ -248,6 +248,9 @@ namespace MainScreen.Sidebar.HierarchyView
             // initialize the item
             itemController.Initialize(item, depth);
 
+            // do not expand the item if it is a fused group on initialization
+            if (itemController.itemInfo.ItemInfo.isFused) itemController.ExpandItem(false);
+
             return itemController;
         }
 

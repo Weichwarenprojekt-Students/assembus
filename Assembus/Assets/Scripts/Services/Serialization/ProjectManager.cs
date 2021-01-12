@@ -166,7 +166,7 @@ namespace Services.Serialization
             }
             catch (ModelManager.ToplevelComponentException e)
             {
-                return (false, e.ComponentName + " can't be on top level!");
+                return (false, e.ComponentName + " cannot be on top-level.");
             }
             catch (Exception)
             {

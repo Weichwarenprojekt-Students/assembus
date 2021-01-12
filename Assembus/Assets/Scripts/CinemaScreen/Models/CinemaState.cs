@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using UnityEngine;
 
 namespace CinemaScreen.Models
 {
@@ -31,13 +32,16 @@ namespace CinemaScreen.Models
         }
 
         /// <summary>
-        ///     Check if the state is not in a list of other states
+        ///     Check if the transition from this state to another state is invalid,
+        ///     given a list of valid states
         /// </summary>
         /// <param name="states">The list of states as multiple parameters</param>
-        /// <returns>boolean if state is not in the list</returns>
-        internal bool NotIn(params CinemaState[] states)
+        /// <returns>True if state transition is valid</returns>
+        internal bool InvalidTransition(params CinemaState[] states)
         {
-            return !states.Contains(this);
+            var notIn = !states.Contains(this); 
+            if (notIn) Debug.LogWarning("WARNING! Invalid state transition! State is not switched!");
+            return notIn;
         }
 
         /// <summary>

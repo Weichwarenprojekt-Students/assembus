@@ -1,4 +1,5 @@
 ﻿using MainScreen.StationView;
+using Models.Project;
 using Services.Serialization;
 using Services.UndoRedo;
 using SFB;
@@ -166,6 +167,19 @@ namespace MainScreen.Sidebar
         /// </summary>
         public void StartCinemaMode()
         {
+            foreach (Transform child in _projectManager.CurrentProject.ObjectModel.transform)
+            {
+                var itemInfo = child.GetComponent<ItemInfoController>().ItemInfo;
+                if (itemInfo.isGroup) continue;
+
+                toast.Error(
+                    Toast.Short,
+                    itemInfo.displayName
+                    + " cannot be on top-level."
+                );
+                return;
+            }
+
             // Deselect all items
             componentHighlighting.ResetPreviousSelections();
 

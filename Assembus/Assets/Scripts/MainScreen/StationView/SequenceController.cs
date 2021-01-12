@@ -80,21 +80,22 @@ namespace MainScreen.StationView
         private void ReactToFuse(FuseCommand command)
         {
             // Check if the active item was included
-            int fusedIndex = _itemList.Count, activeIndex = -1;
+            var fusedItemIndex = _itemList.Count;
+            var activeItemIndex = -1;
             for (var i = 0; i < _itemList.Count; i++)
             {
                 if (_itemList[i].name == _activeItem.name)
                 {
-                    activeIndex = i;
+                    activeItemIndex = i;
                     break;
                 }
-                if (_itemList[i].name == command.ID) fusedIndex = i;
+                if (_itemList[i].name == command.ID) fusedItemIndex = i;
             }
             
             // Skip to the right item
-            if (activeIndex >= 0) SkipToItem(activeIndex); 
+            if (activeItemIndex >= 0) SkipToItem(activeItemIndex); 
             else if (command.IsFused) SkipToItem(_currentIndex);
-            else SkipToItem(fusedIndex);
+            else SkipToItem(fusedItemIndex);
         }
 
         /// <summary>

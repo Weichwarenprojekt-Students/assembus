@@ -913,5 +913,13 @@ namespace MainScreen.Sidebar.HierarchyView
             var hoveredObject = Utility.FindChild(parent, name).gameObject;
             componentHighlighting.HighlightHoverFromList(hoveredObject);
         }
+        /// <summary>
+        ///     Forward the scroll data
+        /// </summary>
+        /// <param name="data">Event data</param>
+        public void OnScroll(BaseEventData data)
+        {
+            scrollRect.OnScroll((PointerEventData) data);
+        }
     }
 }

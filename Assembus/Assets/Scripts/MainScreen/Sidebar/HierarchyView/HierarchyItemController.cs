@@ -228,7 +228,7 @@ namespace MainScreen.Sidebar.HierarchyView
             // Scroll if dragging an item up/down
             if (Dragging)
                 ScrollOnDrag();
-            
+
             // Apply rename of component on press enter key
             if (Input.GetKey(KeyCode.Return) && nameInputObject.activeSelf) ApplyRenaming();
 
@@ -489,36 +489,42 @@ namespace MainScreen.Sidebar.HierarchyView
         /// </summary>
         private void ShowContextMenu()
         {
-            var entries = new List<ContextMenuController.Item>
-            {
-                new ContextMenuController.Item
-                {
-                    Icon = contextMenu.edit,
-                    Name = "Rename",
-                    Action = () => RenameItem()
-                }
-            };
+            var multiple = hierarchyViewController.GetSelectedItems().Count > 1;
 
-            var visible = item.activeSelf;
-            entries.Add(
-                new ContextMenuController.Item
-                {
-                    Icon = visible ? contextMenu.hide : contextMenu.show,
-                    Name = visible ? "Hide Item" : "Show Item",
-                    Action = () => ShowItem(!visible)
-                }
-            );
+            var entries = new List<ContextMenuController.Item>();
 
             var isGroup = itemInfo.ItemInfo.isGroup;
-            if (isGroup)
+            if (!multiple)
+            {
                 entries.Add(
                     new ContextMenuController.Item
                     {
-                        Icon = contextMenu.show,
-                        Name = "Show All",
-                        Action = ShowGroup
+                        Icon = contextMenu.edit,
+                        Name = "Rename",
+                        Action = () => RenameItem()
                     }
                 );
+
+                var visible = item.activeSelf;
+                entries.Add(
+                    new ContextMenuController.Item
+                    {
+                        Icon = visible ? contextMenu.hide : contextMenu.show,
+                        Name = visible ? "Hide Item" : "Show Item",
+                        Action = () => ShowItem(!visible)
+                    }
+                );
+
+                if (isGroup)
+                    entries.Add(
+                        new ContextMenuController.Item
+                        {
+                            Icon = contextMenu.show,
+                            Name = "Show All",
+                            Action = ShowGroup
+                        }
+                    );
+            }
 
             if (hierarchyViewController.SelectedItems.Contains(this))
                 entries.Add(
@@ -530,45 +536,50 @@ namespace MainScreen.Sidebar.HierarchyView
                     }
                 );
 
-            if (isGroup)
+            if (!multiple)
             {
-                entries.Add(
-                    new ContextMenuController.Item
-                    {
-                        Icon = itemInfo.ItemInfo.isFused ? contextMenu.defuse : contextMenu.fuse,
-                        Name = itemInfo.ItemInfo.isFused ? "Split Group" : "Fuse Group",
-                        Action = FuseGroup
-                    }
-                );
+                if (isGroup)
+                {
+                    if (!IsStation)
+                        entries.Add(
+                            new ContextMenuController.Item
+                            {
+                                Icon = itemInfo.ItemInfo.isFused ? contextMenu.defuse : contextMenu.fuse,
+                                Name = itemInfo.ItemInfo.isFused ? "Split Group" : "Fuse Group",
+                                Action = FuseGroup
+                            }
+                        );
 
-                entries.Add(
-                    new ContextMenuController.Item
-                    {
-                        Icon = contextMenu.add,
-                        Name = "Add Group",
-                        Action = AddGroup
-                    }
-                );
 
-                entries.Add(
-                    new ContextMenuController.Item
-                    {
-                        Icon = contextMenu.delete,
-                        Name = "Delete",
-                        Action = DeleteGroup
-                    }
-                );
+                    entries.Add(
+                        new ContextMenuController.Item
+                        {
+                            Icon = contextMenu.add,
+                            Name = "Add Group",
+                            Action = AddGroup
+                        }
+                    );
+
+                    entries.Add(
+                        new ContextMenuController.Item
+                        {
+                            Icon = contextMenu.delete,
+                            Name = "Delete",
+                            Action = DeleteGroup
+                        }
+                    );
+                }
+
+                if (stationController.IsOpen)
+                    entries.Add(
+                        new ContextMenuController.Item
+                        {
+                            Icon = contextMenu.skipTo,
+                            Name = "Skip To",
+                            Action = SequenceViewSkipToItem
+                        }
+                    );
             }
-
-            if (stationController.IsOpen)
-                entries.Add(
-                    new ContextMenuController.Item
-                    {
-                        Icon = contextMenu.skipTo,
-                        Name = "Skip To",
-                        Action = SequenceViewSkipToItem
-                    }
-                );
 
             contextMenu.Show(entries);
         }
@@ -715,6 +726,11 @@ namespace MainScreen.Sidebar.HierarchyView
             if (newName == "")
             {
                 toast.Error(Toast.Short, "Name cannot be empty!");
+                
+                // Reset name if empty
+                nameInput.text = nameText.text;
+                CancelRenaming();
+                
                 return;
             }
 
@@ -910,7 +926,6 @@ namespace MainScreen.Sidebar.HierarchyView
             var hoveredObject = Utility.FindChild(parent, name).gameObject;
             componentHighlighting.HighlightHoverFromList(hoveredObject);
         }
-
         /// <summary>
         ///     Forward the scroll data
         /// </summary>
@@ -918,15 +933,6 @@ namespace MainScreen.Sidebar.HierarchyView
         public void OnScroll(BaseEventData data)
         {
             scrollRect.OnScroll((PointerEventData) data);
-        }
-
-        /// <summary>
-        ///     Select the name input to enable scrolling while renaming an item
-        /// </summary>
-        /// <param name="data">Event data</param>
-        public void SelectTextInput(BaseEventData data)
-        {
-            nameInput.Select();
         }
     }
 }

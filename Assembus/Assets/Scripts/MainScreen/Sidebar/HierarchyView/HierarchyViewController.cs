@@ -86,6 +86,11 @@ namespace MainScreen.Sidebar.HierarchyView
         private HierarchyItemController _lastSelectedItem;
 
         /// <summary>
+        ///     Currently running scrolling-coroutine
+        /// </summary>
+        private Coroutine _scrollingCoroutine;
+
+        /// <summary>
         ///     Gets true if the user scrolls manually while auto scroll to stop auto scroll
         /// </summary>
         private bool _stopAutoScroll;
@@ -94,11 +99,6 @@ namespace MainScreen.Sidebar.HierarchyView
         ///     True if hierarchy view needs to be updated
         /// </summary>
         private bool _updateHierarchyView;
-
-        /// <summary>
-        ///     Currently running scrolling-coroutine
-        /// </summary>
-        private Coroutine _scrollingCoroutine;
 
         /// <summary>
         ///     Late update of the UI
@@ -166,13 +166,13 @@ namespace MainScreen.Sidebar.HierarchyView
         private void LoadModelIntoHierarchyView()
         {
             // Move default item out of hierarchy view
-            defaultHierarchyViewItem.transform.SetParent(null);
+            ActivateDefaultItem(false);
 
             // Remove the old children
             RemoveElementWithChildren(hierarchyView.transform);
 
             // Move default item back into hierarchy view for instantiation
-            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
+            ActivateDefaultItem(true);
 
             // Get the root element of the object model
             var parent = _projectManager.CurrentProject.ObjectModel;
@@ -184,7 +184,7 @@ namespace MainScreen.Sidebar.HierarchyView
             _updateHierarchyView = true;
 
             // Move default item out of hierarchy view again
-            defaultHierarchyViewItem.transform.SetParent(null);
+            ActivateDefaultItem(false);
         }
 
         /// <summary>
@@ -248,6 +248,9 @@ namespace MainScreen.Sidebar.HierarchyView
             // initialize the item
             itemController.Initialize(item, depth);
 
+            // do not expand the item if it is a fused group on initialization
+            if (itemController.itemInfo.ItemInfo.isFused) itemController.ExpandItem(false);
+
             return itemController;
         }
 
@@ -259,9 +262,19 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="depth">The depth of indention</param>
         public void AddSingleListItem(GameObject parent, GameObject item, float depth)
         {
-            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
+            ActivateDefaultItem(true);
             AddListItem(parent, item, depth);
-            defaultHierarchyViewItem.transform.SetParent(null);
+            ActivateDefaultItem(false);
+        }
+
+        /// <summary>
+        ///     Activate the default hierarchy for copying
+        /// </summary>
+        /// <param name="state">True if the item should be activated</param>
+        private void ActivateDefaultItem(bool state)
+        {
+            defaultHierarchyViewItem.transform.SetParent(state ? hierarchyView.transform : gameObject.transform);
+            defaultHierarchyViewItem.SetActive(state);
         }
 
         /// <summary>
@@ -531,7 +544,7 @@ namespace MainScreen.Sidebar.HierarchyView
                 StopCoroutine(_scrollingCoroutine);
 
             // Check if item is outside the borders, if so, scroll to the item
-            if (!(itemPosition <= lowerBorder && topBorder <= itemPosition))
+            if (topBorder > itemPosition || itemPosition > lowerBorder)
                 _scrollingCoroutine = StartCoroutine(ScrollToTarget(itemPosition - 200));
         }
 
@@ -551,13 +564,13 @@ namespace MainScreen.Sidebar.HierarchyView
                 contentPanel.anchoredPosition = new Vector2(0, interpolatedFloat.Value);
 
                 // Check, if the scroll view will scroll outside the viewport
-                if (scrollRect.normalizedPosition.y < 0)
+                if (scrollRect.normalizedPosition.y <= 0)
                 {
                     scrollRect.normalizedPosition = scrollRect.viewport.anchorMin;
                     break;
                 }
 
-                if (scrollRect.normalizedPosition.y > 1)
+                if (scrollRect.normalizedPosition.y >= 1)
                 {
                     scrollRect.normalizedPosition = scrollRect.viewport.anchorMax;
                     break;

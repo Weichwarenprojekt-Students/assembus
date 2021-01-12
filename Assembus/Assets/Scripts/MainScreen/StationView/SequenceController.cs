@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using MainScreen.Sidebar.HierarchyView;
+using Services.UndoRedo.Commands;
 using Shared;
+using Shared.Exceptions;
 using TMPro;
 using UnityEngine;
 
@@ -34,33 +36,111 @@ namespace MainScreen.StationView
         private int _numberOfItems;
 
         /// <summary>
+        ///     Stores the previously selected GameObject item
+        /// </summary>
+        private GameObject _prevItem;
+
+        /// <summary>
         ///     The hierarchy item controller
         /// </summary>
         private HierarchyItemController _station;
 
-
         /// <summary>
         ///     Method to react on changing stations
         /// </summary>
-        public void OnStationUpdate(HierarchyItemController station)
+        public void ActionStationUpdate(HierarchyItemController station, Command command)
         {
-            // Reset item dot indicator
-            OnStationLeave();
+            if (command == null) // No command executed. Init/switch station occured --> Init StationView!
+            {
+                // Reset item dot indicator
+                OnStationLeave();
 
-            // Get the hierarchy item controller reference
-            _station = station;
+                // Get the hierarchy item controller reference
+                _station = station;
 
-            // Extract all leaves from the children container
-            _itemList = Utility.GetAllComponents(station.childrenContainer);
+                // Extract all leaves from the children container
+                _itemList = Utility.GetAllComponents(station.childrenContainer);
+                _numberOfItems = _itemList.Count;
 
-            _numberOfItems = _itemList.Count;
+                // Jump to the end of the current station
+                _currentIndex = _numberOfItems - 1;
+                SkipToItem(_currentIndex);
+            }
+            else // Action has been performed --> Update StationView!
+            {
+                // Load the updated children container of the station into the item list
+                _itemList = Utility.GetAllComponents(station.childrenContainer);
+                _numberOfItems = _itemList.Count;
 
-            // Hide all items of the component group
-            for (var i = 1; i < _itemList.Count; i++) SetItemVisibility(i, false);
+                // Find out which Undo/Redo-Command has been executed
+                var commandType = command.GetType();
+                if (commandType == typeof(FuseCommand)) // Made group fused
+                {
+                    var partOfFuse = true;
+                    for (var i = 0; i < _itemList.Count; i++)
+                        if (_itemList[i].item == _prevItem)
+                        {
+                            partOfFuse = false;
+                            break;
+                        }
 
-            _currentIndex = 0;
+                    if (partOfFuse)
+                    {
+                        var fuseCommand = (FuseCommand) command;
 
-            SkipToItem(0);
+                        // Find fused group in children container
+                        var groupIndex = -1;
+                        for (var i = 0; i < _itemList.Count; i++)
+                            if (_itemList[i].item.name == fuseCommand.ID)
+                            {
+                                groupIndex = i;
+                                break;
+                            }
+
+                        if (fuseCommand.IsFused == false) // Previously not fused --> Fuse
+                        {
+                            // Jump on fused group
+                            SetActiveHierarchyItem(_currentIndex, false); // TODO: Why required?
+                            SkipToItem(groupIndex);
+                        }
+                        else // Previously fused --> Unfuse
+                        {
+                            if (groupIndex + 1 < _itemList.Count)
+                                SkipToItem(groupIndex + 1);
+                        }
+                    }
+                }
+                else if (commandType == typeof(CommandGroup)) // Moved selected components to newly created group
+                {
+                    var newIndex = Utility.GetIndexForStation(_station, _prevItem);
+                    SkipToItem(newIndex);
+                }
+                else if (commandType == typeof(MoveCommand)) // Only moved components
+                {
+                    var moveCommand = (MoveCommand) command;
+
+                    if (moveCommand.ContainsItem(_prevItem.name)) // Currently selected item part of move command
+                    {
+                        try
+                        {
+                            // Check if the selected item is still in the station
+                            Utility.GetIndexForStation(_station, _prevItem);
+                            SkipToItem(_currentIndex); // Remain at the current position
+                        }
+                        catch (ComponentNotFoundException ex)
+                        {
+                            // Moved selected item out of station
+                            SkipToItem(0);
+                            //TODO: Implement better skip
+                        }
+                    }
+                    else // Other item, not the currently selected one, is moved
+                    {
+                        var newIndex = Utility.GetIndexForStation(_station, _prevItem);
+                        SkipToItem(newIndex);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -144,15 +224,18 @@ namespace MainScreen.StationView
                 // Hide dot icon on current item
                 SetActiveHierarchyItem(_currentIndex, false);
 
-                // Set items from current index to new index to invisible
-                for (var i = _currentIndex; i > index; i--)
+                // Set all items succeeding the index to invisible
+                for (var i = _numberOfItems - 1; i > index; i--)
                     SetItemVisibility(i, false);
 
-                // Set items visible from current index to index
-                for (var i = _currentIndex; i <= index; i++)
+                // Set all items to visible until index
+                for (var i = 0; i <= index; i++)
                     SetItemVisibility(i, true);
 
                 _currentIndex = index;
+
+                // Remember the previously selected GameObject
+                _prevItem = _itemList[_currentIndex].item;
 
                 // Show dot icon on current index
                 SetActiveHierarchyItem(_currentIndex, true);

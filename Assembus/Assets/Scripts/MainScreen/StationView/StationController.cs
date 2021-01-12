@@ -1,4 +1,5 @@
 ﻿using MainScreen.Sidebar.HierarchyView;
+using Services.UndoRedo.Commands;
 using Shared;
 using Shared.Toast;
 using TMPro;
@@ -9,6 +10,11 @@ namespace MainScreen.StationView
 {
     public class StationController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        /// <summary>
+        ///     True if previous stations should be shown
+        /// </summary>
+        private static bool _showPreviousStations;
+
         /// <summary>
         ///     The title of the station
         /// </summary>
@@ -99,13 +105,13 @@ namespace MainScreen.StationView
             title.text = shownStation.itemInfo.ItemInfo.displayName;
 
             // Update the station view
-            UpdateStation();
+            UpdateStation(null);
         }
 
         /// <summary>
         ///     Update the station view
         /// </summary>
-        public void UpdateStation()
+        public void UpdateStation(Command command)
         {
             // Check if the station is null
             if (station == null) return;
@@ -126,12 +132,11 @@ namespace MainScreen.StationView
             previousButton.Enable(HasPrevious);
             nextButton.Enable(HasNext);
 
-            // Update the sequence view controller
-            sequenceController.OnStationUpdate(station);
+            // Update the visibility of the previous stations
+            ShowPreviousStations(_showPreviousStations);
 
-            // Update the other toolbar buttons
-            hidePreviousButton.SetActive(false);
-            showPreviousButton.SetActive(true);
+            // Update the sequence view controller
+            sequenceController.ActionStationUpdate(station, command);
         }
 
         /// <summary>
@@ -147,7 +152,7 @@ namespace MainScreen.StationView
         /// </summary>
         public void ShowPreviousStations()
         {
-            ChangePreviousStations(true);
+            ShowPreviousStations(true);
         }
 
         /// <summary>
@@ -155,14 +160,14 @@ namespace MainScreen.StationView
         /// </summary>
         public void HidePreviousStations()
         {
-            ChangePreviousStations(false);
+            ShowPreviousStations(false);
         }
 
         /// <summary>
         ///     Change the visibility of the previous stations
         /// </summary>
         /// <param name="visible">True if the stations shall be visible</param>
-        private void ChangePreviousStations(bool visible)
+        private void ShowPreviousStations(bool visible)
         {
             for (var i = 0; i < station.transform.GetSiblingIndex(); i++)
             {
@@ -173,6 +178,8 @@ namespace MainScreen.StationView
 
             hidePreviousButton.SetActive(visible);
             showPreviousButton.SetActive(!visible);
+
+            _showPreviousStations = visible;
         }
 
         /// <summary>

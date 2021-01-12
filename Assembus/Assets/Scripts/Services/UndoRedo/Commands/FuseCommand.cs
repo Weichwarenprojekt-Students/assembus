@@ -8,12 +8,12 @@ namespace Services.UndoRedo.Commands
         /// <summary>
         ///     The id of the affected game object
         /// </summary>
-        private readonly string _id;
+        public readonly string ID;
 
         /// <summary>
         ///     Boolean displaying the situation of the fused group before the action
         /// </summary>
-        private readonly bool _isFused;
+        public readonly bool IsFused;
 
         /// <summary>
         ///     Constructor
@@ -22,8 +22,8 @@ namespace Services.UndoRedo.Commands
         /// <param name="id">Id of the affected group</param>
         public FuseCommand(bool isFused, string id)
         {
-            _isFused = isFused;
-            _id = id;
+            IsFused = isFused;
+            ID = id;
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Services.UndoRedo.Commands
         /// </summary>
         public override void Undo()
         {
-            SetFused(_isFused);
+            SetFused(IsFused);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Services.UndoRedo.Commands
         /// </summary>
         public override void Redo()
         {
-            SetFused(!_isFused);
+            SetFused(!IsFused);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Services.UndoRedo.Commands
         private void SetFused(bool value)
         {
             // Get the item controller
-            var listItem = Utility.FindChild(HierarchyView.transform, _id);
+            var listItem = Utility.FindChild(HierarchyView.transform, ID);
             var itemController = listItem.GetComponent<HierarchyItemController>();
 
             // Set the new state and update the hierarchy item

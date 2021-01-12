@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MainScreen.Sidebar.HierarchyView;
 using Services.UndoRedo.Models;
 using Shared;
@@ -134,6 +135,16 @@ namespace Services.UndoRedo.Commands
 
             // Indent the item
             listItem.IndentItem(indentionDepth);
+        }
+
+        /// <summary>
+        ///     Check if the GameObject with the given ID has been part of the MoveCommand
+        /// </summary>
+        /// <param name="id">The id of the GameObject</param>
+        /// <returns>Returns if the given GameObject has been part of the MoveCommand</returns>
+        public bool ContainsItem(string id)
+        {
+            return _oldStates.Any(state => state.ID == id);
         }
     }
 }

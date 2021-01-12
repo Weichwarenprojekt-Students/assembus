@@ -78,6 +78,9 @@ namespace MainScreen
         /// </summary>
         public void ShowEditor()
         {
+            // When opening a project, it's always saved
+            _projectManager.Saved = true;
+
             gameObject.SetActive(true);
             hierarchyController.SetupHierarchy();
         }

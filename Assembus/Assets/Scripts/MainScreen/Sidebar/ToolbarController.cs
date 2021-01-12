@@ -104,7 +104,7 @@ namespace MainScreen.Sidebar
         /// </summary>
         private void OnEnable()
         {
-            UpdateProjectView(true);
+            UpdateProjectView(_projectManager.Saved);
         }
 
         /// <summary>

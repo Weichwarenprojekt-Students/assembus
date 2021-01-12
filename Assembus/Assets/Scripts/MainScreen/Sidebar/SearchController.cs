@@ -238,8 +238,13 @@ namespace MainScreen.Sidebar
                 hierarchyViewController.SetColor(targetController, true);
 
             // Expand, if searched item is a group
-            var itemController = targetObject.GetComponent<HierarchyItemController>();
-            itemController.ExpandItem(true);
+            var parent = targetController.transform.parent;
+            while (hierarchyViewController.hierarchyView.transform != parent)
+            {
+                var parentController = parent.GetComponent<HierarchyItemController>();
+                if (parentController != null) parentController.ExpandItem(true);
+                parent = parent.parent;
+            } 
 
             // Scroll to the given item in the list-view
             hierarchyViewController.ScrollToItem(

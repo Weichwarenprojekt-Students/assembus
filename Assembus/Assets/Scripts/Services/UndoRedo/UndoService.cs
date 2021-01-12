@@ -30,9 +30,9 @@ namespace Services.UndoRedo
         }
 
         /// <summary>
-        ///     The action to be executed when a new command is inserted
+        ///     The action to be executed when a command is executed
         /// </summary>
-        public Action OnNewCommand { get; set; }
+        public Action<Command> OnCommandExecution { get; set; }
 
         /// <summary>
         ///     Singleton instance
@@ -69,7 +69,7 @@ namespace Services.UndoRedo
             _current?.Value.Redo();
 
             // Notify the UI that new action was added
-            OnNewCommand?.Invoke();
+            if (_current != null) OnCommandExecution(_current.Value);
         }
 
         /// <summary>
@@ -94,6 +94,9 @@ namespace Services.UndoRedo
 
             // Call redo function of the command
             _current?.Value.Redo();
+
+            // Notify the UI that new action was added
+            if (_current != null) OnCommandExecution(_current.Value);
         }
 
         /// <summary>
@@ -124,6 +127,9 @@ namespace Services.UndoRedo
             }
 
             _current = _current.Previous;
+
+            // Notify the UI that new action was added
+            if (_current != null) OnCommandExecution(_current.Next?.Value);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MainScreen.Sidebar.HierarchyView;
+using Services.UndoRedo.Commands;
 using Shared;
 using TMPro;
 using UnityEngine;
@@ -29,48 +31,106 @@ namespace MainScreen.StationView
         private List<HierarchyItemController> _itemList;
 
         /// <summary>
-        ///     Amount of items assigned to current station
+        ///     The currently active item
         /// </summary>
-        private int _numberOfItems;
+        private HierarchyItemController _activeItem;
 
         /// <summary>
         ///     The hierarchy item controller
         /// </summary>
         private HierarchyItemController _station;
 
-
         /// <summary>
         ///     Method to react on changing stations
         /// </summary>
-        public void OnStationUpdate(HierarchyItemController station)
+        public void ActionStationUpdate(HierarchyItemController station, Command command)
         {
-            // Reset item dot indicator
-            OnStationLeave();
-
-            // Get the hierarchy item controller reference
-            _station = station;
-
-            // Extract all leaves from the children container
+            // Load the updated children container of the station into the item list
             _itemList = Utility.GetAllComponents(station.childrenContainer);
+            
+            // No command executed. Init/switch station occured --> Init StationView!
+            if (command == null) 
+            {
+                // Reset item dot indicator
+                HideActiveItem();
 
-            _numberOfItems = _itemList.Count;
+                // Get the hierarchy item controller reference
+                _station = station;
 
-            // Hide all items of the component group
-            for (var i = 1; i < _itemList.Count; i++) SetItemVisibility(i, false);
-
-            _currentIndex = 0;
-
-            SkipToItem(0);
+                // Jump to the end of the current station
+                _currentIndex = _itemList.Count - 1;
+                SkipToItem(_currentIndex);
+            }
+            // Action has been performed --> Update StationView!
+            else 
+            {
+                var commandType = command.GetType();
+                
+                // Find out the right command and react to it
+                if (commandType == typeof(FuseCommand)) ReactToFuse((FuseCommand) command);
+                else if (commandType == typeof(MoveCommand)) ReactToMove((MoveCommand) command);
+                else SkipToActiveItem();
+            }
         }
 
         /// <summary>
-        ///     Method to react to closing the station
+        ///     React to fuse command
         /// </summary>
-        public void OnStationLeave()
+        /// <param name="command">The fuse command</param>
+        private void ReactToFuse(FuseCommand command)
         {
-            if (_station != null)
-                // Hide the item dot when leaving SequenceView
-                SetActiveHierarchyItem(_currentIndex, false);
+            // Check if the active item was included
+            var fusedItemIndex = _itemList.Count;
+            var activeItemIndex = -1;
+            for (var i = 0; i < _itemList.Count; i++)
+            {
+                if (_itemList[i].name == _activeItem.name)
+                {
+                    activeItemIndex = i;
+                    break;
+                }
+                if (_itemList[i].name == command.ID) fusedItemIndex = i;
+            }
+            
+            // Skip to the right item
+            if (activeItemIndex >= 0) SkipToItem(activeItemIndex); 
+            else if (command.IsFused) SkipToItem(_currentIndex);
+            else SkipToItem(fusedItemIndex);
+        }
+
+        /// <summary>
+        ///     React to a move command
+        /// </summary>
+        /// <param name="command">The move command</param>
+        private void ReactToMove(MoveCommand command)
+        {
+            var activeName = _activeItem == null ? "" : _activeItem.name;
+            if (command.ContainsItem(activeName)) SkipToItem(_currentIndex);
+            else SkipToActiveItem();
+        }
+
+        /// <summary>
+        ///     Try to skip to the active item
+        /// </summary>
+        private void SkipToActiveItem()
+        {
+            try
+            {
+                var newIndex = Utility.GetIndexForStation(_station, _activeItem.item);
+                SkipToItem(newIndex);
+            }
+            catch (Exception)
+            {
+                SkipToItem(_itemList.Count - 1);
+            }
+        }
+        
+        /// <summary>
+        ///     Hide the current active item
+        /// </summary>
+        public void HideActiveItem()
+        {
+            if (_activeItem != null) _activeItem.GetComponent<HierarchyItemController>().SetItemActive(false);
         }
 
         /// <summary>
@@ -80,8 +140,7 @@ namespace MainScreen.StationView
         /// <param name="visible">Visibility of the dot icon</param>
         private void SetActiveHierarchyItem(int index, bool visible)
         {
-            if (_itemList.Count > 0)
-                _itemList[index].SetItemActive(visible);
+            if (_itemList.Count > 0) _itemList[index].SetItemActive(visible);
         }
 
         /// <summary>
@@ -91,8 +150,7 @@ namespace MainScreen.StationView
         /// <param name="visible">Visibility of item</param>
         private void SetItemVisibility(int index, bool visible)
         {
-            if (_itemList.Count > 0)
-                _itemList[index].ShowItem(visible);
+            if (_itemList.Count > 0) _itemList[index].ShowItem(visible);
         }
 
         /// <summary>
@@ -101,65 +159,26 @@ namespace MainScreen.StationView
         /// <param name="index">The index of the item</param>
         public void SkipToItem(int index)
         {
-            // If there are no components, disable all buttons and set display text accordingly
-            if (_itemList.Count < 1)
-            {
-                previousButton.Enable(false);
-                skipFirstButton.Enable(false);
-                nextButton.Enable(false);
-                skipLastButton.Enable(false);
+            // Make sure the index is in the bounds
+            index = Mathf.Clamp(index, 0, _itemList.Count - 1);
+            
+            // Update the control visibility
+            previousButton.Enable(index > 0);
+            nextButton.Enable(index < _itemList.Count - 1);
+            skipFirstButton.Enable(index > 0);
+            skipLastButton.Enable(index < _itemList.Count - 1);
 
-                // Update the shown current item index of the controls
-                UpdateItemIndexText();
-            }
-            else // At least one component available
-            {
-                // Update the control visibility
-                if (index == 0) // Start of list
-                {
-                    previousButton.Enable(false);
-                    skipFirstButton.Enable(false);
+            // Hide old items and switch to the next
+            HideActiveItem();
+            for (var i = _itemList.Count - 1; i > index; i--) SetItemVisibility(i, false);
+            for (var i = 0; i <= index; i++) SetItemVisibility(i, true);
+            _currentIndex = index;
+            if (_itemList.Count > 0) _activeItem = _itemList[_currentIndex];
+            else _currentIndex = -1;
 
-                    nextButton.Enable(true);
-                    skipLastButton.Enable(true);
-                }
-                else if (index == _numberOfItems - 1) // End of list
-                {
-                    nextButton.Enable(false);
-                    skipLastButton.Enable(false);
-
-                    previousButton.Enable(true);
-                    skipFirstButton.Enable(true);
-                }
-                else // In-between start and end
-                {
-                    previousButton.Enable(true);
-                    nextButton.Enable(true);
-                    skipFirstButton.Enable(true);
-                    skipLastButton.Enable(true);
-                }
-
-                if (index < 0 || index >= _numberOfItems) return;
-
-                // Hide dot icon on current item
-                SetActiveHierarchyItem(_currentIndex, false);
-
-                // Set items from current index to new index to invisible
-                for (var i = _currentIndex; i > index; i--)
-                    SetItemVisibility(i, false);
-
-                // Set items visible from current index to index
-                for (var i = _currentIndex; i <= index; i++)
-                    SetItemVisibility(i, true);
-
-                _currentIndex = index;
-
-                // Show dot icon on current index
-                SetActiveHierarchyItem(_currentIndex, true);
-
-                // Update the shown current item index of the controls
-                UpdateItemIndexText();
-            }
+            // Show the new item
+            SetActiveHierarchyItem(_currentIndex, true);
+            UpdateItemIndexText();
         }
 
         /// <summary>
@@ -183,7 +202,7 @@ namespace MainScreen.StationView
         /// </summary>
         public void SkipToLastItem()
         {
-            SkipToItem(_numberOfItems - 1);
+            SkipToItem(_itemList.Count - 1);
         }
 
         /// <summary>
@@ -199,7 +218,7 @@ namespace MainScreen.StationView
         /// </summary>
         private void UpdateItemIndexText()
         {
-            itemIndexText.SetText(_currentIndex + 1 + " / " + _numberOfItems);
+            itemIndexText.SetText(_currentIndex + 1 + " / " + _itemList.Count);
         }
     }
 }

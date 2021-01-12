@@ -416,9 +416,6 @@ namespace MainScreen.Sidebar.HierarchyView
 
             // Show/Hide the station button
             showStation.SetActive(IsStation);
-
-            // Hide dot icon
-            itemActive.SetActive(false);
         }
 
         /// <summary>

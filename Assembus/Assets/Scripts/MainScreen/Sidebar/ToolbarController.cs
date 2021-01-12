@@ -2,6 +2,7 @@
 using Models.Project;
 using Services.Serialization;
 using Services.UndoRedo;
+using Services.UndoRedo.Commands;
 using SFB;
 using Shared;
 using Shared.Toast;
@@ -77,7 +78,7 @@ namespace MainScreen.Sidebar
         /// </summary>
         private void Start()
         {
-            _undoService.OnNewCommand = () => UpdateProjectView(false);
+            _undoService.OnCommandExecution = command => UpdateProjectView(command, false);
         }
 
         /// <summary>
@@ -104,14 +105,15 @@ namespace MainScreen.Sidebar
         /// </summary>
         private void OnEnable()
         {
-            UpdateProjectView(_projectManager.Saved);
+            UpdateProjectView(null, _projectManager.Saved);
         }
 
         /// <summary>
         ///     Update the buttons and the title
         /// </summary>
+        /// <param name="command">Command which has been executed</param>
         /// <param name="saved">True if the project is in a saved state</param>
-        private void UpdateProjectView(bool saved)
+        private void UpdateProjectView(Command command, bool saved)
         {
             // Show the title
             _projectManager.Saved = saved;
@@ -123,7 +125,7 @@ namespace MainScreen.Sidebar
             redo.Enable(_undoService.HasRedo());
 
             // Update the station view
-            stationController.UpdateStation();
+            stationController.UpdateStation(command);
         }
 
         /// <summary>
@@ -132,7 +134,6 @@ namespace MainScreen.Sidebar
         public void UndoAction()
         {
             _undoService.Undo();
-            UpdateProjectView(false);
         }
 
         /// <summary>
@@ -141,7 +142,6 @@ namespace MainScreen.Sidebar
         public void RedoAction()
         {
             _undoService.Redo();
-            UpdateProjectView(false);
         }
 
         /// <summary>
@@ -188,6 +188,9 @@ namespace MainScreen.Sidebar
 
             // Reset camera viewport
             mainController.ResetCamera();
+
+            // Close the currently visible station
+            stationController.CloseStation();
 
             // Switch screens
             mainScreen.SetActive(false);
@@ -256,6 +259,7 @@ namespace MainScreen.Sidebar
                     Destroy(_projectManager.CurrentProject.ObjectModel);
 
                     // Show the start screen
+                    stationController.CloseStation();
                     mainScreen.SetActive(false);
                     startScreen.SetActive(true);
                 }

@@ -166,7 +166,7 @@ namespace MainScreen.Sidebar.HierarchyView
         private void LoadModelIntoHierarchyView()
         {
             // Move default item out of hierarchy view
-            defaultHierarchyViewItem.transform.SetParent(null);
+            defaultHierarchyViewItem.transform.SetParent(gameObject.transform);
 
             // Remove the old children
             RemoveElementWithChildren(hierarchyView.transform);
@@ -184,7 +184,7 @@ namespace MainScreen.Sidebar.HierarchyView
             _updateHierarchyView = true;
 
             // Move default item out of hierarchy view again
-            defaultHierarchyViewItem.transform.SetParent(null);
+            defaultHierarchyViewItem.transform.SetParent(gameObject.transform);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace MainScreen.Sidebar.HierarchyView
         {
             defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
             AddListItem(parent, item, depth);
-            defaultHierarchyViewItem.transform.SetParent(null);
+            defaultHierarchyViewItem.transform.SetParent(gameObject.transform);
         }
 
         /// <summary>

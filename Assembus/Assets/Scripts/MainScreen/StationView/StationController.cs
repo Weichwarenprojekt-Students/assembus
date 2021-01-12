@@ -225,7 +225,7 @@ namespace MainScreen.StationView
             Utility.ToggleVisibility(hierarchyView, true);
 
             // Close the SequenceView
-            sequenceController.OnStationLeave();
+            sequenceController.HideActiveItem();
         }
     }
 }

@@ -166,13 +166,13 @@ namespace MainScreen.Sidebar.HierarchyView
         private void LoadModelIntoHierarchyView()
         {
             // Move default item out of hierarchy view
-            defaultHierarchyViewItem.transform.SetParent(null);
+            ActivateDefaultItem(false);
 
             // Remove the old children
             RemoveElementWithChildren(hierarchyView.transform);
 
             // Move default item back into hierarchy view for instantiation
-            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
+            ActivateDefaultItem(true);
 
             // Get the root element of the object model
             var parent = _projectManager.CurrentProject.ObjectModel;
@@ -184,7 +184,7 @@ namespace MainScreen.Sidebar.HierarchyView
             _updateHierarchyView = true;
 
             // Move default item out of hierarchy view again
-            defaultHierarchyViewItem.transform.SetParent(null);
+            ActivateDefaultItem(false);
         }
 
         /// <summary>
@@ -262,9 +262,19 @@ namespace MainScreen.Sidebar.HierarchyView
         /// <param name="depth">The depth of indention</param>
         public void AddSingleListItem(GameObject parent, GameObject item, float depth)
         {
-            defaultHierarchyViewItem.transform.SetParent(hierarchyView.transform);
+            ActivateDefaultItem(true);
             AddListItem(parent, item, depth);
-            defaultHierarchyViewItem.transform.SetParent(null);
+            ActivateDefaultItem(false);
+        }
+
+        /// <summary>
+        ///     Activate the default hierarchy for copying
+        /// </summary>
+        /// <param name="state">True if the item should be activated</param>
+        private void ActivateDefaultItem(bool state)
+        {
+            defaultHierarchyViewItem.transform.SetParent(state ? hierarchyView.transform : gameObject.transform);
+            defaultHierarchyViewItem.SetActive(state);
         }
 
         /// <summary>

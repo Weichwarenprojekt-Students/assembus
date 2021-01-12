@@ -1,4 +1,4 @@
-![alt text](docs/img/assembus-logo-text.png)
+![alt text](docs/img/assembus-logo-background.png)
 
 # Introduction
 

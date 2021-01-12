@@ -718,6 +718,11 @@ namespace MainScreen.Sidebar.HierarchyView
             if (newName == "")
             {
                 toast.Error(Toast.Short, "Name cannot be empty!");
+                
+                // Reset name if empty
+                nameInput.text = nameText.text;
+                CancelRenaming();
+                
                 return;
             }
 

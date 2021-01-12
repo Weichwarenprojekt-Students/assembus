@@ -48,9 +48,9 @@ namespace MainScreen
         private bool _close;
 
         /// <summary>
-        ///     The current width of the screen
+        ///     The current width and height of the screen
         /// </summary>
-        private int _width;
+        private int _width, _height;
 
         /// <summary>
         ///     Add event for window closing
@@ -88,7 +88,8 @@ namespace MainScreen
         private void Update()
         {
             var width = Screen.width;
-            if (width == _width) return;
+            var height = Screen.height;
+            if (width == _width && height == _height) return;
 
             // Reposition the camera
             cameraController.ZoomOnObject(_projectManager.CurrentProject.ObjectModel);
@@ -103,6 +104,7 @@ namespace MainScreen
             // Set the new bounds
             mainCamera.rect = new Rect(x, 0, 1 - x, 1);
             _width = width;
+            _height = height;
         }
 
         /// <summary>

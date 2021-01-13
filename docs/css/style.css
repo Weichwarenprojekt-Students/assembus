@@ -196,7 +196,7 @@ footer img {
     }
 }
 
-a.pronounce {
+button.pronounce {
     border: 0;
     background-color: transparent;
     outline: none;

@@ -204,8 +204,8 @@
                 <br>
                 <h1> Editing the Assembly Line</h1>
 
-                <img alt="Context menu" class="assembus-doc-image-right" data-action="zoom"
-                     src="img/manual/context-menu.png">
+                <img alt="Station View Highlighting" class="assembus-doc-image" data-action="zoom"
+                     src="img/manual/station-view-drag.png">
 
                 <p>
                     The editing of your assembly sequence is done in the hierarchical list. The actual assembly sequence
@@ -216,6 +216,9 @@
                     items
                     between two boundaries.
                 </p>
+
+                <img alt="Context menu" class="assembus-doc-image-right" data-action="zoom"
+                     src="img/manual/context-menu.png">
                 <p>
                     By default, all components are located inside the "Default Station". New assembly stations can be
                     created by
@@ -226,6 +229,7 @@
                     If the station view is open, you can also directly drag components onto the 3D editor
                     to add them to the station.
                 </p>
+
                 <p>
                     To keep the project clean and tidy, multiple components can be grouped.
                     You can either right-click on an assembly station and select "Add Group" to create a new empty group
@@ -237,8 +241,7 @@
                 </p>
                 <p>
                     To rename a component, component group or assembly station, open the context menu with a right-click
-                    and
-                    select "Rename" to alter the displayed name.
+                    and select "Rename" to alter the displayed name.
                 </p>
             </div>
 
@@ -266,7 +269,7 @@
                 <p>
                     Use the skip-arrows on the bottom of the screen to incrementally assemble or disassemble all
                     components.
-                    The dot-icon and the color highlighting in the hierarchical list indicates which components have
+                    The dot-icon and the color highlighting in the hierarchical list indicate which components have
                     already
                     been assembled into the final model. <br/>
                     Alternatively you can right-click on a list item and select "Skip To" to jump to the selected
@@ -282,9 +285,7 @@
                     By default, all components which have been assembled in previous stations, are hidden to ensure
                     clarity.
                     You can enable visibility of components from preceding stations by clicking the eye-button in the
-                    upper
-                    right
-                    corner of the screen.
+                    upper right corner of the screen.
                 </p>
 
 
@@ -359,6 +360,27 @@
                     The id for components looks like this: <code>assembus_item_X</code>,
                     where <code>X</code> is the index of the corresponding item in the OBJ file, starting with 0.
                 </p>
+
+                <h1>Example</h1>
+
+                <code>
+                    &lt;AssemblyLine&gt;<br/>
+                    &nbsp&nbsp&lt;Station name=&quot;Default Station&quot; id=&quot;assembus_group_0&quot;&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;First Part&quot;
+                    id=&quot;assembus_item_0&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;Second Part&quot;
+                    id=&quot;assembus_item_1&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;Group name=&quot;First Group&quot; id=&quot;assembus_group_1&quot; isFused=&quot;true&quot;&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Group name=&quot;Inner Group&quot; id=&quot;assembus_group_2&quot;&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;Group Part 1&quot; id=&quot;assembus_item_3&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;Group Part 2&quot; id=&quot;assembus_item_2&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;/Group&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Group name=&quot;Empty Group&quot; id=&quot;assembus_group_3&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;/Group&gt;<br/>
+                    &nbsp&nbsp&lt;/Station&gt;<br/>
+                    &nbsp&nbsp&lt;Station name=&quot;Assembly Station&quot; id=&quot;assembus_group_4&quot;/&gt;<br/>
+                    &lt;/AssemblyLine&gt;
+                </code>
             </div>
         </div>
     </div>

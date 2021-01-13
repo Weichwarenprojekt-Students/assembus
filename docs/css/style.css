@@ -1,0 +1,498 @@
+:root {
+    --prime-1: #7C8DA7;
+    --prime-2: #4E6382;
+    --prime-3: #354967;
+    --prime-4: #213451;
+    --prime-5: #102138;
+    --text: #f5f5f5;
+    --footer-height: 80px;
+    --header-height: 60px;
+    --doc-nav-width: 220px;
+}
+
+body {
+    color: #333;
+    overflow-x: hidden;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+    position: relative;
+}
+
+a {
+    text-decoration: none;
+}
+
+.header {
+    height: var(--header-height);
+}
+
+.btn i.zmdi {
+    margin-right: 8px;
+}
+
+.jumbotron p {
+    font-size: 1.5rem;
+}
+
+section {
+    padding: 80px 0;
+}
+
+section:nth-child(even) {
+    background-color: var(--prime-1);
+}
+
+#intro {
+    margin-top: var(--header-height);
+    padding: 32px 0 64px;
+    color: var(--text);
+    background-color: var(--prime-5);
+}
+
+.assembus-logo {
+    height: 30px;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: white;
+    background-color: var(--prime-4);
+}
+
+@media screen and (max-width: 1199px) {
+    #intro {
+        padding-top: 72px;
+        height: auto;
+    }
+}
+
+.jumbotron, .intro-image {
+    display: flex;
+    align-items: center;
+}
+
+@media screen and (max-width: 1199px) {
+    .intro-image {
+        margin-bottom: 0;
+    }
+}
+
+#intro .jumbotron {
+    padding-bottom: 32px;
+}
+
+.intro-image img {
+    height: 520px;
+}
+
+@media screen and (max-width: 1199px) {
+    .intro-image {
+        margin-top: 40px;
+    }
+
+    .intro-image img {
+        height: auto;
+        width: 100%;
+    }
+}
+
+.intro-buttons, .intro-subheading {
+    margin-top: 40px;
+}
+
+footer {
+    background-color: var(--prime-5);
+    height: var(--footer-height);
+    color: var(--text);
+    position: absolute;
+    width: 100%;
+    bottom: calc(-1 * var(--footer-height));
+    clear: both;
+}
+
+footer .container-md {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+footer span {
+    display: inline-block;
+}
+
+footer img {
+    height: 80px;
+    width: auto;
+    display: inline-block;
+    margin-left: 16px;
+}
+
+.feature-row {
+    margin-top: 64px;
+    margin-bottom: 32px;
+}
+
+.feature-box {
+    text-align: center;
+}
+
+.feature-box i.zmdi {
+    font-size: 8rem;
+    margin-bottom: 32px;
+}
+
+.section-buttons {
+    margin-top: 48px;
+}
+
+.logo-box {
+    display: inline-block;
+    padding: 40px 80px 0 0;
+}
+
+.logo-image {
+    height: 120px;
+    padding: 16px 0;
+}
+
+.logo-box .logo-image img {
+    height: 100%;
+    width: auto;
+}
+
+.logo-box p {
+    text-align: left;
+    padding: 0 16px;
+}
+
+@media screen and (max-width: 900px) {
+    .assembus-doc-nav {
+        display: none;
+    }
+
+    div > .assembus-doc-content {
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width: 1199px) {
+    .hidden-logo {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .logo-image {
+        height: auto;
+    }
+
+    .logo-box {
+        padding: 40px 0 0 0;
+        text-align: center;
+    }
+
+    .logo-box .logo-image img {
+        height: auto;
+        width: 90%;
+    }
+}
+
+button.pronounce {
+    border: 0;
+    background-color: transparent;
+    outline: none;
+}
+
+
+/**
+ *
+ * Navigation
+ *
+ */
+.fixed-top {
+    z-index: 900; /* Fix image zoom */
+}
+
+@media screen and (max-width: 576px) {
+    .navbar-collapse {
+        top: 58px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: fixed;
+        background-color: var(--prime-5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .navbar-nav .nav-link {
+        text-align: center;
+        font-size: 3rem;
+        color: white !important;
+        background-image: linear-gradient(white 50%, white 50%);
+        background-size: 10000px 4px;
+        background-repeat: no-repeat;
+        background-position: -10000px 4.5rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+        background-position: 0 4.5rem;
+        transition: background-position 2s ease-in-out;
+    }
+}
+
+/* From: https://codepen.io/jorenerene/pen/vxKbJb */
+@media screen and (min-width: 577px) {
+    .navbar-toggle {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .navbar-toggle.toggle-x {
+        border: none;
+        background: transparent !important;
+        outline: none;
+    }
+
+    .navbar-toggle.toggle-x:hover {
+        background: transparent !important;
+    }
+
+    .navbar-toggle.toggle-x .icon-bar {
+        width: 22px;
+        height: 2px;
+        display: block;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
+        background-color: #fff;
+    }
+
+    .navbar-toggle.toggle-x .icon-bar:nth-of-type(1) {
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        -webkit-transform-origin: 10% 10%;
+        -ms-transform-origin: 10% 10%;
+        transform-origin: 10% 10%;
+    }
+
+    .navbar-toggle.toggle-x .icon-bar:nth-of-type(2) {
+        margin-top: 4px;
+        opacity: 0;
+        filter: alpha(opacity=0);
+    }
+
+    .navbar-toggle.toggle-x .icon-bar:nth-of-type(3) {
+        margin-top: 4px;
+        -webkit-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+        -webkit-transform-origin: 10% 90%;
+        -ms-transform-origin: 10% 90%;
+        transform-origin: 10% 90%;
+    }
+
+    .navbar-toggle.toggle-x.collapsed .icon-bar:nth-of-type(1) {
+        -webkit-transform: rotate(0);
+        -ms-transform: rotate(0);
+        transform: rotate(0);
+    }
+
+    .navbar-toggle.toggle-x.collapsed .icon-bar:nth-of-type(2) {
+        opacity: 1;
+        filter: alpha(opacity=100);
+    }
+
+    .navbar-toggle.toggle-x.collapsed .icon-bar:nth-of-type(3) {
+        -webkit-transform: rotate(0);
+        -ms-transform: rotate(0);
+        transform: rotate(0);
+    }
+
+    .navbar-header {
+        float: none;
+    }
+
+    .navbar-toggle {
+        display: block;
+        padding: 9px 10px;
+    }
+}
+
+
+/**
+ *
+ * Manual specific
+ *
+ */
+
+.clean {
+    margin-top: var(--header-height);
+}
+
+.clean section {
+    padding: 32px 0 0;
+    clear: both;
+}
+
+.clean section:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.clean footer {
+    margin-top: 64px;
+}
+
+.assembus-doc-image {
+    width: 100%;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.assembus-doc-image-right {
+    width: 50%;
+    float: right;
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+section#manual {
+    padding: 64px 0;
+}
+
+.assembus-doc-nav {
+    width: var(--doc-nav-width);
+    float: left;
+}
+
+.assembus-doc-nav > ul {
+    width: 100%;
+}
+
+hr {
+    margin: 64px 0;
+}
+
+.sticky-top {
+    top: calc(64px + var(--header-height));
+}
+
+:target {
+    display: block;
+    position: relative;
+    top: -64px;
+    visibility: hidden;
+}
+
+.assembus-doc-nav > .navbar-brand {
+    padding-left: 1rem;
+}
+
+.assembus-doc-content {
+    margin-left: calc(var(--doc-nav-width) + 64px);
+}
+
+.assembus-doc-title {
+    margin-bottom: 32px;
+}
+
+.getting-started-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.getting-started-row > * {
+    width: 100%;
+    padding-bottom: 32px;
+    padding-top: 32px;
+}
+
+.getting-started-first {
+    padding-right: 32px;
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.getting-started-second {
+    padding-left: 32px;
+    grid-row: 1;
+    grid-column: 2;
+}
+
+@media screen and (max-width: 991px) {
+    .getting-started-row {
+        display: block;
+        margin-bottom: 64px;
+    }
+
+    .getting-started-first, .getting-started-second {
+        padding: 0;
+    }
+}
+
+
+/**
+ *
+ * Download specific
+ *
+ */
+
+section#download {
+    background-color: var(--prime-5);
+    padding: 96px 0;
+    color: white;
+}
+
+img.download-logo {
+    width: 90%;
+    height: auto;
+    max-width: 250px;
+    margin: 24px auto;
+}
+
+.download-logo-container {
+    text-align: center;
+}
+
+.download-button a {
+    display: none;
+}
+
+.download-icon {
+    margin-right: 8px;
+    height: 24px;
+    margin-bottom: 1px;
+}
+
+@media all and (max-width: 991px) {
+    #download .jumbotron {
+        order: 2;
+    }
+
+    #download * {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .general-download {
+        display: none;
+    }
+}
+
+.download-title {
+    margin-top: 32px;
+}
+
+.download-buttons {
+    margin-top: 16px;
+    margin-bottom: 32px;
+}
+
+span.manual-teaser {
+    display: inline-block;
+    margin-top: 16px;
+}

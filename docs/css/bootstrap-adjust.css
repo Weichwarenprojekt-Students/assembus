@@ -1,0 +1,46 @@
+:root {
+    --prime-1: #7C8DA7;
+    --prime-2: #4E6382;
+    --prime-3: #354967;
+    --prime-4: #213451;
+    --prime-5: #102138;
+    --text: #f5f5f5;
+}
+
+
+.bg-primary {
+    background-color: var(--prime-5) !important;
+}
+
+.btn {
+    border-radius: 0;
+}
+
+.btn-primary {
+    background-color: var(--prime-3);
+    border-color: var(--prime-3);
+    color: var(--text);
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus,
+.btn-primary:active:focus {
+    color: var(--text);
+    background-color: var(--prime-2);
+    border-color: var(--prime-2);
+    box-shadow: none;
+}
+
+.text-muted {
+    color: #cdcdcd !important;
+}
+
+.navbar-toggler {
+    border-radius: 0;
+    border: 0;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0;
+}

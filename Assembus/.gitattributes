@@ -1,0 +1,54 @@
+# 3D models
+Assembus/*.3dm filter=lfs diff=lfs merge=lfs -text
+Assembus/*.3ds filter=lfs diff=lfs merge=lfs -text
+Assembus/*.blend filter=lfs diff=lfs merge=lfs -text
+Assembus/*.c4d filter=lfs diff=lfs merge=lfs -text
+Assembus/*.collada filter=lfs diff=lfs merge=lfs -text
+Assembus/*.dae filter=lfs diff=lfs merge=lfs -text
+Assembus/*.dxf filter=lfs diff=lfs merge=lfs -text
+Assembus/*.fbx filter=lfs diff=lfs merge=lfs -text
+Assembus/*.jas filter=lfs diff=lfs merge=lfs -text
+Assembus/*.lws filter=lfs diff=lfs merge=lfs -text
+Assembus/*.lxo filter=lfs diff=lfs merge=lfs -text
+Assembus/*.ma filter=lfs diff=lfs merge=lfs -text
+Assembus/*.max filter=lfs diff=lfs merge=lfs -text
+Assembus/*.mb filter=lfs diff=lfs merge=lfs -text
+Assembus/*.obj filter=lfs diff=lfs merge=lfs -text
+Assembus/*.ply filter=lfs diff=lfs merge=lfs -text
+Assembus/*.skp filter=lfs diff=lfs merge=lfs -text
+Assembus/*.stl filter=lfs diff=lfs merge=lfs -text
+Assembus/*.ztl filter=lfs diff=lfs merge=lfs -text
+# Audio
+Assembus/*.aif filter=lfs diff=lfs merge=lfs -text
+Assembus/*.aiff filter=lfs diff=lfs merge=lfs -text
+Assembus/*.it filter=lfs diff=lfs merge=lfs -text
+Assembus/*.mod filter=lfs diff=lfs merge=lfs -text
+Assembus/*.mp3 filter=lfs diff=lfs merge=lfs -text
+Assembus/*.ogg filter=lfs diff=lfs merge=lfs -text
+Assembus/*.s3m filter=lfs diff=lfs merge=lfs -text
+Assembus/*.wav filter=lfs diff=lfs merge=lfs -text
+Assembus/*.xm filter=lfs diff=lfs merge=lfs -text
+# Fonts
+Assembus/*.otf filter=lfs diff=lfs merge=lfs -text
+Assembus/*.ttf filter=lfs diff=lfs merge=lfs -text
+# Images
+Assembus/*.bmp filter=lfs diff=lfs merge=lfs -text
+Assembus/*.exr filter=lfs diff=lfs merge=lfs -text
+Assembus/*.gif filter=lfs diff=lfs merge=lfs -text
+Assembus/*.hdr filter=lfs diff=lfs merge=lfs -text
+Assembus/*.iff filter=lfs diff=lfs merge=lfs -text
+Assembus/*.jpeg filter=lfs diff=lfs merge=lfs -text
+Assembus/*.jpg filter=lfs diff=lfs merge=lfs -text
+Assembus/*.pict filter=lfs diff=lfs merge=lfs -text
+Assembus/*.png filter=lfs diff=lfs merge=lfs -text
+Assembus/*.psd filter=lfs diff=lfs merge=lfs -text
+Assembus/*.tga filter=lfs diff=lfs merge=lfs -text
+Assembus/*.tif filter=lfs diff=lfs merge=lfs -text
+Assembus/*.tiff filter=lfs diff=lfs merge=lfs -text
+
+# Collapse Unity-generated files on GitHub
+Assembus/*.asset linguist-generated
+Assembus/*.mat linguist-generated
+Assembus/*.meta linguist-generated
+Assembus/*.prefab linguist-generated
+Assembus/*.unity linguist-generated

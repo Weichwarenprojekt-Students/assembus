@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport">
+
+    <title>Assembus - Manual</title>
+
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link href="css/material-design-iconic-font.min.css" rel="stylesheet">
+    <link href="css/bootstrap-adjust.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/zooming.min.js" type="text/javascript"></script>
+
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+</head>
+
+<body class="clean" data-bs-offset="100" data-bs-spy="scroll" data-bs-target="#docs-navbar" tabindex="0">
+
+<nav class="navbar navbar-expand-sm fixed-top navbar-dark bg-primary header">
+    <div class="container-md">
+        <a class="navbar-brand" href="index.html">
+            <img alt="" class="assembus-logo" src="img/assembus-logo-text.png">
+        </a>
+
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggle toggle-x collapsed"
+                data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a aria-current="page" class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="manual.html">Manual</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="download.html">Download</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/Weichwarenprojekt/Assembus">
+                        <i class="zmdi zmdi-github"></i> Github
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section id="manual">
+    <div class="container-md">
+        <nav class="navbar navbar-light bg-light px-3 sticky-top assembus-doc-nav" id="docs-navbar">
+            <a class="navbar-brand">Content</a>
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#getting-started">Getting Started</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#project-management">Project Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#editor">The Editor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#visualization">Visualization</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#export">Export</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="assembus-doc-content">
+
+            <div id="getting-started"></div>
+            <div>
+                <h1 class="display-3 assembus-doc-title"> Getting Started </h1>
+                <div>
+                    <div class="getting-started-row">
+                        <div class="col-xl-5 col-lg-12 jumbotron getting-started-first">
+                            <div>
+                                <h1>Project Management</h1>
+                                <p class="intro-subheading">
+                                    Your first contact with Assembus will be the starting screen. This screen allows you
+                                    to create, delete and load projects.
+                                    <br>
+                                    <a href="#project-management"> More here. </a>
+                                </p>
+                            </div>
+                        </div>
+                        <img alt="logo" class="getting-started-second" src="img/manual/square-start-screen.png">
+                    </div>
+
+                    <div class="getting-started-row">
+                        <div class="col-xl-5 col-lg-12 jumbotron getting-started-second">
+                            <div>
+                                <h1>The Editor</h1>
+                                <p class="intro-subheading">
+                                    The heart of Assembus is the editor. The editor allows you to change the order of
+                                    the components and provides features like grouping or renaming that help you to
+                                    keep an overview.
+                                    <br>
+                                    <a href="#editor"> More here. </a>
+                                </p>
+                            </div>
+                        </div>
+                        <img alt="logo" class="getting-started-first" src="img/manual/square-editor.png">
+                    </div>
+
+                    <div class="getting-started-row">
+                        <div class="col-xl-5 col-lg-12 jumbotron getting-started-first">
+                            <div>
+                                <h1>Visualization</h1>
+                                <p class="intro-subheading">
+                                    A picture is worth a thousand words. That's why Assembus provides a station view
+                                    for improved visualization during editing and a cinema mode for showing finished
+                                    assembly lines.
+                                    <br>
+                                    <a href="#visualization"> More here. </a>
+                                </p>
+                            </div>
+                        </div>
+                        <img alt="logo" class="getting-started-second" src="img/manual/square-visualization.png">
+                    </div>
+
+                    <div class="getting-started-row">
+                        <div class="col-xl-5 col-lg-12 jumbotron getting-started-second">
+                            <div>
+                                <h1>Export</h1>
+                                <p class="intro-subheading">
+                                    None of the features would be worth anything if the data was stuck in Assembus.
+                                    Therefore the created project can be exported for further usage.
+                                    <br>
+                                    <a href="#export"> More here. </a>
+                                </p>
+                            </div>
+                        </div>
+                        <img alt="logo" class="getting-started-first" src="img/manual/square-export.png">
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div id="project-management"></div>
+            <div>
+                <h1 class="display-3 assembus-doc-title">Project Management</h1>
+
+                <p>
+                    After opening the application you will see the project creation window. At the right-hand side, you
+                    can create a new project by entering your preferred project name, a destination where it should be
+                    saved, and the .obj-file of your assembled 3D model. Optionally, you can overwrite an existing
+                    project at the destination directory. Your project is created after clicking on the "Create"-button.
+                </p>
+                <img alt="project creation" class="assembus-doc-image" data-action="zoom"
+                     src="img/manual/start-screen.png">
+                <p>
+                    On the left half of the window you can see previously created projects. You can open them by simply
+                    clicking
+                    on the project or delete it by clicking on the trashcan-icon. Further, you are able to open projects
+                    which
+                    are not listed with the "Import"-button.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="editor"></div>
+            <div>
+                <h1 class="display-3 assembus-doc-title">The Editor</h1>
+
+                <img alt="Overview" class="assembus-doc-image" data-action="zoom" src="img/manual/overview.png">
+
+                <p>
+                    The 3D preview visualizes all components of the assembled model. You can easily inspect the 3D model
+                    by using your mouse.
+                    To rotate the object, hold the right mouse button while moving the mouse. The mousewheel can be used
+                    to zoom in and out. Additionally, you can change the focus of the camera by double clicking a
+                    component of the 3D model or an entry of the hierarchical list. To change the focus without changing
+                    the selection you can press <kbd>Ctrl</kbd> while double clicking.
+                </p>
+
+                <img alt="Highlighting" class="assembus-doc-image" data-action="zoom" src="img/manual/highlighting.png">
+
+                <p>
+                    If you want to revert any changes you can use the Undo-button in
+                    the sidebar navigation. Similarly, you can move one step forward with the Redo-button.
+                    Alternatively, both action are mapped to a shortcut:
+                    <kbd><kbd>Ctrl</kbd>+<kbd>Z</kbd></kbd> to Undo and <kbd><kbd>Ctrl</kbd>+<kbd>Y</kbd></kbd>
+                    or <kbd><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></kbd> to
+                    Redo.
+                </p>
+                <br>
+                <h1> Editing the Assembly Line</h1>
+
+                <img alt="Station View Highlighting" class="assembus-doc-image" data-action="zoom"
+                     src="img/manual/station-view-drag.png">
+
+                <p>
+                    The editing of your assembly sequence is done in the hierarchical list. The actual assembly sequence
+                    is
+                    defined by the ordering of the elements inside the hierarchical list.
+                    The ordering can be modified by dragging elements. Multiple items can be selected by clicking and
+                    holding <kbd>Ctrl</kbd> while selecting items in the list. Press <kbd>Shift</kbd> to select all
+                    items
+                    between two boundaries.
+                </p>
+
+                <img alt="Context menu" class="assembus-doc-image-right" data-action="zoom"
+                     src="img/manual/context-menu.png">
+                <p>
+                    By default, all components are located inside the "Default Station". New assembly stations can be
+                    created by
+                    clicking the overflow-menu in the top and selecting "Create Station". The station will be added as a
+                    top-level group.
+                    Simply move components into the new station by using Drag&Drop.
+                    The separation into stations is used by the <a href=#station-view>Station View</a>.
+                    If the station view is open, you can also directly drag components onto the 3D editor
+                    to add them to the station.
+                </p>
+
+                <p>
+                    To keep the project clean and tidy, multiple components can be grouped.
+                    You can either right-click on an assembly station and select "Add Group" to create a new empty group
+                    or you can select multiple items to be grouped and right click on the selection and select
+                    "Group selected" to group the marked components.
+                    If you want to abstract pre-built components, you can fuse existing groups by right-clicking on a
+                    group and selecting "Fuse Group" to hide all items of the group from the user. Fused groups are
+                    marked with a chain icon and their content can be toggled by clicking at the icon.
+                </p>
+                <p>
+                    To rename a component, component group or assembly station, open the context menu with a right-click
+                    and select "Rename" to alter the displayed name.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="visualization"></div>
+            <div>
+                <h1 class="display-3 assembus-doc-title">Visualization</h1>
+
+                <h1 id="station-view">Station View</h1>
+
+                <p>
+                    The station view allows to fully assemble and disassemble the 3D model in realtime.
+                    It allows you to visualize and understand your built assembly line through the help
+                    of the 3D preview. You can use the default mouse navigation to view the 3D model.
+                </p>
+
+                <img alt="Station View" class="assembus-doc-image" data-action="zoom" src="img/manual/station-view.png">
+
+                <p>
+                    To open the station view for a specific assembly station, simply click on the box-pointer-icon
+                    of the corresponding station in the list.
+                </p>
+
+                <p>
+                    Use the skip-arrows on the bottom of the screen to incrementally assemble or disassemble all
+                    components.
+                    The dot-icon and the color highlighting in the hierarchical list indicate which components have
+                    already
+                    been assembled into the final model. <br/>
+                    Alternatively you can right-click on a list item and select "Skip To" to jump to the selected
+                    component.
+
+                    To switch the currently visible station, simply click on the navigation arrows on the top of the
+                    screen.
+                    The name of the currently visible station is displayed on the top of the screen.
+                </p>
+
+
+                <p>
+                    By default, all components which have been assembled in previous stations, are hidden to ensure
+                    clarity.
+                    You can enable visibility of components from preceding stations by clicking the eye-button in the
+                    upper right corner of the screen.
+                </p>
+
+
+                <h1 id="cinema-mode">Cinema Mode</h1>
+
+                <p>
+                    The cinema mode offers a movie-like experience to visualize the assembly process and to train
+                    assembly personnel.
+                    This mode works similar to the station view but is is not intended to apply changes to the assembly
+                    line but to solely
+                    playback the entire assembly process for employee training.
+                </p>
+
+                <img alt="Cinema Mode" class="assembus-doc-image" data-action="zoom" src="img/manual/cinema-mode.png">
+
+                <p>
+                    To open the cinema mode, simply click on the box-triangle icon on the sidebar. The cinema mode
+                    screen will appear and start with the very first assembly station.
+                    You can skip to the previous or next component with the skip buttons. The assembly speed/delay can
+                    be modified with the speed slider right next to the playback control buttons.
+                </p>
+
+                <p>
+                    Alternatively you can click and drag around the dot indicator which is placed on the progress bar,
+                    which
+                    is
+                    located above the playback controls to go one step back
+                    or forth. Each section of the progress bar represents one assembly station. The dot indicator shows
+                    the
+                    assembly progress inside the current station. To show the
+                    name of the assembly station and the amount of components, simply hover the mouse above the desired
+                    progress
+                    bar section.
+                </p>
+            </div>
+
+            <hr>
+
+            <div id="export"></div>
+            <div>
+                <h1 class="display-3 assembus-doc-title">Export</h1>
+
+                <p>
+                    The export function allows you to easily export your entire assembly line configuration, which
+                    includes
+                    all
+                    defined assembly stations, component ordering
+                    and (fused) component groups.
+                </p>
+
+                <p>
+                    Assembus exports your assembly line configuration as a simple ZIP file which uses the .bus
+                    file-ending.
+                    The
+                    ZIP directory contains the actual 3D OBJ file
+                    and the assembly line configuration which uses the XML meta language to describe the assembly
+                    sequence.
+                </p>
+
+                <p>
+                    To invoke the export, simply click on the box-icon with the upwards arrow, which is located in the
+                    sidebar.
+                    Specify an export directory and the desired
+                    export filename. Finally click the save button to export the Assembus project.
+                </p>
+
+                <p>
+                    The XML file contains the hierarchy as specified in Assembus,
+                    with an <code>&lt;AssemblyLine&gt;</code> root element.
+                    Since it's not guaranteed, that the OBJ file only contains unique names, the association is
+                    done with an artificial id, specified in the <code>id</code> attribute.
+                    The id for components looks like this: <code>assembus_item_X</code>,
+                    where <code>X</code> is the index of the corresponding item in the OBJ file, starting with 0.
+                </p>
+
+                <h1>Example</h1>
+
+                <code>
+                    &lt;AssemblyLine&gt;<br/>
+                    &nbsp&nbsp&lt;Station name=&quot;Default Station&quot; id=&quot;assembus_group_0&quot;&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;First Part&quot;
+                    id=&quot;assembus_item_0&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;Second Part&quot;
+                    id=&quot;assembus_item_1&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;Group name=&quot;First Group&quot; id=&quot;assembus_group_1&quot; isFused=&quot;true&quot;&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Group name=&quot;Inner Group&quot; id=&quot;assembus_group_2&quot;&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;Group Part 1&quot; id=&quot;assembus_item_3&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Component name=&quot;Group Part 2&quot; id=&quot;assembus_item_2&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;/Group&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&lt;Group name=&quot;Empty Group&quot; id=&quot;assembus_group_3&quot;/&gt;<br/>
+                    &nbsp&nbsp&nbsp&nbsp&lt;/Group&gt;<br/>
+                    &nbsp&nbsp&lt;/Station&gt;<br/>
+                    &nbsp&nbsp&lt;Station name=&quot;Assembly Station&quot; id=&quot;assembus_group_4&quot;/&gt;<br/>
+                    &lt;/AssemblyLine&gt;
+                </code>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container-md">
+        <span>Weichwarenprojekt 2021</span>
+        <img alt="Made with Unity" src="img/made-with-unity.png">
+    </div>
+</footer>
+
+</body>
+</html>
